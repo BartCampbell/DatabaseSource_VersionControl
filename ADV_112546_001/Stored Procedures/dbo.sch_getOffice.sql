@@ -7,7 +7,7 @@ GO
 -- Create date: Mar-12-2014
 -- Description:	RA Coder will use this sp to pull list of providers in a project
 -- =============================================
---	sch_getOffice @Projects='0', @ProjectGroup='0', @Page=1, @PageSize=100, @Alpha='', @Sort='', @Order='', @Provider=9, @bucket=0, @followup_bucket=0, @user=60, @scheduler=60, @PoolPK=0, @ZonePK=0, @OFFICE=0
+--	sch_getOffice @Projects='0', @ProjectGroup='0', @Page=1, @PageSize=100, @Alpha='', @Sort='', @Order='', @Provider=9, @bucket=0, @followup_bucket=0, @user=1, @scheduler=0, @PoolPK=0, @ZonePK=0, @OFFICE=0
 CREATE PROCEDURE [dbo].[sch_getOffice] 
 	@Projects varchar(100),
 	@ProjectGroup varchar(10),

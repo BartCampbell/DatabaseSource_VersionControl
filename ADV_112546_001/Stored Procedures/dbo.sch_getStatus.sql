@@ -2,7 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
---  sch_getStatus '0',0,0,60,2,0
+--  sch_getStatus '0',0,0,1,0,0,1
 CREATE PROCEDURE [dbo].[sch_getStatus]
 	@Projects varchar(500),
 	@ProjectGroup varchar(10),
@@ -55,21 +55,21 @@ BEGIN
 		END
 	END
 
-
+	SELECT PO.ProviderOfficeBucket_PK, COUNT(DISTINCT PO.ProviderOffice_PK) Offices INTO #Buckets
+		FROM tblProviderOffice PO WITH (NOLOCK)
+			INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON cPO.ProviderOffice_PK = PO.ProviderOffice_PK
+			INNER JOIN #tmpProject P ON P.Project_PK = cPO.Project_PK
+			LEFT JOIN tblZoneZipcode ZZC WITH (NOLOCK) ON ZZC.ZipCode_PK = PO.ZipCode_PK
+		WHERE (@PoolPK=0 OR PO.Pool_PK=@PoolPK)
+			AND (@ZonePK=0 OR ZZC.Zone_PK=@ZonePK)
+			AND (@scheduler=0 OR PO.AssignedUser_PK=@scheduler)
+	GROUP BY PO.ProviderOfficeBucket_PK
+	CREATE INDEX idxProviderOfficeBucket_PK ON #Buckets (ProviderOfficeBucket_PK)
 
 	--Main Buckets
 	SELECT POB.ProviderOfficeBucket_PK, POB.Bucket, Offices ,POB.sortOrder
 		FROM tblProviderOfficeBucket POB WITH (NOLOCK)
-			OUTER APPLY (SELECT COUNT(DISTINCT PO.ProviderOffice_PK) Offices 
-						FROM tblProviderOffice PO WITH (NOLOCK)
-							INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON cPO.ProviderOffice_PK = PO.ProviderOffice_PK
-							INNER JOIN #tmpProject P ON P.Project_PK = cPO.Project_PK
-							LEFT JOIN tblZoneZipcode ZZC WITH (NOLOCK) ON ZZC.ZipCode_PK = PO.ZipCode_PK
-						WHERE POB.ProviderOfficeBucket_PK = PO.ProviderOfficeBucket_PK
-							AND (@PoolPK=0 OR PO.Pool_PK=@PoolPK)
-							AND (@ZonePK=0 OR ZZC.Zone_PK=@ZonePK)
-							AND (@scheduler=0 OR PO.AssignedUser_PK=@scheduler)
-						) X
+			LEFT JOIN #Buckets PO ON POB.ProviderOfficeBucket_PK = PO.ProviderOfficeBucket_PK
 	WHERE POB.IsVisible=1
 	ORDER BY POB.sortOrder
 

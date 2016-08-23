@@ -38,7 +38,7 @@ BEGIN
 	;With tbl AS(
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY M.Lastname ASC) AS [#],
-			M.Member_ID,M.Lastname+IsNull(', '+M.Firstname,'') Member,
+			S.ChaseID,M.Member_ID,M.Lastname+IsNull(', '+M.Firstname,'') Member,
 			PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider,
 			S.Scanned_Date Extracted,
 			CD.Coded_Date Coded,

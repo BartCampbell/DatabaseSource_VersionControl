@@ -9,7 +9,7 @@ GO
 -- Description:	
 -- =============================================
 /* Sample Executions
-rdb_getRetroBurndownDrill 0,1,1,'08/26/2015',0
+rdb_getRetroBurndownDrill 0,1,'0',1,'08/26/2015',0
 */
 CREATE PROCEDURE [dbo].[rdb_getRetroBurndownDrill]
 	@Projects varchar(20),
@@ -39,11 +39,12 @@ BEGIN
 	--Schedule Info
 	CREATE TABLE #tmp(Suspect_PK [bigint] NOT NULL primary key,Sch_Date date)
 	INSERT INTO #tmp
-	SELECT DISTINCT S.Suspect_PK,MIN(PO.LastUpdated_Date) Sch_Date, MIN(PO.sch_type)
+	SELECT DISTINCT S.Suspect_PK,MIN(IsNull(PO.LastUpdated_Date,S.Scanned_Date)) Sch_Date--, MIN(PO.sch_type)
 	FROM tblSuspect S WITH (NOLOCK)
 			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
+	WHERE PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL
 	GROUP BY S.Suspect_PK
 
 	--Overall Progress for All Projects
@@ -51,7 +52,7 @@ BEGIN
 	BEGIN
 		SELECT 
 			S.Project_PK,Pr.Project_Name Project,
-			COUNT(CASE WHEN IsNull(IsNull(T.Sch_Date,S.Scanned_Date),S.CNA_Date) IS NOT NULL THEN S.Suspect_PK ELSE NULL END) Scheduled,
+			COUNT(CASE WHEN IsNull(T.Sch_Date,S.Scanned_Date) IS NOT NULL THEN S.Suspect_PK ELSE NULL END) Scheduled,
 			COUNT(CASE WHEN S.IsScanned=1 THEN S.Suspect_PK ELSE NULL END) Extracted,
 			COUNT(CASE WHEN S.IsScanned=0 AND S.IsCNA=1 THEN S.Suspect_PK ELSE NULL END) CNA,
 			COUNT(CASE WHEN S.IsCoded=1 THEN S.Suspect_PK ELSE NULL END) Coded
@@ -71,7 +72,7 @@ BEGIN
 		With tbl AS(
 			SELECT 
 				ROW_NUMBER() OVER(ORDER BY M.Lastname ASC) AS [#],
-				M.Member_ID,M.Lastname+IsNull(', '+M.Firstname,'') Member,
+				S.ChaseID,M.Member_ID,M.Lastname+IsNull(', '+M.Firstname,'') Member,
 				PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider,
 				PO.Address,ZC.ZipCode [Zip Code],ZC.City,ZC.State,
 				POB.Bucket [Office Status],
@@ -88,7 +89,7 @@ BEGIN
 				LEFT JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON PO.ProviderOfficeBucket_PK = POB.ProviderOfficeBucket_PK
 				LEFT JOIN tblZipCode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK
 				LEFT JOIN #tmp T ON T.Suspect_PK = S.Suspect_PK
-				WHERE  (@DrillType=1 AND IsNull(IsNull(T.Sch_Date,S.Scanned_Date),S.CNA_Date)<@Dt)
+				WHERE  (@DrillType=1 AND IsNull(T.Sch_Date,S.Scanned_Date)<@Dt)
 					OR (@DrillType=2 AND S.Scanned_Date<@Dt)
 					OR (@DrillType=3 AND S.Coded_Date<@Dt)
 					OR (@DrillType=4 AND S.CNA_Date<@Dt)

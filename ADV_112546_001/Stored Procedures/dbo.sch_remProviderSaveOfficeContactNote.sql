@@ -2,7 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
---	[sch_cancelAppointment] 7,1
+--	sch_remProviderSaveOfficeContactNote @project=0, @old_office=107, @provider=391, @note=41, @aditionaltext='Removing Provider', @User_PK=1, @contact_num=0, @followup=0;
 CREATE PROCEDURE [dbo].[sch_remProviderSaveOfficeContactNote] 
 	@project int,
 	@old_office int,

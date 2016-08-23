@@ -14,7 +14,7 @@ CREATE PROCEDURE [dbo].[sa_getPools]
 AS
 BEGIN
 	SELECT Pool_PK,Pool_Name
-			  ,IsBucketRule,ProviderOfficeBucket_PK
+			  ,IsBucketRule
 			  ,IsFollowupRule
 			  ,IsRemainingRule,RemainingCharts,RemainingChartsMoreOrEqual
 			  ,IsLastScheduledRule,DaysSinceLastScheduled

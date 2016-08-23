@@ -22,7 +22,7 @@ BEGIN
 	SELECT TOP 1 @InvoicePK=ProviderOfficeInvoice_PK FROM tblExtractionQueueAttachLog WITH (NOLOCK) WHERE IsProcessed=0 AND IsInvoice=1 AND ExtractionQueue_PK=@fileID AND PageFrom=@pgFrom AND PageTo=@pgTo
 	IF (@InvoicePK IS NULL)
 	BEGIN
-		INSERT INTO tblProviderOfficeInvoice(InvoiceAmount,InvoiceNumber,InvoiceVendor_PK,ProviderOffice_PK) VALUES(@invoiceAmount,@invoiceNumber,@invoiceVendor,@office)
+		INSERT INTO tblProviderOfficeInvoice(InvoiceAmount,InvoiceNumber,InvoiceVendor_PK,ProviderOffice_PK,dtUpdate,UploadDate,Update_User_PK) VALUES(@invoiceAmount,@invoiceNumber,@invoiceVendor,@office,GETDATE(),GetDate(),@usr)
 		SELECT @InvoicePK = @@IDENTITY
 	END
 	ELSE

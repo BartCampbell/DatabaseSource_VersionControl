@@ -11,7 +11,8 @@ CREATE PROCEDURE [dbo].[sr_getOffice]
 	@Alpha Varchar(2),
 	@Sort Varchar(150),
 	@Order Varchar(4),
-	@filter_type int,
+	@bucket int,
+	@followup_bucket int,
 	@user int,
 	@oid bigint,
 	@segment int
@@ -48,10 +49,10 @@ BEGIN
 		ORDER BY 
 			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'AD' THEN PO.Address WHEN 'CT' THEN ZC.City WHEN 'CN' THEN ZC.County WHEN 'ST' THEN ZC.State WHEN 'ZC' THEN ZC.Zipcode ELSE NULL END END ASC,
 			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'AD' THEN PO.Address WHEN 'CT' THEN ZC.City WHEN 'CN' THEN ZC.County WHEN 'ST' THEN ZC.State WHEN 'ZC' THEN ZC.Zipcode ELSE NULL END END DESC,
-			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'CD' THEN SUM(cPO.charts) WHEN 'SC' THEN SUM(cPO.extracted_count) WHEN 'CH' THEN SUM(cPO.coded_count)  WHEN 'OS' THEN MIN(cPO.office_status) WHEN 'PRV' THEN SUM(cPO.providers) ELSE NULL END END ASC,
-			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'CD' THEN SUM(cPO.charts) WHEN 'SC' THEN SUM(cPO.extracted_count) WHEN 'CH' THEN SUM(cPO.coded_count)  WHEN 'OS' THEN MIN(cPO.office_status) WHEN 'PRV' THEN SUM(cPO.providers) ELSE NULL END END DESC --,
+			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'CD' THEN SUM(cPO.charts) WHEN 'SC' THEN SUM(cPO.extracted_count) WHEN 'CH' THEN SUM(cPO.coded_count)  WHEN 'OS' THEN PO.ProviderOfficeBucket_PK WHEN 'PRV' THEN SUM(cPO.providers) ELSE NULL END END ASC,
+			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'CD' THEN SUM(cPO.charts) WHEN 'SC' THEN SUM(cPO.extracted_count) WHEN 'CH' THEN SUM(cPO.coded_count)  WHEN 'OS' THEN PO.ProviderOfficeBucket_PK WHEN 'PRV' THEN SUM(cPO.providers) ELSE NULL END END DESC --,
 		) AS RowNumber
-			,MIN(cPO.office_status) OfficeStatus		
+			,PO.ProviderOfficeBucket_PK OfficeStatus		
 			,0 Project_PK,IsNull(PO.ProviderOffice_PK,0) ProviderOffice_PK,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode
 			,SUM(cPO.providers) Providers
 			,SUM(cPO.charts) charts
@@ -66,30 +67,11 @@ BEGIN
 			LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
 			LEFT JOIN #tmpSearch S ON S.ProviderOffice_PK = cPO.ProviderOffice_PK
 		WHERE IsNull(PO.Address,0) Like @Alpha+'%'
-			AND (@filter_type=0
-				OR (@filter_type=1 AND office_status IN (1,2,3,4)) --Offices Contacted
-				OR (@filter_type=2 AND office_status IN (1,2,3,4) AND charts=cna_count)	--Offices Not Available
-				OR (@filter_type=3 AND office_status=4 AND charts<>cna_count)	--Offices Not Scheduled
-				OR (@filter_type=4 AND office_status IN (1,2,3)) --Offices Scheduled
-				OR (@filter_type=5 AND office_status=3 AND charts=cna_count) --Offices Not Available
-				OR (@filter_type=6 AND office_status=3 AND charts<>cna_count) --Offices Not Scanned
-				OR (@filter_type=7 AND office_status IN (1,2)) --Offices Scanned
-				OR (@filter_type=8 AND office_status IN (2)) --Offices Not Coded
-				 --Charts Not Available		21
-				 --Charts Scanned			22
-				 --Charts Remaining			23
-				 OR (@filter_type=9 AND office_status IN (1)) --Offices Coded
-				 --Charts Coded				24
-				 --Charts Not Available		25
-				 --Charts Scanned			26
-				 --Charts Remaining			27
-				 OR (@filter_type=10 AND office_status=5) --Offices Not Contacted
-				 OR (@filter_type=11 AND office_status=5 AND charts=cna_count) --Offices Not Contacted
-				 OR (@filter_type=12 AND office_status=5 AND charts<>cna_count) --Offices Not Contacted
-			)
+			AND (@bucket=0 OR PO.ProviderOfficeBucket_PK=@bucket)
+			AND (@followup_bucket=0 OR follow_up<=GetDate())
 			AND (@oid=0 OR S.ProviderOffice_PK IS NOT NULL)
 			AND (@segment=0 OR S.ProviderOffice_PK IS NOT NULL)
-		GROUP BY PO.ProviderOffice_PK,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode
+		GROUP BY PO.ProviderOffice_PK,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode,PO.ProviderOfficeBucket_PK
 	
 	SELECT * FROM #tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
 	

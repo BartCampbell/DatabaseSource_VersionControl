@@ -7,7 +7,7 @@ GO
 -- Create date: Mar-12-2014
 -- Description:	RA Coder will use this sp to pull list of providers in a project
 -- =============================================
---	sr_getExportSummary 1,1,1
+--	sr_getExportSummary 1,1,0,1
 CREATE PROCEDURE [dbo].[sr_getExportSummary] 
 	@Projects varchar(100),
 	@ProjectGroup varchar(10),
@@ -30,33 +30,45 @@ BEGIN
 	ELSE
 		EXEC ('INSERT INTO #tmpProject(Project_PK) SELECT Project_PK FROM tblProject WHERE Project_PK IN ('+@Projects+') AND ('+@ProjectGroup+'=0 OR ProjectGroup_PK='+@ProjectGroup+')');	
 	-- PROJECT SELECTION
+
+	--Schedule Info
+	CREATE TABLE #tmpSch(Project_PK [int] NOT NULL,Provider_PK bigint NOT NULL,Schedule DateTime) --,
+	--PRINT 'INSERT INTO #tmp'
+	INSERT INTO #tmpSch
+	SELECT DISTINCT S.Project_PK,S.Provider_PK,MIN(IsNull(PO.LastUpdated_Date,S.Scanned_Date)) Schedule
+	FROM tblSuspect S WITH (NOLOCK)
+			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
+			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
+			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
+	WHERE PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL
+	GROUP BY S.Project_PK,S.Provider_PK
+	CREATE CLUSTERED INDEX  idxTProjectPK ON #tmpSch (Project_PK,Provider_PK)
 ;
     
 	--Project Summary
 	SELECT 
 		(SELECT COUNT(*) FROM tblSuspect S WITH (NOLOCK) INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK WHERE (@segment=0 OR M.Segment_PK=@segment)) TotalCharts,
-		(SELECT COUNT(DISTINCT S.Suspect_PK) FROM tblSuspect S WITH (NOLOCK) 
-			INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
-			INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
-			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
-			INNER JOIN cacheProviderOffice cPO WITH (NOLOCK)  ON tP.Project_PK = cPO.Project_PK AND P.ProviderOffice_PK = cPO.ProviderOffice_PK
-			WHERE cPO.office_status IN (1,2,3) AND  (@segment=0 OR M.Segment_PK=@segment)
+		(SELECT COUNT(DISTINCT S.Suspect_PK)
+			FROM tblSuspect S WITH (NOLOCK)
+			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK 
+			INNER JOIN #tmpSch Sch ON Sch.Project_PK = S.Project_PK AND Sch.Provider_PK = S.Provider_PK
+			WHERE (@segment=0 OR M.Segment_PK=@segment)
 		) ScheduledCharts,
 		(SELECT COUNT(*) FROM tblSuspect S WITH (NOLOCK) INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK WHERE S.IsScanned=1 AND (@segment=0 OR M.Segment_PK=@segment)) ScannedCharts,
-		(SELECT COUNT(*) FROM tblSuspect S WITH (NOLOCK) INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK WHERE S.IsCNA=1 AND (@segment=0 OR M.Segment_PK=@segment)) CNACharts,
+		(SELECT COUNT(*) FROM tblSuspect S WITH (NOLOCK) INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK WHERE S.IsCNA=1 AND S.IsScanned=0 AND (@segment=0 OR M.Segment_PK=@segment)) CNACharts,
 		(SELECT COUNT(*) FROM tblSuspect S WITH (NOLOCK) INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK WHERE S.IsCoded=1 AND (@segment=0 OR M.Segment_PK=@segment)) AuditedCharts,
 		(SELECT COUNT(DISTINCT S.Suspect_PK) FROM tblSuspect S WITH (NOLOCK) 
 			INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
 			INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
 			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK 
-			INNER JOIN tblProviderOfficeStatus cPO WITH (NOLOCK)  ON tP.Project_PK = cPO.Project_PK AND P.ProviderOffice_PK = cPO.ProviderOffice_PK
+			INNER JOIN tblProviderOfficeStatus cPO WITH (NOLOCK)  ON P.ProviderOffice_PK = cPO.ProviderOffice_PK
 			WHERE cPO.OfficeIssueStatus IN (1,6) AND (@segment=0 OR M.Segment_PK=@segment)
 		) OfficeWithNotesCharts,
 		(SELECT COUNT(DISTINCT cPO.ProviderOffice_PK) FROM tblSuspect S WITH (NOLOCK) 
 			INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
 			INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
 			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK 
-			INNER JOIN tblProviderOfficeStatus cPO WITH (NOLOCK)  ON tP.Project_PK = cPO.Project_PK AND P.ProviderOffice_PK = cPO.ProviderOffice_PK
+			INNER JOIN tblProviderOfficeStatus cPO WITH (NOLOCK)  ON P.ProviderOffice_PK = cPO.ProviderOffice_PK
 			WHERE cPO.OfficeIssueStatus IN (1,6) AND (@segment=0 OR M.Segment_PK=@segment)
 		) OfficeWithNotes    
 
@@ -66,8 +78,8 @@ BEGIN
 		,PM.Lastname+IsNull(', '+PM.Firstname,'') [Provider Name]
 		,PO.Address [Address Line 1],ZC.City,ZC.ZipCode,ZC.State
 		,PO.GroupName [Group Name],PO.ContactPerson [Contact Name],PO.ContactNumber [Phone Number]
-		,T.Schedule
-		,CASE WHEN DATEDIFF(day,T.Schedule,GetDate())>0 AND (Count(DISTINCT S.Suspect_PK)-COUNT(DISTINCT CASE WHEN Scanned_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END)-COUNT(DISTINCT CASE WHEN CNA_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END))>0 THEN CAST(DATEDIFF(day,T.Schedule,GetDate()) AS VARCHAR(10)) ELSE '' END [Days Overdue]
+		,Sch.Schedule
+		,CASE WHEN DATEDIFF(day,Sch.Schedule,GetDate())>0 AND (Count(DISTINCT S.Suspect_PK)-COUNT(DISTINCT CASE WHEN Scanned_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END)-COUNT(DISTINCT CASE WHEN CNA_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END))>0 THEN CAST(DATEDIFF(day,Sch.Schedule,GetDate()) AS VARCHAR(10)) ELSE '' END [Days Overdue]
 		--Alex Palomino for 10/24/2013 1300-1800 Hrs
     	,Count(DISTINCT S.Suspect_PK) Charts
     	,COUNT(DISTINCT CASE WHEN Scanned_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END) Scanned
@@ -76,12 +88,13 @@ BEGIN
 		,PM.TIN		
     	FROM tblSuspect S
 		INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
-		INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK    	
+		INNER JOIN #tmpSch Sch ON Sch.Project_PK = S.Project_PK AND Sch.Provider_PK = S.Provider_PK    	
     	INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
 		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
     	INNER JOIN tblProviderOffice PO ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 		INNER JOIN cacheProviderOffice cPO ON cPO.Project_PK = S.Project_PK AND cPO.ProviderOffice_PK = PO.ProviderOffice_PK
     	LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK=PO.ZipCode_PK
+		/*
     	OUTER APPLY (
     					--SELECT TOP 1 IsNull(U.Firstname+' '+U.Lastname+' for ','')+CAST(Month(Sch_Start) AS VARCHAR)+'/'+CAST(Day(Sch_Start) AS VARCHAR)+'/'+CAST(Year(Sch_Start) AS VARCHAR)+' '+Right(0+CAST(DatePart(Hour,Sch_Start) AS VARCHAR),2)+Right(0+CAST(DatePart(Minute,Sch_Start) AS VARCHAR),2)+'-'+Right(0+CAST(DatePart(Hour,Sch_End) AS VARCHAR),2)+Right(0+CAST(DatePart(Minute,Sch_End) AS VARCHAR),2)+' Hrs' Schedule
 						SELECT TOP 1 Sch_Start Schedule
@@ -90,9 +103,9 @@ BEGIN
     					WHERE POS.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = POS.Project_PK 
     					ORDER BY Sch_Start DESC
     				) T
-    WHERE --T.Schedule IS NOT NULL AND 
-		cPO.office_status IN (1,2,3) AND (@segment=0 OR M.Segment_PK=@segment)
-    GROUP BY PM.Provider_ID,PM.Lastname,PM.Firstname,PO.Address,ZC.City,ZC.State,ZC.ZipCode,PM.TIN,PO.GroupName,PO.ContactPerson,PO.ContactNumber,T.Schedule
+					*/
+    WHERE (@segment=0 OR M.Segment_PK=@segment)
+    GROUP BY PM.Provider_ID,PM.Lastname,PM.Firstname,PO.Address,ZC.City,ZC.State,ZC.ZipCode,PM.TIN,PO.GroupName,PO.ContactPerson,PO.ContactNumber,Sch.Schedule
     ORDER BY PM.Lastname,PM.Firstname
     
     --Not Scheduled Providers
@@ -108,9 +121,9 @@ BEGIN
     	INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
 		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
     	LEFT JOIN tblProviderOffice PO ON P.ProviderOffice_PK = PO.ProviderOffice_PK
-		LEFT JOIN cacheProviderOffice cPO ON cPO.Project_PK = S.Project_PK AND cPO.ProviderOffice_PK = PO.ProviderOffice_PK
     	LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK=PO.ZipCode_PK
-    WHERE IsNull(cPO.office_status,5) IN (4,5) AND (@segment=0 OR M.Segment_PK=@segment)
+		LEFT JOIN #tmpSch Sch ON Sch.Project_PK = S.Project_PK AND Sch.Provider_PK = S.Provider_PK
+    WHERE Sch.Provider_PK IS NULL AND (@segment=0 OR M.Segment_PK=@segment)
     GROUP BY PM.Provider_ID,PM.Lastname,PM.Firstname,PO.Address,ZC.City,ZC.State,ZC.ZipCode,PM.TIN,PO.GroupName,PO.ContactPerson,PO.ContactNumber
     ORDER BY PM.Lastname,PM.Firstname    
  
@@ -118,13 +131,13 @@ BEGIN
 	CREATE TABLE #tmpIssueOffice(Project_PK [int] NOT NULL,ProviderOffice_PK BIGINT NOT NULL,ContactNote_PK TinyInt NOT NULL PRIMARY KEY CLUSTERED (Project_PK ASC,ProviderOffice_PK ASC,ContactNote_PK ASC)) ON [PRIMARY]
 
 	Insert Into #tmpIssueOffice
-	SELECT DISTINCT PO.Project_PK,PO.ProviderOffice_PK,T.ContactNote_PK
+	SELECT DISTINCT 0 Project_PK,PO.ProviderOffice_PK,T.ContactNote_PK
 	FROM  tblProviderOfficeStatus PO
 		CROSS Apply (
 			SELECT TOP 1 CNO.ContactNote_PK 
 				FROM tblContactNotesOffice CNO INNER JOIN tblContactNote CN 
 					ON CN.ContactNote_PK = CNO.ContactNote_PK
-				WHERE PO.Project_PK = CNO.Project_PK AND PO.ProviderOffice_PK = CNO.Office_PK AND CN.IsIssue=1
+				WHERE PO.ProviderOffice_PK = CNO.Office_PK AND CN.IsIssue=1 --PO.Project_PK = CNO.Project_PK AND 
 				ORDER BY CNO.LastUpdated_Date DESC) T
 		WHERE PO.OfficeIssueStatus IN (1,2,5,6) 
 
@@ -142,7 +155,7 @@ BEGIN
     	INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
 		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
     	INNER JOIN tblProviderOffice PO ON P.ProviderOffice_PK = PO.ProviderOffice_PK
-		INNER JOIN #tmpIssueOffice tIO ON tIO.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = tIO.Project_PK
+		INNER JOIN #tmpIssueOffice tIO ON tIO.ProviderOffice_PK = PO.ProviderOffice_PK --AND S.Project_PK = tIO.Project_PK
 		INNER JOIN tblContactNote CN ON CN.ContactNote_PK = tIO.ContactNote_PK
 		LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK=PO.ZipCode_PK
     WHERE (@segment=0 OR M.Segment_PK=@segment)

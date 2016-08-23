@@ -3,7 +3,6 @@ CREATE TABLE [dbo].[tblPool]
 [Pool_PK] [smallint] NOT NULL IDENTITY(1, 1),
 [Pool_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [IsBucketRule] [bit] NULL,
-[ProviderOfficeBucket_PK] [tinyint] NULL,
 [IsFollowupRule] [bit] NULL,
 [IsRemainingRule] [bit] NULL,
 [RemainingCharts] [smallint] NULL,
@@ -24,8 +23,6 @@ CREATE TABLE [dbo].[tblPool]
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblPool] ADD CONSTRAINT [PK_tblPool] PRIMARY KEY CLUSTERED  ([Pool_PK]) ON [PRIMARY]
-GO
-CREATE NONCLUSTERED INDEX [IX_tblPool_Bucket] ON [dbo].[tblPool] ([ProviderOfficeBucket_PK]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_tblPool_Team] ON [dbo].[tblPool] ([SchedulerTeam_PK]) ON [PRIMARY]
 GO

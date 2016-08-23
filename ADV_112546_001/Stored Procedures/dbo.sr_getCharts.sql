@@ -19,7 +19,8 @@ CREATE PROCEDURE [dbo].[sr_getCharts]
 	@Order Varchar(4),
 	@Office int,
 	@Provider int,
-	@filter_type int,
+	@bucket int,
+	@followup_bucket int,
 	@user int,
 	@mid bigint,
 	@segment int
@@ -68,37 +69,15 @@ BEGIN
 			INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
 			INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
 			INNER JOIN tblMember M WITH (NOLOCK) ON S.Member_PK = M.Member_PK
-			INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON cPO.ProviderOffice_PK = P.ProviderOffice_PK AND cPO.Project_PK = S.Project_PK
-			--LEFT JOIN tblSuspectScanningNotes SSN WITH (NOLOCK) ON SSN.Suspect_PK = S.Suspect_PK
-			--LEFT JOIN tblScanningNotes SN WITH (NOLOCK) ON SSN.ScanningNote_PK = SN.ScanningNote_PK
-			--LEFT JOIN #OfficeCNA OCNA WITH (NOLOCK) ON cPO.Project_PK = OCNA.Project_PK AND cPO.ProviderOffice_PK = OCNA.Office_PK
-			
+			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK = P.ProviderOffice_PK
+			INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON S.Project_PK = cPO.Project_PK AND PO.ProviderOffice_PK = cPO.ProviderOffice_PK
 		WHERE (@Office=0 OR P.ProviderOffice_PK=@Office)
 			AND (@Provider=0 OR P.Provider_PK=@Provider)
 			AND (@segment=0 OR M.Segment_PK=@segment)
 			AND (@mid=0 OR S.Member_PK=@mid)
 			AND IsNull(M.Lastname+IsNull(', '+M.Firstname,''),0) Like @Alpha+'%'
-			AND (@filter_type=0
-				OR (@filter_type=1 AND office_status IN (1,2,3,4)) --Offices Contacted
-				OR (@filter_type=2 AND office_status IN (1,2,3,4) AND charts=cna_count)	--Offices Not Available
-				OR (@filter_type=3 AND office_status=4 AND charts<>cna_count)	--Offices Not Scheduled
-				OR (@filter_type=4 AND office_status IN (1,2,3)) --Offices Scheduled
-				OR (@filter_type=5 AND office_status=3 AND charts=cna_count) --Offices Not Available
-				OR (@filter_type=6 AND office_status=3 AND charts<>cna_count) --Offices Not Scanned
-				OR (@filter_type=7 AND office_status IN (1,2)) --Offices Scanned
-				OR (@filter_type=8 AND office_status=2) --Offices Not Coded
-					OR (@filter_type=21 AND office_status=2 AND S.IsCNA=1)								-- Charts Not Available		21
-					OR (@filter_type=22 AND office_status=2 AND IsScanned=1)							-- Charts Scanned			22
-					OR (@filter_type=23 AND office_status=2 AND IsScanned=0 AND S.IsCNA=0)				-- Charts Remaining			23
-				OR (@filter_type=9 AND office_status=1) --Offices Coded
-					OR (@filter_type=24 AND office_status=1 AND IsCoded=1)								-- Charts Coded				24
-					OR (@filter_type=25 AND office_status=1 AND S.IsCNA=1)									-- Charts Not Available		25
-					OR (@filter_type=26 AND office_status=1 AND IsCoded=1)								-- Charts Scanned			26
-					OR (@filter_type=27 AND office_status=1 AND IsScanned=0 AND S.IsCNA=0 AND IsCoded=0)	-- Charts Remaining			27
-				 OR (@filter_type=10 AND office_status=5) --Offices Not Contacted
-				 OR (@filter_type=11 AND office_status=5 AND charts=cna_count) --Offices Not Contacted
-				 OR (@filter_type=12 AND office_status=5 AND charts<>cna_count) --Offices Not Contacted
-			)
+			AND (@bucket=0 OR PO.ProviderOfficeBucket_PK=@bucket)
+			AND (@followup_bucket=0 OR follow_up<=GetDate())
 	)
 				
 	SELECT * FROM tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber;
@@ -109,33 +88,15 @@ BEGIN
 			INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
 			INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
 			INNER JOIN tblMember M WITH (NOLOCK) ON S.Member_PK = M.Member_PK
-			INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON cPO.ProviderOffice_PK = P.ProviderOffice_PK AND cPO.Project_PK = S.Project_PK
+			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK = P.ProviderOffice_PK
+			INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON S.Project_PK = cPO.Project_PK AND PO.ProviderOffice_PK = cPO.ProviderOffice_PK
 						
 		WHERE (@Office=0 OR P.ProviderOffice_PK=@Office)
 		AND (@Provider=0 OR P.Provider_PK=@Provider)
 		AND (@segment=0 OR M.Segment_PK=@segment)
 		AND (@mid=0 OR S.Member_PK=@mid)
-			AND (@filter_type=0
-				OR (@filter_type=1 AND office_status IN (1,2,3,4)) --Offices Contacted
-				OR (@filter_type=2 AND office_status IN (1,2,3,4) AND charts=cna_count)	--Offices Not Available
-				OR (@filter_type=3 AND office_status=4 AND charts<>cna_count)	--Offices Not Scheduled
-				OR (@filter_type=4 AND office_status IN (1,2,3)) --Offices Scheduled
-				OR (@filter_type=5 AND office_status=3 AND charts=cna_count) --Offices Not Available
-				OR (@filter_type=6 AND office_status=3 AND charts<>cna_count) --Offices Not Scanned
-				OR (@filter_type=7 AND office_status IN (1,2)) --Offices Scanned
-				OR (@filter_type=8 AND office_status=2) --Offices Not Coded
-					OR (@filter_type=21 AND office_status=2 AND IsCNA=1)								-- Charts Not Available		21
-					OR (@filter_type=22 AND office_status=2 AND IsScanned=1)							-- Charts Scanned			22
-					OR (@filter_type=23 AND office_status=2 AND IsScanned=0 AND IsCNA=0)				-- Charts Remaining			23
-				OR (@filter_type=9 AND office_status=1) --Offices Coded
-					OR (@filter_type=24 AND office_status=1 AND IsCoded=1)								-- Charts Coded				24
-					OR (@filter_type=25 AND office_status=1 AND IsCNA=1)									-- Charts Not Available		25
-					OR (@filter_type=26 AND office_status=1 AND IsCoded=1)								-- Charts Scanned			26
-					OR (@filter_type=27 AND office_status=1 AND IsScanned=0 AND IsCNA=0 AND IsCoded=0)	-- Charts Remaining			27
-				 OR (@filter_type=10 AND office_status=5) --Offices Not Contacted
-				 OR (@filter_type=11 AND office_status=5 AND charts=cna_count) --Offices Not Contacted
-				 OR (@filter_type=12 AND office_status=5 AND charts<>cna_count) --Offices Not Contacted
-			)
+		AND (@bucket=0 OR PO.ProviderOfficeBucket_PK=@bucket)
+		AND (@followup_bucket=0 OR follow_up<=GetDate())
 		GROUP BY LEFT(M.Lastname+IsNull(', '+M.Firstname,''),1), RIGHT(LEFT(M.Lastname+IsNull(', '+M.Firstname,''),2),1)			
 		ORDER BY alpha1, alpha2;
 			
@@ -149,32 +110,14 @@ BEGIN
 			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK	
 			INNER JOIN tblMember M WITH (NOLOCK) ON S.Member_PK = M.Member_PK
 			INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK	
-			INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON cPO.ProviderOffice_PK = P.ProviderOffice_PK AND cPO.Project_PK = S.Project_PK
+			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK = P.ProviderOffice_PK
+			INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON S.Project_PK = cPO.Project_PK AND PO.ProviderOffice_PK = cPO.ProviderOffice_PK
 						
 		WHERE (@Office=0 OR P.ProviderOffice_PK=@Office)
 			AND (@Provider=0 OR P.Provider_PK=@Provider)
 			AND (@segment=0 OR M.Segment_PK=@segment)
 			AND (@mid=0 OR S.Member_PK=@mid)
-			AND (@filter_type=0
-				OR (@filter_type=1 AND office_status IN (1,2,3,4)) --Offices Contacted
-				OR (@filter_type=2 AND office_status IN (1,2,3,4) AND charts=cna_count)	--Offices Not Available
-				OR (@filter_type=3 AND office_status=4 AND charts<>cna_count)	--Offices Not Scheduled
-				OR (@filter_type=4 AND office_status IN (1,2,3)) --Offices Scheduled
-				OR (@filter_type=5 AND office_status=3 AND charts=cna_count)		--Offices Not Available
-				OR (@filter_type=6 AND office_status=3 AND charts<>cna_count)		--Offices Not Scanned
-				OR (@filter_type=7 AND office_status IN (1,2)) --Offices Scanned
-				OR (@filter_type=8 AND office_status=2) --Offices Not Coded
-					OR (@filter_type=21 AND office_status=2 AND IsCNA=1)								-- Charts Not Available		21
-					OR (@filter_type=22 AND office_status=2 AND IsScanned=1)							-- Charts Scanned			22
-					OR (@filter_type=23 AND office_status=2 AND IsScanned=0 AND IsCNA=0)				-- Charts Remaining			23
-				OR (@filter_type=9 AND office_status=1) --Offices Coded
-					OR (@filter_type=24 AND office_status=1 AND IsCoded=1)								-- Charts Coded				24
-					OR (@filter_type=25 AND office_status=1 AND IsCNA=1)									-- Charts Not Available		25
-					OR (@filter_type=26 AND office_status=1 AND IsCoded=1)								-- Charts Scanned			26
-					OR (@filter_type=27 AND office_status=1 AND IsScanned=0 AND IsCNA=0 AND IsCoded=0)	-- Charts Remaining			27
-				 OR (@filter_type=10 AND office_status=5) --Offices Not Contacted
-				 OR (@filter_type=11 AND office_status=5 AND charts=cna_count) --Offices Not Contacted
-				 OR (@filter_type=12 AND office_status=5 AND charts<>cna_count) --Offices Not Contacted
-			)
+			AND (@bucket=0 OR PO.ProviderOfficeBucket_PK=@bucket)
+			AND (@followup_bucket=0 OR follow_up<=GetDate())
 END
 GO

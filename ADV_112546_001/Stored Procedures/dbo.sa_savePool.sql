@@ -7,7 +7,7 @@ CREATE PROCEDURE [dbo].[sa_savePool]
 	@PK int,
 	@Pool_name varchar(50),
 	@IsBucketRule int, 
-	@ProviderOfficeBucket_PK int, 
+	@ProviderOfficeBucket_PK varchar(100), 
 	@IsFollowupRule int, 
 	@IsRemainingRule int, 
 	@RemainingCharts int, 
@@ -29,15 +29,23 @@ AS
 BEGIN
 	if @PK=0
 	BEGIN
-		INSERT INTO tblPool(Pool_Name, IsBucketRule, ProviderOfficeBucket_PK, IsFollowupRule, IsRemainingRule, RemainingCharts, RemainingChartsMoreOrEqual, IsLastScheduledRule, DaysSinceLastScheduled, IsScheduledTypeRule, ScheduledType, IsZoneRule, Zone_PK, IsProjectRule, Projects, ProjectGroups, SchedulerTeam_PK, Pool_Priority, IsAutoRefreshPool,PriorityWithinPool) 
-		VALUES (@Pool_name, @IsBucketRule, @ProviderOfficeBucket_PK, @IsFollowupRule, @IsRemainingRule, @RemainingCharts, @RemainingChartsMoreOrEqual, @IsLastScheduledRule, @DaysSinceLastScheduled, @IsScheduledTypeRule, @ScheduledType, @IsZoneRule, @Zone_PK, @IsProjectRule, @Project_PK, @ProjectGroup_PK, @SchedulerTeam_PK, @Pool_Priority, @IsAutoRefreshPool,@PriorityWithinPool)
+		INSERT INTO tblPool(Pool_Name, IsBucketRule, IsFollowupRule, IsRemainingRule, RemainingCharts, RemainingChartsMoreOrEqual, IsLastScheduledRule, DaysSinceLastScheduled, IsScheduledTypeRule, ScheduledType, IsZoneRule, Zone_PK, IsProjectRule, Projects, ProjectGroups, SchedulerTeam_PK, Pool_Priority, IsAutoRefreshPool,PriorityWithinPool) 
+		VALUES (@Pool_name, @IsBucketRule, @IsFollowupRule, @IsRemainingRule, @RemainingCharts, @RemainingChartsMoreOrEqual, @IsLastScheduledRule, @DaysSinceLastScheduled, @IsScheduledTypeRule, @ScheduledType, @IsZoneRule, @Zone_PK, @IsProjectRule, @Project_PK, @ProjectGroup_PK, @SchedulerTeam_PK, @Pool_Priority, @IsAutoRefreshPool,@PriorityWithinPool)
 		SELECT @PK=@@IDENTITY
 	END
 	ELSE
 	BEGIN
-		UPDATE tblPool SET Pool_name=@Pool_name, IsBucketRule=@IsBucketRule, ProviderOfficeBucket_PK=@ProviderOfficeBucket_PK, IsFollowupRule=@IsFollowupRule, IsRemainingRule=@IsRemainingRule, RemainingCharts=@RemainingCharts, RemainingChartsMoreOrEqual=@RemainingChartsMoreOrEqual, IsLastScheduledRule=@IsLastScheduledRule, DaysSinceLastScheduled=@DaysSinceLastScheduled, IsScheduledTypeRule=@IsScheduledTypeRule, ScheduledType=@ScheduledType, IsZoneRule=@IsZoneRule, Zone_PK=@Zone_PK, IsProjectRule=@IsProjectRule, Projects=@Project_PK, ProjectGroups=@ProjectGroup_PK, SchedulerTeam_PK=@SchedulerTeam_PK, Pool_Priority=@Pool_Priority, IsAutoRefreshPool=@IsAutoRefreshPool, PriorityWithinPool=@PriorityWithinPool
+		UPDATE tblPool SET Pool_name=@Pool_name, IsBucketRule=@IsBucketRule, IsFollowupRule=@IsFollowupRule, IsRemainingRule=@IsRemainingRule, RemainingCharts=@RemainingCharts, RemainingChartsMoreOrEqual=@RemainingChartsMoreOrEqual, IsLastScheduledRule=@IsLastScheduledRule, DaysSinceLastScheduled=@DaysSinceLastScheduled, IsScheduledTypeRule=@IsScheduledTypeRule, ScheduledType=@ScheduledType, IsZoneRule=@IsZoneRule, Zone_PK=@Zone_PK, IsProjectRule=@IsProjectRule, Projects=@Project_PK, ProjectGroups=@ProjectGroup_PK, SchedulerTeam_PK=@SchedulerTeam_PK, Pool_Priority=@Pool_Priority, IsAutoRefreshPool=@IsAutoRefreshPool, PriorityWithinPool=@PriorityWithinPool
 		WHERE Pool_PK = @PK
 	END	
+
+	DELETE FROM tblPoolBucket WHERE Pool_PK=@PK
+	IF (@IsBucketRule=1)
+	BEGIN
+		DECLARE @SQL AS VARCHAR(MAX)
+		SET @SQL = 'INSERT INTO tblPoolBucket(Pool_PK,ProviderOfficeBucket_PK) SELECT '+CAST(@PK AS VARCHAR)+',ProviderOfficeBucket_PK FROM tblProviderOfficeBucket WHERE ProviderOfficeBucket_PK IN ('+@ProviderOfficeBucket_PK+')'
+		EXEC (@SQL); 
+	END
 
 	exec sa_execPool @PK
 	exec sa_getPools 1

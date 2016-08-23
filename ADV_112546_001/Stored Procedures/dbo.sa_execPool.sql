@@ -33,7 +33,7 @@ BEGIN
 	DECLARE @IsAutoRefreshPool int
 	DECLARE @PriorityWithinPool int
 
-	SELECT @IsBucketRule=IsBucketRule,@ProviderOfficeBucket_PK=ProviderOfficeBucket_PK
+	SELECT @IsBucketRule=IsBucketRule--,@ProviderOfficeBucket_PK=ProviderOfficeBucket_PK
 			,@IsFollowupRule=IsFollowupRule
 			,@IsRemainingRule=IsRemainingRule,@RemainingCharts=RemainingCharts,@RemainingChartsMoreOrEqual=RemainingChartsMoreOrEqual
 			,@IsLastScheduledRule=IsLastScheduledRule,@DaysSinceLastScheduled=DaysSinceLastScheduled
@@ -83,8 +83,9 @@ BEGIN
 			) cPO
 		LEFT JOIN #tmpSchedule tS ON tS.ProviderOffice_PK = PO.ProviderOffice_PK
 		LEFT JOIN #tmpZone Z ON tS.ProviderOffice_PK = PO.ProviderOffice_PK
+		LEFT JOIN tblPoolBucket PB ON PO.ProviderOfficeBucket_PK = PB.ProviderOfficeBucket_PK AND PB.Pool_PK = @PoolPK
 		WHERE PO.Pool_PK IS NULL
-			AND (@ProviderOfficeBucket_PK=0 OR PO.ProviderOfficeBucket_PK=@ProviderOfficeBucket_PK)
+			AND (@IsBucketRule=0 OR PB.Pool_PK IS NOT NULL)
 			AND (@IsFollowupRule=0 OR cPO.FollowUpDate<=GetDate())
 			AND (@IsLastScheduledRule=0 OR DATEDIFF(day,ScheduleDate,GetDate())>=@DaysSinceLastScheduled)
 			AND (@IsScheduledTypeRule=0 OR @ScheduledType=0 OR ScheduleType=@ScheduledType)
