@@ -22,7 +22,7 @@ BEGIN
 			  ,IsZoneRule,Zone_PK
 			  ,IsProjectRule,Projects,ProjectGroups
 			  ,SchedulerTeam_PK,Pool_Priority,IsAutoRefreshPool,PriorityWithinPool
-			  ,Offices
+			  ,Offices, 0 IsForcedAllocationAllowed
 		  FROM dbo.tblPool P with (nolock)
 			Outer Apply (SELECT count(1) Offices FROM tblProviderOffice PO with (nolock) WHERE PO.Pool_PK = P.Pool_PK AND ProviderOfficeBucket_PK<>0) X
 

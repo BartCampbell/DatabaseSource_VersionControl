@@ -28,9 +28,9 @@ BEGIN
 			,S.CNA_Date
 			,S.ChartRec_InComp_Date
 
-			,dbo.tmi_udf_GetSuspectDOSs(S.Suspect_PK) DOSs
+			,dbo.tmi_udf_GetMemberProviderDOSs(S.Member_PK,PM.Provider_ID) DOSs
 			,IsNull(S.IsInComp_Replied,0) IsInComp_Replied
-			,EQ.PDFname,EQAL.PageFrom,EQAL.PageTo,EQAL.dtInsert AttachDate,U.Lastname+IsNull(', '+U.Firstname,'') AttachedBy,EQAL.IsInvoice,EQAL.IsCNA
+			,EQ.PDFname,EQAL.PageFrom,EQAL.PageTo,EQAL.dtInsert AttachDate,U.Lastname+IsNull(', '+U.Firstname,'') AttachedBy,EQAL.IsInvoice
 		FROM 
 			tblSuspect S WITH (NOLOCK)
 			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK

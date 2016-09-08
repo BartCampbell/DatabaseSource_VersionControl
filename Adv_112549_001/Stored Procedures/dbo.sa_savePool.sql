@@ -24,7 +24,8 @@ CREATE PROCEDURE [dbo].[sa_savePool]
 	@SchedulerTeam_PK int, 
 	@Pool_Priority int, 
 	@IsAutoRefreshPool int,
-	@PriorityWithinPool int
+	@PriorityWithinPool int,
+	@IsForcedAllocationAllowed int
 AS
 BEGIN
 	if @PK=0

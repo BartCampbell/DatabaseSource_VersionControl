@@ -72,8 +72,8 @@ BEGIN
 	END
 
 	IF (@ValidateType='HCC')
-		SELECT DISTINCT V.HCC Code,H.HCC_Desc Code_Desc FROM tblHCC2Validate V INNER JOIN tblHCC H ON H.HCC = V.HCC AND H.PaymentModel = V.PaymentModel WHERE V.Member_PK = @Member
+		SELECT DISTINCT V.HCC Code,H.HCC_Desc Code_Desc FROM tblHCC2Validate V INNER JOIN tblHCC H ON H.HCC = V.HCC AND H.PaymentModel = V.PaymentModel
 	ELSE IF (@ValidateType='NLP')
-		SELECT DISTINCT MC.DiagnosisCode Code,MC.Code_Description Code_Desc FROM tblNPL2Validate V INNER JOIN tblModelCode MC ON MC.DiagnosisCode = V.DiagnosisCode WHERE V.Suspect_PK = @Suspect
+		SELECT DISTINCT MC.DiagnosisCode Code,MC.Code_Description Code_Desc FROM tblNPL2Validate V INNER JOIN tblModelCode MC ON MC.DiagnosisCode = V.DiagnosisCode
 END
 GO
