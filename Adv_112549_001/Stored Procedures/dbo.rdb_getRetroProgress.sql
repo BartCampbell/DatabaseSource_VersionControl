@@ -2,12 +2,6 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-
--- =============================================
--- Author:	Sajid Ali
--- Create date: Oct-02-2015
--- Description:	
--- =============================================
 /* Sample Executions
 rdb_getRetroProgress '0',1,'0'
 PrepareCacheProviderOffice
@@ -15,7 +9,8 @@ PrepareCacheProviderOffice
 CREATE PROCEDURE [dbo].[rdb_getRetroProgress]
 	@Projects varchar(20),
 	@User int,
-	@ProjectGroup varchar(10)
+	@ProjectGroup varchar(10),
+	@Channel int
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -42,7 +37,7 @@ BEGIN
 			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
-	WHERE PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL
+	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL) AND (@Channel=0 OR S.Channel_PK=@Channel)
 	--GROUP BY S.Project_PK,S.Provider_PK
 	CREATE CLUSTERED INDEX  idxTProjectPK ON #tmp (Project_PK,Provider_PK)
 	/*
@@ -67,6 +62,7 @@ BEGIN
 			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
 			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
 			LEFT JOIN #tmp T ON S.Project_PK = T.Project_PK AND S.Provider_PK = T.Provider_PK
+		WHERE (@Channel=0 OR S.Channel_PK=@Channel)
 		GROUP BY S.ChartPriority --ORDER BY ChartPriority
 		UNION
 		SELECT '' ChartPriority, 0 Chases
@@ -82,7 +78,7 @@ BEGIN
 			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Suspect_PK = SLC.Suspect_PK
 			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
 			INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
-		WHERE SLC.IsCompleted=1
+		WHERE SLC.IsCompleted=1 AND (@Channel=0 OR S.Channel_PK=@Channel)
 		GROUP BY S.ChartPriority, SLC.CoderLevel
 		ORDER BY S.ChartPriority
 END

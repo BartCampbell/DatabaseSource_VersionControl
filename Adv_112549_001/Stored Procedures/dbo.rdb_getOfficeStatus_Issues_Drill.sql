@@ -2,12 +2,6 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-
--- =============================================
--- Author:	Sajid Ali
--- Create date: Oct-02-2015
--- Description:	
--- =============================================
 /* Sample Executions
 rdb_getOfficeStatus_Issues_Drill 0,1,0,-1,0
 */
@@ -17,7 +11,8 @@ CREATE PROCEDURE [dbo].[rdb_getOfficeStatus_Issues_Drill]
 	@ProjectGroup varchar(10),
 	@Status int,
 	@Issue int,
-	@Export int
+	@Export int,
+	@Channel int
 AS
 BEGIN
 	/*
@@ -92,25 +87,28 @@ BEGIN
 		;With tbl AS(
 			SELECT ROW_NUMBER() OVER(ORDER BY PO.Address ASC) AS [#],
 			PO.Address,ZC.ZipCode [Zip Code],ZC.City,ZC.State
-			,SUM(cPO.Providers) Providers, Sum(cPO.Charts) Charts,'' Project,CN.ContactNote_Text [Issue]
+			,Count(DISTINCT S.Provider_PK) Providers, Count(DISTINCT S.Suspect_PK) Charts,'' Project,CN.ContactNote_Text [Issue]
 			,CASE WHEN @Status IN (0,7) THEN CASE MIN(POS.OfficeIssueStatus) WHEN 1 THEN 'Pending' WHEN 2 THEN 'Awaiting Scheduler' WHEN 5 THEN 'Contacted' WHEN 6 THEN 'Data Issue' ELSE '' END ELSE '' END [Issue Status]
-			FROM cacheProviderOffice cPO WITH (NOLOCK)
-				INNER JOIN #tmpProject Pr ON Pr.Project_PK = cPO.Project_PK
-				INNER JOIN tblProviderOffice PO ON PO.ProviderOffice_PK = cPO.ProviderOffice_PK				
+			FROM tblSuspect S WITH (NOLOCK)
+				INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
+				INNER JOIN tblProvider PP ON PP.Provider_PK = S.Provider_PK
+				INNER JOIN tblProviderOffice PO ON PO.ProviderOffice_PK = PP.ProviderOffice_PK				
 				INNER JOIN tblProject P ON P.Project_PK = Pr.Project_PK
 				LEFT JOIN tblZipCode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK
-				LEFT JOIN #tmpOffice T ON cPO.ProviderOffice_PK = T.ProviderOffice_PK --cPO.Project_PK = T.Project_PK AND 
+				LEFT JOIN #tmpOffice T ON PP.ProviderOffice_PK = T.ProviderOffice_PK --cPO.Project_PK = T.Project_PK AND 
 				LEFT JOIN tblContactNote CN ON CN.ContactNote_PK = T.ContactNote_PK
 				LEFT JOIN tblProviderOfficeStatus POS WITH (NOLOCK) ON POS.ProviderOffice_PK = PO.ProviderOffice_PK
-			WHERE
-			(@Issue=0 AND @Status=0 AND T.ProviderOffice_PK IS NOT NULL) --'Issue'
-			--OR (@Status=5 AND T.ProviderOffice_PK IS NOT NULL) --'Copy Center'  
-			OR (@Status=1 AND office_status=1) --'Coded'
-			OR (@Status=2 AND office_status=2) --'Extracted'
-			OR (@Status=3 AND office_status=3) --'Scheduled'
-			OR (@Status=4 AND office_status=4) --'Contacted'
-			OR (@Status=6 AND office_status=5) -- Not Contacted
-			OR (@Status IN (0,7,5) AND T.ProviderOffice_PK IS NOT NULL) --'Issue Chart'
+			WHERE (@Channel=0 OR S.Channel_PK=@Channel)
+				AND (
+				(@Issue=0 AND @Status=0 AND T.ProviderOffice_PK IS NOT NULL) --'Issue'
+				--OR (@Status=5 AND T.ProviderOffice_PK IS NOT NULL) --'Copy Center'  
+				OR (@Status=1 AND office_status=1) --'Coded'
+				OR (@Status=2 AND office_status=2) --'Extracted'
+				OR (@Status=3 AND office_status=3) --'Scheduled'
+				OR (@Status=4 AND office_status=4) --'Contacted'
+				OR (@Status=6 AND office_status=5) -- Not Contacted
+				OR (@Status IN (0,7,5) AND T.ProviderOffice_PK IS NOT NULL) --'Issue Chart'
+				)
 			GROUP BY PO.ProviderOffice_PK,PO.Address,ZC.ZipCode,ZC.City,ZC.State,CN.ContactNote_Text
 		)
 		SELECT * FROM tbl WHERE [#]<=25 OR @Export=1 ORDER BY [#]

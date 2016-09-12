@@ -23,7 +23,8 @@ CREATE PROCEDURE [dbo].[sch_getOffice]
 	@scheduler int,
 	@PoolPK int,
 	@ZonePK int,
-	@OFFICE bigint
+	@OFFICE bigint,
+	@address varchar(100)
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -50,7 +51,7 @@ BEGIN
 	DECLARE @IsScheduler AS BIT = 0
 	DECLARE @IsSupervisor AS BIT = 0
 	DECLARE @IsManager AS BIT = 0
-	If (@Provider<>0) 
+	If (@Provider<>0 OR @address<>'' ) 
 	BEGIN
 		SET @scheduler = 0
 		SET @PoolPK = 0;
@@ -60,7 +61,8 @@ BEGIN
 		SET @Projects = '0'
 		SET @ProjectGroup = '0'
 		SET @IsManager=1
-		SELECT TOP 1 @OFFICE = ProviderOffice_PK FROM tblProvider WITH (NOLOCK) WHERE Provider_PK=@Provider;
+		if (@Provider<>0)
+			SELECT TOP 1 @OFFICE = ProviderOffice_PK FROM tblProvider WITH (NOLOCK) WHERE Provider_PK=@Provider;
 	END
 	ELSE 
 	BEGIN 
@@ -100,6 +102,7 @@ BEGIN
 			AND (@scheduler=0 OR PO.AssignedUser_PK=@scheduler)
 			AND (@followup_bucket=0 OR follow_up<=GetDate())
 			AND (@OFFICE=0 OR PO.ProviderOffice_PK=@OFFICE)
+			AND (@address='' OR PO.Address LIKE '%'+@address+'%')
 		GROUP BY PO.ProviderOffice_PK
 
 	IF @Page>0 AND @PageSize>0

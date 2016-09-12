@@ -36,20 +36,4 @@ BEGIN
 			LEFT JOIN tblInvoiceVendor IV WITH (NOLOCK) ON IV.InvoiceVendor_PK = SII.InvoiceVendor_PK
 		WHERE P.ProviderOffice_PK=@Office AND S.Project_PK=@Project
 END
-
-
-IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name='IX_tblSuspectInvoiceInfo_Suspect' AND object_id = OBJECT_ID('tblSuspectInvoiceInfo'))
-BEGIN
-	ALTER TABLE [dbo].[tblSuspectInvoiceInfo] DROP CONSTRAINT [PK_tblSuspectInvoiceInfo]
-
-	ALTER TABLE [dbo].[tblSuspectInvoiceInfo] ADD  CONSTRAINT [PK_tblSuspectInvoiceInfo] PRIMARY KEY CLUSTERED 
-	(
-		[Invoice_PK] ASC
-	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-
-	CREATE NONCLUSTERED INDEX [IX_tblSuspectInvoiceInfo_Suspect] ON [dbo].[tblSuspectInvoiceInfo]
-	(
-		[Suspect_PK] ASC
-	)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-END
 GO

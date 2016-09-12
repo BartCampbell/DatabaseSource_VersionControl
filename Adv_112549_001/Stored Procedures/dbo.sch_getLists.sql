@@ -78,7 +78,7 @@ BEGIN
 	END
 
 	SELECT Zone_PK,Zone_Name FROM tblZone ORDER BY Zone_Name
-
+/*
 	-- PROJECT SELECTION
 	CREATE TABLE #tmpProject (Project_PK INT)
 	CREATE INDEX idxProjectPK ON #tmpProject (Project_PK)
@@ -94,5 +94,6 @@ BEGIN
 	SELECT P.Project_PK, Project_Name, ProjectGroup_PK FROM tblProject P  WITH (NOLOCK) INNER JOIN #tmpProject T ON T.Project_PK=P.Project_PK WHERE IsRetrospective=1 ORDER BY PROJECT_NAME
 		
 	SELECT DISTINCT ProjectGroup,ProjectGroup_PK FROM tblProject P  WITH (NOLOCK) INNER JOIN #tmpProject T ON T.Project_PK=P.Project_PK WHERE IsRetrospective=1 ORDER BY ProjectGroup
+*/
 END
 GO

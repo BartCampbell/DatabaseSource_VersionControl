@@ -2,22 +2,18 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
--- =============================================
--- Author:	Sajid Ali
--- Create date: Oct-02-2015
--- Description:	
--- =============================================
 /* Sample Executions
 rdb_getRetroProgressDrill 0,1,0,1,'',''
 rdb_getRetroProgressDrill '0',1,'0',0,'A',0
 */
-CREATE PROCEDURE [dbo].[rdb_getRetroProgressDrill]
+Create PROCEDURE [dbo].[rdb_getRetroProgressDrill]
 	@Projects varchar(20),
 	@User int,
 	@ProjectGroup varchar(10),
 	@DrillType int,
 	@Priority varchar(10),
-	@Export int
+	@Export int,
+	@Channel int
 AS
 BEGIN
 	Declare @Sch_Type AS INT = 99
@@ -50,7 +46,7 @@ BEGIN
 			--INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
-	WHERE PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL
+	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL) AND (@Channel=0 OR S.Channel_PK=@Channel)
 	GROUP BY S.Project_PK,S.Provider_PK
 	CREATE CLUSTERED INDEX  idxTProjectPK ON #tmp (Project_PK,Provider_PK)
 
@@ -70,6 +66,7 @@ BEGIN
 			INTO #tbl
 			FROM #tmp cPO INNER JOIN tblProject P WITH (NOLOCK) ON P.Project_PK=cPO.Project_PK 
 				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Project_PK = cPO.Project_PK AND S.Provider_PK = cPO.Provider_PK
+			WHERE (@Channel=0 OR S.Channel_PK=@Channel)
 			GROUP BY P.Project_PK,Project_Name,P.ProjectGroup
 
 			SELECT Project_PK,[Project],[Total Chases]
@@ -103,7 +100,7 @@ BEGIN
 				INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
 				INNER JOIN tblProject Pr WITH (NOLOCK) ON Pr.Project_PK = S.Project_PK
 				LEFT JOIN #tmp T ON S.Project_PK = T.Project_PK AND S.Provider_PK = T.Provider_PK
-			WHERE @Priority='' OR S.ChartPriority=@Priority
+			WHERE (@Priority='' OR S.ChartPriority=@Priority) AND (@Channel=0 OR S.Channel_PK=@Channel)
 			GROUP BY S.Project_PK,Pr.Project_Name,Pr.ProjectGroup
 			ORDER BY Pr.Project_Name
 		END
@@ -153,6 +150,7 @@ BEGIN
 			    ) 
 				AND (@Priority='' OR S.ChartPriority=@Priority)
 				AND (@Sch_Type=99 OR T.schedule_type=@Sch_Type)
+				AND (@Channel=0 OR S.Channel_PK=@Channel)
 		)
 		SELECT * FROM tbl WHERE [#]<=25 OR @Export=1 ORDER BY [#]
 

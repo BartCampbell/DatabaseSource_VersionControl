@@ -2,19 +2,14 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-
--- =============================================
--- Author:	Sajid Ali
--- Create date: Oct-02-2015
--- Description:	
--- =============================================
 /* Sample Executions
 rdb_retroValidation 0,1,0
 */
 Create PROCEDURE [dbo].[rdb_retroValidation]
 	@Projects varchar(20),
 	@User int,
-	@ProjectGroup varchar(10)
+	@ProjectGroup varchar(10),
+	@Channel int
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -32,12 +27,12 @@ BEGIN
 	ELSE
 		EXEC ('INSERT INTO #tmpProject(Project_PK) SELECT Project_PK FROM tblProject WHERE Project_PK IN ('+@Projects+') AND ('+@ProjectGroup+'=0 OR ProjectGroup_PK='+@ProjectGroup+')');
 
-
 	--Validation Status
 	SELECT NT.NoteType_PK,NT.NoteType,COUNT(CD.CodedData_PK) Diags FROM tblNoteType NT WITH (NOLOCK)
 		INNER JOIN tblCodedData CD WITH (NOLOCK) ON CD.CodedSource_PK = NT.NoteType_PK
 		INNER JOIN tblSuspect S WITH (NOLOCK) ON CD.Suspect_PK = S.Suspect_PK
 		INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
+	WHERE (@Channel=0 OR S.Channel_PK=@Channel)
 	GROUP BY NT.NoteType_PK,NT.NoteType ORDER BY NT.NoteType
 
 	--Validation Status
@@ -47,6 +42,7 @@ BEGIN
 		INNER JOIN tblNoteText NT WITH (NOLOCK) ON NT.NoteText_PK = CDN.NoteText_PK
 		INNER JOIN tblNoteType NTy WITH (NOLOCK) ON NT.NoteType_PK = NTy.NoteType_PK
 		INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK		
+	WHERE (@Channel=0 OR S.Channel_PK=@Channel)
 	GROUP BY NTy.NoteType,NT.NoteText_PK,NT.NoteText ORDER BY NTy.NoteType DESC,Diags DESC
 END
 GO
