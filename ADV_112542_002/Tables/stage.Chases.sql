@@ -53,6 +53,8 @@ CREATE TABLE [stage].[Chases]
 [ProjectName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProviderMaster_PK] [int] NULL,
 [ProviderOffice_PK] [int] NULL,
-[Member_PK] [int] NULL
+[Member_PK] [int] NULL,
+[NewOffice_PK] [int] NULL,
+[Provider_PK] [int] NULL
 ) ON [PRIMARY]
 GO
