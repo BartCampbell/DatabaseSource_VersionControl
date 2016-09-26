@@ -3,13 +3,6 @@ GO
 SET ANSI_NULLS ON
 GO
 
-
--- =============================================
--- Author:		<Author,,Name>
--- Create date: <Create Date,,>
--- Description:	<Description,,>
--- =============================================
--- SELECT [dbo].[tmi_udf_GetMemberProviderDOSs](2,'PRV000176')
 CREATE FUNCTION [dbo].[tmi_udf_GetSuspectDOSs]
 (	
 	@Suspect_PK BIGINT
@@ -21,7 +14,7 @@ BEGIN
 	DECLARE @DOS DATE
 	
 	SET @RETURN = '';
-
+	
 	DECLARE db_cursor CURSOR FOR  
 		SELECT DISTINCT CAST(DOS_To AS DATE) DOS 
 			FROM tblSuspectDOS CD 
@@ -45,6 +38,4 @@ BEGIN
 	
 	RETURN @RETURN;
 END
-
-
 GO
