@@ -7,7 +7,7 @@ GO
 -- Create date: Mar-12-2014
 -- Description:	RA Coder will use this sp to pull list of providers in a project
 -- =============================================
---	sch_getOfficeProviderMember @Office=1
+--	sch_getOfficeProviderMember @Office=107
 CREATE PROCEDURE [dbo].[sch_getOfficeProviderMember] 
 	@Office bigint
 AS

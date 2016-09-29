@@ -27,7 +27,7 @@ BEGIN
 	SET @SQL = 'UPDATE tblScannedData WITH (ROWLOCK) SET is_deleted=1 WHERE ScannedData_PK IN ('+ @ids +');';
 	EXEC(@SQL);
 
-	IF NOT EXISTS(SELECT COUNT(*) FROM tblScannedData WHERE suspect_pk=@Source_Suspect AND IsNull(is_deleted,0)=0)
+	IF NOT EXISTS(SELECT * FROM tblScannedData WHERE suspect_pk=@Source_Suspect AND IsNull(is_deleted,0)=0)
 	BEGIN
 		--Setting Assignenment to QA to allow him to re attach in chart management 
 		Update E 

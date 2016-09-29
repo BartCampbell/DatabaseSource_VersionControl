@@ -38,7 +38,7 @@ BEGIN
 		BEGIN
 			SET @SQL = 'UPDATE tblScannedData WITH (ROWLOCK) SET is_deleted=0,suspect_pk='+ CAST(@suspect_pk AS VARCHAR) +',CodedStatus=NULL WHERE ScannedData_PK IN ('+ @ids +')';	
 			EXEC(@SQL);
-			IF NOT EXISTS(SELECT COUNT(*) FROM tblScannedData WHERE suspect_pk=@Source_Suspect)
+			IF NOT EXISTS(SELECT * FROM tblScannedData WHERE suspect_pk=@Source_Suspect)
 				Update tblExtractionQueueAttachLog SET Suspect_PK = @suspect_pk WHERE Suspect_PK = @Source_Suspect
 		END
 		ELSE

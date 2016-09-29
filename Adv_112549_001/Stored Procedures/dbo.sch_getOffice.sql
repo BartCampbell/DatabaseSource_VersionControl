@@ -17,7 +17,7 @@ CREATE PROCEDURE [dbo].[sch_getOffice]
 	@Sort Varchar(150),
 	@Order Varchar(4),
 	@Provider BigInt,
-	@bucket tinyint,
+	@bucket int,
 	@followup_bucket tinyint,
 	@user int,
 	@scheduler int,
@@ -56,7 +56,7 @@ BEGIN
 		SET @scheduler = 0
 		SET @PoolPK = 0;
 		SET @ZonePK = 0;
-		SET @bucket = 0;
+		SET @bucket = -1;
 		SET @followup_bucket=0;
 		SET @Projects = '0'
 		SET @ProjectGroup = '0'
@@ -96,7 +96,7 @@ BEGIN
 		INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON cPO.ProviderOffice_PK = PO.ProviderOffice_PK
 		INNER JOIN #tmpProject P ON P.Project_PK = cPO.Project_PK 
 		LEFT JOIN tblZoneZipcode ZZC WITH (NOLOCK) ON ZZC.ZipCode_PK = PO.ZipCode_PK
-		WHERE (@bucket=0 OR PO.ProviderOfficeBucket_PK=@bucket)
+		WHERE (@bucket=-1 OR PO.ProviderOfficeBucket_PK=@bucket)
 			AND (@PoolPK=0 OR PO.Pool_PK=@PoolPK)
 			AND (@ZonePK=0 OR ZZC.Zone_PK=@ZonePK)
 			AND (@scheduler=0 OR PO.AssignedUser_PK=@scheduler)

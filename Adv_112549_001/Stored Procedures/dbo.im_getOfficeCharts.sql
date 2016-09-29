@@ -30,7 +30,7 @@ BEGIN
 		FROM tblProviderOfficeInvoice POI WITH (NOLOCK) 
 			INNER JOIN tblProviderOfficeInvoiceSuspect POIS WITH (NOLOCK) ON POIS.ProviderOfficeInvoice_PK = POI.ProviderOfficeInvoice_PK
 			INNER JOIN #Suspect S ON S.Suspect_PK = POIS.Suspect_PK
-		WHERE POI.ProviderOfficeInvoiceBucket_PK>2 --Excluding Pending and Rejected Invoices
+		WHERE POI.ProviderOfficeInvoice_PK<>@invoice AND POI.ProviderOfficeInvoiceBucket_PK>2 --Excluding Pending and Rejected Invoices
 
 	SELECT ROW_NUMBER() OVER(
 		ORDER BY 

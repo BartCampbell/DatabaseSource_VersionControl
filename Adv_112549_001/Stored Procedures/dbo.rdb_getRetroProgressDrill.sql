@@ -3,8 +3,8 @@ GO
 SET ANSI_NULLS ON
 GO
 /* Sample Executions
-rdb_getRetroProgressDrill 0,1,0,1,'',''
-rdb_getRetroProgressDrill '0',1,'0',0,'A',0
+{projects:'0,11,1',user:1,project_group:1,drill_type:2,priority:'',channel:1}
+rdb_getRetroProgressDrill '0,11,1',1,'0',2,'',0,1
 */
 Create PROCEDURE [dbo].[rdb_getRetroProgressDrill]
 	@Projects varchar(20),
@@ -93,7 +93,7 @@ BEGIN
 				COUNT(*) Chases,
 				COUNT(CASE WHEN IsNull(IsNull(T.Sch_Date,S.Scanned_Date),S.CNA_Date) IS NOT NULL THEN S.Suspect_PK ELSE NULL END) Scheduled,
 				COUNT(CASE WHEN S.IsScanned=1 THEN S.Suspect_PK ELSE NULL END) Extracted,
-				COUNT(CASE WHEN S.IsCNA=1 THEN S.Suspect_PK ELSE NULL END) CNA,
+				COUNT(CASE WHEN S.IsCNA=1 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END) CNA,
 				COUNT(CASE WHEN S.IsCoded=1 THEN S.Suspect_PK ELSE NULL END) Coded
 			FROM tblSuspect S WITH (NOLOCK) 
 				INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
@@ -144,7 +144,7 @@ BEGIN
 				WHERE (
 					(@DrillType=0)
 					OR (@DrillType=1 AND T.Sch_Date IS NOT NULL)
-					OR (@DrillType=2 AND S.IsCNA=1)
+					OR (@DrillType=2 AND S.IsCNA=1 AND S.IsScanned=0)
 					OR (@DrillType=3 AND S.IsScanned=1)
 					OR (@DrillType=4 AND S.IsCoded=1)
 			    ) 
