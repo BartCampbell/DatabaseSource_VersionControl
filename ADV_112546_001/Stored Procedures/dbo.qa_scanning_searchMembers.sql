@@ -50,7 +50,7 @@ BEGIN
 			INNER JOIN tblProject P WITH (NOLOCK) ON S.Project_PK = P.Project_PK
 			INNER JOIN tblProvider PP WITH (NOLOCK) ON PP.Provider_PK = S.Provider_PK
 			INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PP.ProviderMaster_PK = PM.ProviderMaster_PK
-			LEFT JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Coded_User_PK
+			LEFT JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Scanned_User_PK
 			LEFT JOIN tblScanningQANote_Suspect SN WITH (NOLOCK) ON SN.Suspect_PK = S.Suspect_PK
 			LEFT JOIN tblUser QA WITH (NOLOCK) ON QA.User_PK = SN.QA_User_PK
 		WHERE S.IsScanned=1'

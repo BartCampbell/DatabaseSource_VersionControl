@@ -7,7 +7,7 @@ GO
 -- Create date: Oct-19-2014
 -- Description:	Status Report will use this sp to pull list of status with count
 -- =============================================
---  im_getStatus 0,1
+--  im_getStatus 0,0,1
 CREATE PROCEDURE [dbo].[im_getStatus]
 	@Projects varchar(100),
 	@ProjectGroup varchar(10),
@@ -30,17 +30,20 @@ BEGIN
 	ELSE
 		EXEC ('INSERT INTO #tmpProject(Project_PK) SELECT Project_PK FROM tblProject WHERE Project_PK IN ('+@Projects+') AND ('+@ProjectGroup+'=0 OR ProjectGroup_PK='+@ProjectGroup+')');
 	-- PROJECT SELECTION
-		
-	SELECT COUNT(DISTINCT SII.Suspect_PK) [COUNT], CASE WHEN SII.IsApproved=1 THEN 2 WHEN SII.IsApproved=0 THEN 1 ELSE 0 END [Status]
-		FROM tblSuspectInvoiceInfo SII INNER JOIN tblSuspect S ON S.Suspect_PK = SII.Suspect_PK
+
+	SELECT COUNT(DISTINCT POI.ProviderOfficeInvoice_PK) Invoices,COUNT(S.Suspect_PK) Charts,POI.ProviderOfficeInvoiceBucket_PK
+		INTO #tmp
+		FROM
+			tblProviderOfficeInvoice POI WITH (NOLOCK)
+			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK=POI.ProviderOffice_PK 
+			INNER JOIN tblProviderOfficeInvoiceSuspect POIS ON POIS.ProviderOfficeInvoice_PK = POI.ProviderOfficeInvoice_PK
+			INNER JOIN tblSuspect S ON S.Suspect_PK = POIS.Suspect_PK
 			INNER JOIN #tmpProject P ON P.Project_PK = S.Project_PK
-	GROUP BY CASE WHEN SII.IsApproved=1 THEN 2 WHEN SII.IsApproved=0 THEN 1 ELSE 0 END
-	UNION
-	SELECT COUNT(DISTINCT SII.Suspect_PK) [COUNT], CASE WHEN SII.IsPaid=1 THEN 5 ELSE 4 END [Status]
-		FROM tblSuspectInvoiceInfo SII INNER JOIN tblSuspect S ON S.Suspect_PK = SII.Suspect_PK
-			INNER JOIN #tmpProject P ON P.Project_PK = S.Project_PK
-	WHERE IsApproved=1
-	GROUP BY CASE WHEN SII.IsPaid=1 THEN 5 ELSE 4 END
-	ORDER BY [Status]
+	GROUP BY POI.ProviderOfficeInvoiceBucket_PK
+
+	SELECT POIB.Bucket,POIB.ProviderOfficeInvoiceBucket_PK,IsNull(Invoices,0) Invoices,IsNull(Charts,0) Charts
+	FROM tblProviderOfficeInvoiceBucket POIB 
+			LEFT JOIN #tmp POI WITH (NOLOCK) ON POIB.ProviderOfficeInvoiceBucket_PK = POI.ProviderOfficeInvoiceBucket_PK
+	ORDER BY POIB.sortOrder
 END
 GO

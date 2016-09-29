@@ -7,7 +7,8 @@ CREATE TABLE [dbo].[tblProviderMaster]
 [LastUpdated] [smalldatetime] NULL,
 [NPI] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderGroup] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblProviderMaster] ADD CONSTRAINT [PK_tblProviderMaster] PRIMARY KEY CLUSTERED  ([ProviderMaster_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]

@@ -7,8 +7,8 @@ GO
 -- Create date: Mar-12-2014
 -- Description:	RA Coder will use this sp to pull list of providers in a project
 -- =============================================
---	im_getOffice '0','0',0,0,'','UO','ASC',0,1,0,0,''
---	[im_getOffice] 0,0,0,'','UO','ASC',9,9,0,0,''
+--	im_getOffice '0','0',0,25,'','UO','ASC',0,1,'','','','','','',12
+--	im_getOffice '0','0',0,0,'','UO','ASC',0,1,'','','','','','',107
 Create PROCEDURE [dbo].[im_getOffice] 
 	@Projects varchar(100),
 	@ProjectGroup varchar(10),
@@ -19,11 +19,17 @@ Create PROCEDURE [dbo].[im_getOffice]
 	@Order Varchar(4),
 	@filter_type int,
 	@user int,
-	@mid bigint,
-	@office bigint,
-	@invoice varchar(20)
+	@chase varchar(100),
+	@member varchar(100),
+	@address varchar(100),
+	@invoice varchar(100),
+	@provider varchar(100),
+	@vendor varchar(100),
+	@officePK int
 AS
 BEGIN
+	If (@officePK>0)
+		SET @PageSize = 1000
 	-- PROJECT SELECTION
 	CREATE TABLE #tmpProject (Project_PK INT)
 	CREATE INDEX idxProjectPK ON #tmpProject (Project_PK)
@@ -41,57 +47,48 @@ BEGIN
 		EXEC ('INSERT INTO #tmpProject(Project_PK) SELECT Project_PK FROM tblProject WHERE Project_PK IN ('+@Projects+') AND ('+@ProjectGroup+'=0 OR ProjectGroup_PK='+@ProjectGroup+')');
 	-- PROJECT SELECTION
 
-	DECLARE @MemberID AS VARCHAR(100) = ''
-	IF (@mid<>0)
-		SELECT @MemberID=Member_ID FROM tblMember WHERE Member_PK=@mid
-
 	SELECT ROW_NUMBER() OVER(
 		ORDER BY 
 			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'UO' THEN POI.dtUpdate ELSE NULL END END ASC,
 			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'UO' THEN POI.dtUpdate ELSE NULL END END DESC,
-			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'IN' THEN POI.InvoiceNumber WHEN 'IA' THEN POI.InvoiceAmount WHEN 'AD' THEN PO.Address ELSE NULL END END ASC,
-			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'IN' THEN POI.InvoiceNumber WHEN 'IA' THEN POI.InvoiceAmount WHEN 'AD' THEN PO.Address ELSE NULL END END DESC,
-			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'AP' THEN POI.IsApproved WHEN 'PD' THEN IsNull(POI.IsPaid,0) ELSE NULL END END ASC,
-			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'AP' THEN POI.IsApproved WHEN 'PD' THEN IsNull(POI.IsPaid,0) ELSE NULL END END DESC
+			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'IN' THEN POI.InvoiceNumber WHEN 'IV' THEN IV.InvoiceVendor WHEN 'AD' THEN PO.Address WHEN 'ST' THEN POIB.Bucket ELSE NULL END END ASC,
+			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'IN' THEN POI.InvoiceNumber WHEN 'IV' THEN IV.InvoiceVendor WHEN 'AD' THEN PO.Address WHEN 'ST' THEN POIB.Bucket ELSE NULL END END DESC,
+			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'CHT' THEN Count(DISTINCT S.Suspect_PK) WHEN 'IA' THEN POI.AmountPaid ELSE NULL END END ASC,
+			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'CHT' THEN Count(DISTINCT S.Suspect_PK) WHEN 'IA' THEN POI.AmountPaid ELSE NULL END END DESC
 		) AS RowNumber
 			,PO.ProviderOffice_PK,POI.ProviderOfficeInvoice_PK
 			,POI.InvoiceNumber,POI.InvoiceAmount,IV.InvoiceVendor,POI.dtUpdate [Uploaded Date]
-			,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode
-			,CASE 
-				WHEN POI.IsApproved=1 THEN 'Approved'
-				WHEN POI.IsApproved=0 THEN 'Rejected'
-				ELSE 'Pending'
-			END [Status]
-			,IsNull(POI.IsPaid,0) IsPaid
+			,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode
+			,POIB.Bucket [Status], POIB.ProviderOfficeInvoiceBucket_PK
 			,Count(DISTINCT S.Suspect_PK) Charts
-			,POI.InvoiceVendor_PK, InvoiceAccountNumber, Check_Transaction_Number, PaymentType_PK, Inv_File
+			,POI.InvoiceVendor_PK, InvoiceAccountNumber, Check_Transaction_Number, PaymentType_PK, Inv_File,POI.AmountPaid
 		INTO #tbl
 		FROM 
 			tblProviderOfficeInvoice POI WITH (NOLOCK)
+			INNER JOIN tblProviderOfficeInvoiceBucket POIB WITH (NOLOCK) ON POIB.ProviderOfficeInvoiceBucket_PK = POI.ProviderOfficeInvoiceBucket_PK
 			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK=POI.ProviderOffice_PK 
-			INNER JOIN tblExtractionQueueAttachLog EQAL ON EQAL.ProviderOfficeInvoice_PK = POI.ProviderOfficeInvoice_PK
-			INNER JOIN tblSuspect S ON S.Suspect_PK = EQAL.Suspect_PK
-			INNER JOIN #tmpProject P ON P.Project_PK = S.Project_PK
-			LEFT JOIN tblInvoiceVendor IV ON IV.InvoiceVendor_PK = POI.InvoiceVendor_PK
+			INNER JOIN tblProviderOfficeInvoiceSuspect POIS ON POIS.ProviderOfficeInvoice_PK = POI.ProviderOfficeInvoice_PK
+			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Suspect_PK = POIS.Suspect_PK
+			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
+			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
+			INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
+			INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
+			LEFT JOIN tblInvoiceVendor IV WITH (NOLOCK) ON IV.InvoiceVendor_PK = POI.InvoiceVendor_PK
 			LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
 		WHERE IsNull(PO.Address,0) Like @Alpha+'%'
-			AND (@office=0 OR PO.ProviderOffice_PK=@office)
---			AND (@mid=0 OR P.ProviderOffice_PK IS NOT NULL)
---			AND (@invoice='' OR P.ProviderOffice_PK IS NOT NULL)
-
---			AND (@filter_type<>0 OR POI.IsApproved Is NULL) --Pending
---			AND (@filter_type<>1 OR POI.IsApproved=0) -- Rejected
---			AND (@filter_type<>2 OR POI.IsApproved=1) -- Approved
---			AND (@filter_type<>4 OR (POI.IsApproved=1 AND IsNull(IsPaid,0)=0)) -- Approved & Not Paid
---			AND (@filter_type<>5 OR (POI.IsApproved=1 AND IsPaid=1)) -- Approved & Paid
-
---			AND (@mid=0 OR M.Member_ID=@MemberID)
---			AND (@invoice='' OR POI.InvoiceNumber Like '%'+@invoice+'%')
+			AND (@officePK=0 OR PO.ProviderOffice_PK=@officePK)
+			AND (@filter_type=0 OR POI.ProviderOfficeInvoiceBucket_PK=@filter_type)
+			AND (@chase='' OR S.ChaseID Like '%'+@chase+'%')
+			AND (@member='' OR M.Member_ID  + ' ' + M.Lastname + ' ' + M.Firstname Like '%'+@member+'%')
+			AND (@invoice='' OR POI.InvoiceNumber Like '%'+@invoice+'%')
+			AND (@address='' OR PO.Address Like '%'+@address+'%')
+			AND (@provider='' OR PM.Provider_ID  + ' ' + PM.Lastname + ' ' + IsNull(PM.Firstname,'') Like '%'+@provider+'%')
+			AND (@vendor='' OR IV.InvoiceVendor Like '%'+@vendor+'%')
 		GROUP BY PO.ProviderOffice_PK,POI.ProviderOfficeInvoice_PK
 			,POI.InvoiceNumber,POI.InvoiceAmount,IV.InvoiceVendor,POI.dtUpdate
 			,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode
-			,POI.IsApproved, POI.IsPaid
-			,POI.InvoiceVendor_PK, InvoiceAccountNumber, Check_Transaction_Number, PaymentType_PK, Inv_File
+			,POIB.Bucket, POIB.ProviderOfficeInvoiceBucket_PK
+			,POI.InvoiceVendor_PK, InvoiceAccountNumber, Check_Transaction_Number, PaymentType_PK, Inv_File,POI.AmountPaid
 	IF (@Page<>0) 
 	BEGIN
 		SELECT * FROM #tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
@@ -102,8 +99,15 @@ BEGIN
 			ORDER BY alpha1, alpha2
 	END
 	ELSE
-		SELECT * FROM #tbl ORDER BY RowNumber
+	BEGIN
+		ALTER TABLE #tbl DROP COLUMN ProviderOffice_PK
+		ALTER TABLE #tbl DROP COLUMN ProviderOfficeInvoice_PK
+		ALTER TABLE #tbl DROP COLUMN ProviderOfficeInvoiceBucket_PK
+		ALTER TABLE #tbl DROP COLUMN PaymentType_PK
+		ALTER TABLE #tbl DROP COLUMN InvoiceVendor_PK
 
+		SELECT * FROM #tbl ORDER BY RowNumber
+	END
 	Drop Table #tbl
 END
 GO

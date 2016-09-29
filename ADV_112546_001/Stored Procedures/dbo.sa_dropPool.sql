@@ -8,7 +8,7 @@ CREATE PROCEDURE [dbo].[sa_dropPool]
 	@recreate int
 AS
 BEGIN
-	Update tblProviderOffice SET Pool_PK=NULL,AssignedDate=NULL,AssignedUser_PK=NULL WHERE Pool_PK=@PK
+	Update tblProviderOffice SET Pool_PK=NULL WHERE Pool_PK=@PK --,AssignedDate=NULL,AssignedUser_PK=NULL
 	IF @recreate=0
 		DELETE tblPool WHERE Pool_PK=@PK
 	ELSE

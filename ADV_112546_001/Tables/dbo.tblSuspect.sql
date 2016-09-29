@@ -34,7 +34,8 @@ CREATE TABLE [dbo].[tblSuspect]
 [REN_PROVIDER_SPECIALTY] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ChartPriority] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ChartRec_Date] [smalldatetime] NULL,
-[InvoiceExt_Date] [smalldatetime] NULL
+[InvoiceExt_Date] [smalldatetime] NULL,
+[Channel_PK] [int] NULL
 ) ON [PRIMARY]
 GO
 SET QUOTED_IDENTIFIER ON
@@ -93,4 +94,6 @@ GO
 CREATE NONCLUSTERED INDEX [IX_tblSuspectProvider] ON [dbo].[tblSuspect] ([Provider_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IDX_SuspectPK_ScanDate] ON [dbo].[tblSuspect] ([Suspect_PK]) INCLUDE ([Scanned_Date]) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[tblSuspect] ADD CONSTRAINT [FK_tblSuspect_tblChannel] FOREIGN KEY ([Channel_PK]) REFERENCES [dbo].[tblChannel] ([Channel_PK])
 GO

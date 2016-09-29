@@ -7,7 +7,7 @@ GO
 -- Create date: Mar-12-2014
 -- Description:	RA Coder will use this sp to pull list of providers in a project
 -- =============================================
---	oil_getOffice 0,0,0,25,'','FU','DESC',0,0,0,1
+--	oil_getOffice 0,0,1,25,'','FU','DESC',0,0,0,1,1
 CREATE PROCEDURE [dbo].[oil_getOffice]
 	@Projects varchar(100),
 	@ProjectGroup varchar(10),
@@ -19,7 +19,8 @@ CREATE PROCEDURE [dbo].[oil_getOffice]
 	@Provider BigInt,
 	@filter_type int,
 	@filter_type_sub int,
-	@user int
+	@user int,
+	@Channel int
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -52,39 +53,40 @@ BEGIN
 			ORDER BY 
 				CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'AD' THEN PO.Address WHEN 'CT' THEN ZC.City WHEN 'CN' THEN ZC.County WHEN 'ST' THEN ZC.State WHEN 'ZC' THEN ZC.Zipcode WHEN 'CP' THEN PO.ContactPerson WHEN 'CNU' THEN PO.ContactNumber WHEN 'FN' THEN PO.FaxNumber ELSE NULL END END ASC,
 				CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'AD' THEN PO.Address WHEN 'CT' THEN ZC.City WHEN 'CN' THEN ZC.County WHEN 'ST' THEN ZC.State WHEN 'ZC' THEN ZC.Zipcode WHEN 'CP' THEN PO.ContactPerson WHEN 'CNU' THEN PO.ContactNumber WHEN 'FN' THEN PO.FaxNumber ELSE NULL END END DESC,
-				CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'CH' THEN SUM(cPO.Charts-cPO.extracted_count-cPO.cna_count) WHEN 'IS' THEN MIN(POS.OfficeIssueStatus) WHEN 'PRV' THEN SUM(cPO.Providers) WHEN 'FU' THEN CASE WHEN SUM(cPO.extracted_count)+SUM(cPO.cna_count)>=SUM(cPO.Charts) THEN 9999 ELSE MIN(CASE WHEN cPO.extracted_count+cPO.cna_count>=cPO.Charts THEN 9999 ELSE DATEDIFF(day,GetDate(),follow_up) END) END ELSE NULL END END ASC,
-				CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'CH' THEN SUM(cPO.Charts-cPO.extracted_count-cPO.cna_count) WHEN 'IS' THEN MIN(POS.OfficeIssueStatus) WHEN 'PRV' THEN SUM(cPO.Providers) WHEN 'FU' THEN CASE WHEN SUM(cPO.extracted_count)+SUM(cPO.cna_count)>=SUM(cPO.Charts) THEN 9999 ELSE MIN(CASE WHEN cPO.extracted_count+cPO.cna_count>=cPO.Charts THEN 9999 ELSE DATEDIFF(day,GetDate(),follow_up) END) END ELSE NULL END END DESC 
+				CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'CH' THEN COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END) WHEN 'IS' THEN MIN(POS.OfficeIssueStatus) WHEN 'PRV' THEN COUNT(DISTINCT S.Provider_PK) END END ASC,
+				CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'CH' THEN COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END) WHEN 'IS' THEN MIN(POS.OfficeIssueStatus) WHEN 'PRV' THEN COUNT(DISTINCT S.Provider_PK) END END DESC
 			) AS RowNumber
-				,MAX(cPO.Project_PK) Project_PK,cPO.ProviderOffice_PK,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,Isnull(PO.EMR_Type_PK,0) EMR_Type_PK
-				,SUM(cPO.Providers) Providers
-				,Sum(cPO.Charts-cPO.extracted_count-cPO.cna_count) Charts
-				,MIN(CASE WHEN cPO.extracted_count+cPO.cna_count>=cPO.Charts THEN 9999 ELSE DATEDIFF(day,GetDate(),follow_up) END) followup_days
-				,MIN(schedule_type) schedule_type,SUM(cPO.extracted_count) extracted,SUM(cPO.coded_count) coded,SUM(cPO.cna_count) cna
+				,MAX(S.Project_PK) Project_PK,PO.ProviderOffice_PK,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,Isnull(PO.EMR_Type_PK,0) EMR_Type_PK
+				,COUNT(DISTINCT S.Provider_PK) Providers
+				,COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END) Charts
 				,MIN(PO.ProviderOfficeBucket_PK) OfficeStatus
 				,MIN(POS.OfficeIssueStatus) OfficeIssueStatus
 			FROM tblProviderOffice PO WITH (NOLOCK) 
-				INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON cPO.ProviderOffice_PK = PO.ProviderOffice_PK
-				INNER JOIN #tmpProject P ON P.Project_PK = cPO.Project_PK
-				Outer APPLY (SELECT TOP 1 * FROM tblProviderOfficeStatus WHERE ProviderOffice_PK = cPO.ProviderOffice_PK) POS
+				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
+				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
+				INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
+				Outer APPLY (SELECT TOP 1 * FROM tblProviderOfficeStatus WHERE ProviderOffice_PK = PO.ProviderOffice_PK) POS
 				LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
 			WHERE IsNull(PO.Address,0) Like @Alpha+'%'
 				AND (@OFFICE=0 OR PO.ProviderOffice_PK=@OFFICE)
 				AND (@OFFICE<>0 OR POS.OfficeIssueStatus IS NOT NULL)
 				AND (@OFFICE<>0 OR (@filter_type=0 OR POS.OfficeIssueStatus=@filter_type))
-			GROUP BY cPO.ProviderOffice_PK,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,Isnull(PO.EMR_Type_PK,0)
+				AND (@Channel=0 OR S.Channel_PK=@Channel)
+			GROUP BY PO.ProviderOffice_PK,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,Isnull(PO.EMR_Type_PK,0)
 		)
 	
 		SELECT * FROM tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
 	
-		SELECT UPPER(LEFT(PO.Address,1)) alpha1, UPPER(RIGHT(LEFT(PO.Address,2),1)) alpha2,Count(DISTINCT cPO.ProviderOffice_PK) records
+		SELECT UPPER(LEFT(PO.Address,1)) alpha1, UPPER(RIGHT(LEFT(PO.Address,2),1)) alpha2,Count(DISTINCT PO.ProviderOffice_PK) records
 			FROM tblProviderOffice PO WITH (NOLOCK) 
-				INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON cPO.ProviderOffice_PK = PO.ProviderOffice_PK
-				INNER JOIN #tmpProject P ON P.Project_PK = cPO.Project_PK
-				Outer APPLY (SELECT TOP 1 * FROM tblProviderOfficeStatus WHERE ProviderOffice_PK = cPO.ProviderOffice_PK) POS
-				LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
+				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
+				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
+				INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
+				Outer APPLY (SELECT TOP 1 * FROM tblProviderOfficeStatus WHERE ProviderOffice_PK = PO.ProviderOffice_PK) POS	
 			WHERE (@OFFICE=0 OR PO.ProviderOffice_PK=@OFFICE)
 				AND (@OFFICE<>0 OR POS.OfficeIssueStatus IS NOT NULL)
 				AND (@OFFICE<>0 OR (@filter_type=0 OR POS.OfficeIssueStatus=@filter_type))
+				AND (@Channel=0 OR S.Channel_PK=@Channel)
 			GROUP BY LEFT(PO.Address,1), RIGHT(LEFT(PO.Address,2),1)			
 			ORDER BY alpha1, alpha2;
 	END
@@ -124,6 +126,7 @@ BEGIN
 				AND (@OFFICE=0 OR PO.ProviderOffice_PK=@OFFICE)
 				AND (@OFFICE<>0 OR POS.OfficeIssueStatus IS NOT NULL)
 				AND (@OFFICE<>0 OR (@filter_type=0 OR POS.OfficeIssueStatus=@filter_type))
+				AND (@Channel=0 OR S.Channel_PK=@Channel)
 	END
 END
 GO

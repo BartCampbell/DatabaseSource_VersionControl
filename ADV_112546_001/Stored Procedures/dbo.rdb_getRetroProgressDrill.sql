@@ -2,14 +2,9 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
--- =============================================
--- Author:	Sajid Ali
--- Create date: Oct-02-2015
--- Description:	
--- =============================================
 /* Sample Executions
-rdb_getRetroProgressDrill 0,1,0,1,'',''
-rdb_getRetroProgressDrill '0',1,'0',0,'A',0
+{projects:'0,11,1',user:1,project_group:1,drill_type:2,priority:'',channel:1}
+rdb_getRetroProgressDrill '0,11,1',1,'0',2,'',0,1
 */
 Create PROCEDURE [dbo].[rdb_getRetroProgressDrill]
 	@Projects varchar(20),
@@ -17,7 +12,8 @@ Create PROCEDURE [dbo].[rdb_getRetroProgressDrill]
 	@ProjectGroup varchar(10),
 	@DrillType int,
 	@Priority varchar(10),
-	@Export int
+	@Export int,
+	@Channel int
 AS
 BEGIN
 	Declare @Sch_Type AS INT = 99
@@ -50,7 +46,7 @@ BEGIN
 			--INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
-	WHERE PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL
+	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL) AND (@Channel=0 OR S.Channel_PK=@Channel)
 	GROUP BY S.Project_PK,S.Provider_PK
 	CREATE CLUSTERED INDEX  idxTProjectPK ON #tmp (Project_PK,Provider_PK)
 
@@ -70,6 +66,7 @@ BEGIN
 			INTO #tbl
 			FROM #tmp cPO INNER JOIN tblProject P WITH (NOLOCK) ON P.Project_PK=cPO.Project_PK 
 				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Project_PK = cPO.Project_PK AND S.Provider_PK = cPO.Provider_PK
+			WHERE (@Channel=0 OR S.Channel_PK=@Channel)
 			GROUP BY P.Project_PK,Project_Name,P.ProjectGroup
 
 			SELECT Project_PK,[Project],[Total Chases]
@@ -96,14 +93,14 @@ BEGIN
 				COUNT(*) Chases,
 				COUNT(CASE WHEN IsNull(IsNull(T.Sch_Date,S.Scanned_Date),S.CNA_Date) IS NOT NULL THEN S.Suspect_PK ELSE NULL END) Scheduled,
 				COUNT(CASE WHEN S.IsScanned=1 THEN S.Suspect_PK ELSE NULL END) Extracted,
-				COUNT(CASE WHEN S.IsCNA=1 THEN S.Suspect_PK ELSE NULL END) CNA,
+				COUNT(CASE WHEN S.IsCNA=1 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END) CNA,
 				COUNT(CASE WHEN S.IsCoded=1 THEN S.Suspect_PK ELSE NULL END) Coded
 			FROM tblSuspect S WITH (NOLOCK) 
 				INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
 				INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
 				INNER JOIN tblProject Pr WITH (NOLOCK) ON Pr.Project_PK = S.Project_PK
 				LEFT JOIN #tmp T ON S.Project_PK = T.Project_PK AND S.Provider_PK = T.Provider_PK
-			WHERE @Priority='' OR S.ChartPriority=@Priority
+			WHERE (@Priority='' OR S.ChartPriority=@Priority) AND (@Channel=0 OR S.Channel_PK=@Channel)
 			GROUP BY S.Project_PK,Pr.Project_Name,Pr.ProjectGroup
 			ORDER BY Pr.Project_Name
 		END
@@ -147,12 +144,13 @@ BEGIN
 				WHERE (
 					(@DrillType=0)
 					OR (@DrillType=1 AND T.Sch_Date IS NOT NULL)
-					OR (@DrillType=2 AND S.IsCNA=1)
+					OR (@DrillType=2 AND S.IsCNA=1 AND S.IsScanned=0)
 					OR (@DrillType=3 AND S.IsScanned=1)
 					OR (@DrillType=4 AND S.IsCoded=1)
 			    ) 
 				AND (@Priority='' OR S.ChartPriority=@Priority)
 				AND (@Sch_Type=99 OR T.schedule_type=@Sch_Type)
+				AND (@Channel=0 OR S.Channel_PK=@Channel)
 		)
 		SELECT * FROM tbl WHERE [#]<=25 OR @Export=1 ORDER BY [#]
 

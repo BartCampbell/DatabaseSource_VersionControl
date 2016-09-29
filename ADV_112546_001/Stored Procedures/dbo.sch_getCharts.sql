@@ -5,7 +5,7 @@ GO
 --	sch_getCharts 4,107
 CREATE PROCEDURE [dbo].[sch_getCharts] 
 	@drill_type tinyint,
-	@office bigint
+	@office bigint 
 AS
 BEGIN
 	DECLARE @SQL VARCHAR(MAX)
@@ -13,9 +13,9 @@ BEGIN
 	SET @SQL = 'SELECT S.Suspect_PK,S.ChaseID,M.Member_ID, M.Lastname+IsNull('', ''+M.Firstname,'''') MemberName, M.DOB,
 		    PM.Provider_ID, PM.Lastname+IsNull('', ''+PM.Firstname,'''') ProviderName ';
             if @drill_type = 0 --All
-                SET @SQL = @SQL + ' ,ChartRec_Date Received, ChartRec_InComp_Date Incomplete,SICN.Note Notes, InvoiceRec_Date Invoice ,CNA_Date CNA,SN.Note_Text Notes, Scanned_Date Extracted, Coded_Date Coded';
+                SET @SQL = @SQL + ' ,IsNull(ChartRec_Date,Scanned_Date) Received, ChartRec_InComp_Date Incomplete,SICN.Note Notes, InvoiceRec_Date Invoice ,CNA_Date CNA,SN.Note_Text Notes, Scanned_Date Extracted, Coded_Date Coded';
             if (@drill_type = 1) --Chart Rec
-                SET @SQL = @SQL + ' ,ChartRec_Date Received';
+                SET @SQL = @SQL + ' ,IsNull(ChartRec_Date,Scanned_Date) Received';
             else if (@drill_type = 2) --ChartRec_InComp
                 SET @SQL = @SQL + ' ,ChartRec_InComp_Date Incomplete,SICNN.IncompleteNote, SICN.Note Notes,IsNull(IsInComp_Replied,0) Replied';
             else if (@drill_type = 3) --Invoice Rec

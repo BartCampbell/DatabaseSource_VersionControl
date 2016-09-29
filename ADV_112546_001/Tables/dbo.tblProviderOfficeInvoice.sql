@@ -16,8 +16,17 @@ CREATE TABLE [dbo].[tblProviderOfficeInvoice]
 [dtUpdate] [smalldatetime] NULL,
 [Inv_File] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [IsPaid] [bit] NULL,
-[IsExtracted] [bit] NULL
+[IsExtracted] [bit] NULL,
+[ProviderOfficeInvoiceBucket_PK] [tinyint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblProviderOfficeInvoice] ADD CONSTRAINT [PK_tblProviderOfficeInvoice] PRIMARY KEY CLUSTERED  ([ProviderOfficeInvoice_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeInvoicePayment] ON [dbo].[tblProviderOfficeInvoice] ([PaymentType_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeInvoiceOffice] ON [dbo].[tblProviderOfficeInvoice] ([ProviderOffice_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeInvoiceBucket] ON [dbo].[tblProviderOfficeInvoice] ([ProviderOfficeInvoiceBucket_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeInvoiceUpdateUser] ON [dbo].[tblProviderOfficeInvoice] ([Update_User_PK]) ON [PRIMARY]
 GO

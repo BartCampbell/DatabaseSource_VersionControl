@@ -17,7 +17,8 @@ CREATE PROCEDURE [dbo].[rdb_retroValidationDrill]
 	@ProjectGroup varchar(10),
 	@DrillType int,
 	@ID int,
-	@Export int
+	@Export int,
+	@Channel int
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -59,8 +60,11 @@ BEGIN
 			LEFT JOIN tblNoteText NTx ON NTx.NoteText_PK = CDN.NoteText_PK
 			LEFT JOIN tblModelCode MC ON MC.DiagnosisCode = CD.DiagnosisCode
 			LEFT JOIN tblHCC H ON H.HCC = MC.V12HCC AND H.PaymentModel=12
-			WHERE (@DrillType=0 AND CD.CodedSource_PK=@ID)
+			WHERE (@Channel=0 OR S.Channel_PK=@Channel)
+			AND (
+			(@DrillType=0 AND CD.CodedSource_PK=@ID)
 				OR (@DrillType=1 AND CDN.NoteText_PK=@ID)
+				)
 	)
 	SELECT * FROM tbl WHERE [#]<=25 OR @Export=1 ORDER BY [#]
 

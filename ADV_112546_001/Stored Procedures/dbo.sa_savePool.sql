@@ -24,18 +24,19 @@ CREATE PROCEDURE [dbo].[sa_savePool]
 	@SchedulerTeam_PK int, 
 	@Pool_Priority int, 
 	@IsAutoRefreshPool int,
-	@PriorityWithinPool int
+	@PriorityWithinPool int,
+	@IsForcedAllocationAllowed int
 AS
 BEGIN
 	if @PK=0
 	BEGIN
-		INSERT INTO tblPool(Pool_Name, IsBucketRule, IsFollowupRule, IsRemainingRule, RemainingCharts, RemainingChartsMoreOrEqual, IsLastScheduledRule, DaysSinceLastScheduled, IsScheduledTypeRule, ScheduledType, IsZoneRule, Zone_PK, IsProjectRule, Projects, ProjectGroups, SchedulerTeam_PK, Pool_Priority, IsAutoRefreshPool,PriorityWithinPool) 
-		VALUES (@Pool_name, @IsBucketRule, @IsFollowupRule, @IsRemainingRule, @RemainingCharts, @RemainingChartsMoreOrEqual, @IsLastScheduledRule, @DaysSinceLastScheduled, @IsScheduledTypeRule, @ScheduledType, @IsZoneRule, @Zone_PK, @IsProjectRule, @Project_PK, @ProjectGroup_PK, @SchedulerTeam_PK, @Pool_Priority, @IsAutoRefreshPool,@PriorityWithinPool)
+		INSERT INTO tblPool(Pool_Name, IsBucketRule, IsFollowupRule, IsRemainingRule, RemainingCharts, RemainingChartsMoreOrEqual, IsLastScheduledRule, DaysSinceLastScheduled, IsScheduledTypeRule, ScheduledType, IsZoneRule, Zone_PK, IsProjectRule, Projects, ProjectGroups, SchedulerTeam_PK, Pool_Priority, IsAutoRefreshPool,PriorityWithinPool,IsForcedAllocationAllowed) 
+		VALUES (@Pool_name, @IsBucketRule, @IsFollowupRule, @IsRemainingRule, @RemainingCharts, @RemainingChartsMoreOrEqual, @IsLastScheduledRule, @DaysSinceLastScheduled, @IsScheduledTypeRule, @ScheduledType, @IsZoneRule, @Zone_PK, @IsProjectRule, @Project_PK, @ProjectGroup_PK, @SchedulerTeam_PK, @Pool_Priority, @IsAutoRefreshPool,@PriorityWithinPool,@IsForcedAllocationAllowed)
 		SELECT @PK=@@IDENTITY
 	END
 	ELSE
 	BEGIN
-		UPDATE tblPool SET Pool_name=@Pool_name, IsBucketRule=@IsBucketRule, IsFollowupRule=@IsFollowupRule, IsRemainingRule=@IsRemainingRule, RemainingCharts=@RemainingCharts, RemainingChartsMoreOrEqual=@RemainingChartsMoreOrEqual, IsLastScheduledRule=@IsLastScheduledRule, DaysSinceLastScheduled=@DaysSinceLastScheduled, IsScheduledTypeRule=@IsScheduledTypeRule, ScheduledType=@ScheduledType, IsZoneRule=@IsZoneRule, Zone_PK=@Zone_PK, IsProjectRule=@IsProjectRule, Projects=@Project_PK, ProjectGroups=@ProjectGroup_PK, SchedulerTeam_PK=@SchedulerTeam_PK, Pool_Priority=@Pool_Priority, IsAutoRefreshPool=@IsAutoRefreshPool, PriorityWithinPool=@PriorityWithinPool
+		UPDATE tblPool SET Pool_name=@Pool_name, IsBucketRule=@IsBucketRule, IsFollowupRule=@IsFollowupRule, IsRemainingRule=@IsRemainingRule, RemainingCharts=@RemainingCharts, RemainingChartsMoreOrEqual=@RemainingChartsMoreOrEqual, IsLastScheduledRule=@IsLastScheduledRule, DaysSinceLastScheduled=@DaysSinceLastScheduled, IsScheduledTypeRule=@IsScheduledTypeRule, ScheduledType=@ScheduledType, IsZoneRule=@IsZoneRule, Zone_PK=@Zone_PK, IsProjectRule=@IsProjectRule, Projects=@Project_PK, ProjectGroups=@ProjectGroup_PK, SchedulerTeam_PK=@SchedulerTeam_PK, Pool_Priority=@Pool_Priority, IsAutoRefreshPool=@IsAutoRefreshPool, PriorityWithinPool=@PriorityWithinPool, IsForcedAllocationAllowed=@IsForcedAllocationAllowed
 		WHERE Pool_PK = @PK
 	END	
 

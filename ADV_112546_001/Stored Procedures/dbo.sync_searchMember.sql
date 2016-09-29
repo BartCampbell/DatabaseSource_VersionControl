@@ -45,7 +45,7 @@ BEGIN
 	SELECT DISTINCT 0 Provider_PK,0 Member_PK,0 Suspect_PK,0 IsScanned,0 IsCNA,GETDATE() Scanned_Date,GETDATE() CNA_Date,0 Project_PK,0 IsInvoiced, ' ' DOSs
 	UNION
 	SELECT DISTINCT S.Provider_PK,S.Member_PK,S.Suspect_PK,S.IsScanned,S.IsCNA,S.Scanned_Date,S.CNA_Date,S.Project_PK,IsNull(IsInvoiced,0) IsInvoiced
-		,dbo.tmi_udf_GetMemberProviderDOSs(S.Member_PK,PM.Provider_ID) DOSs
+		,dbo.tmi_udf_GetSuspectDOSs(S.Suspect_PK) DOSs
 		FROM tblSuspect S WITH (NOLOCK) 
 			INNER JOIN #tmp T ON T.Suspect_PK=S.Suspect_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON T.Provider_PK=P.Provider_PK
