@@ -21,11 +21,10 @@ CREATE PROCEDURE [dbo].[im_updateInvoice]
 	@addInfo varchar(200),
 	@inv_file varchar(50),
 	@suspects varchar(1000),
-	@office int,
-	@project int
+	@office int
 AS
 BEGIN
-	UPDATE tblSuspectInvoiceInfo SET Update_User_PK=@usr, dtUpdate = GETDATE(), 
+	UPDATE tblProviderOfficeInvoice SET Update_User_PK=@usr, dtUpdate = GETDATE(), 
 		InvoiceVendor_PK=@invVendor,
 		InvoiceNumber=@invNum,
 		InvoiceAmount=@invAmt,
@@ -33,17 +32,18 @@ BEGIN
 		PaymentType_PK=@payType,
 		Check_Transaction_Number=@invTransNum,
 		InvoiceAccountNumber=@invAcc,
-		Inv_File=@inv_file
-	WHERE Invoice_PK = @invoice
+		Inv_File=@inv_file,
+		ProviderOfficeInvoiceBucket_PK = CASE WHEN @invoice_status=0 THEN ProviderOfficeInvoiceBucket_PK ELSE @invoice_status END
+	WHERE ProviderOfficeInvoice_PK = @invoice
 
-	DELETE FROM tblSuspectInvoiceDetail WHERE Invoice_PK = @invoice
+	DELETE FROM tblProviderOfficeInvoiceSuspect WHERE ProviderOfficeInvoice_PK = @invoice
+	EXEC('INSERT INTO tblProviderOfficeInvoiceSuspect(ProviderOfficeInvoice_PK,Suspect_PK) SELECT '+@invoice+',Suspect_PK FROM tblSuspect WHERE Suspect_PK IN ('+@suspects+')')
 
-	EXEC('INSERT INTO tblSuspectInvoiceDetail(Invoice_PK,Suspect_PK) SELECT '+@invoice+',Suspect_PK FROM tblSuspect WHERE Suspect_PK IN ('+@suspects+')')
-
-	IF (@invoice_status=5)
+	DECLARE @default_note AS varchar(1000)
+	IF (@invoice_status=4)
 	BEGIN
 		--PAID
-		DECLARE @default_note AS varchar(1000) = 'Invoice# '+@invNum+' in the amount of $'+CAST(@invAmt AS VARCHAR)+' paid on '+ CAST(MONTH(GETDATE()) AS VARCHAR) +'-'+ CAST(DAY(GETDATE()) AS VARCHAR) +'-'+ CAST(YEAR(GETDATE()) AS VARCHAR) +' via '
+		SET @default_note = 'Invoice# '+@invNum+' in the amount of $'+CAST(@invAmt AS VARCHAR)+' paid on '+ CAST(MONTH(GETDATE()) AS VARCHAR) +'-'+ CAST(DAY(GETDATE()) AS VARCHAR) +'-'+ CAST(YEAR(GETDATE()) AS VARCHAR) +' via '
 		if (@payType=1)
 			SET @default_note = @default_note + 'Credit Card with Confirmation#'
 		else if (@payType=2)
@@ -54,31 +54,39 @@ BEGIN
 		SET @default_note = @default_note + '  '+@invTransNum
 
 		INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num)
-		VALUES(@project,@office,50,@default_note,@usr,GETDATE(),0)
-
-		Update tblSuspectInvoiceInfo SET IsApproved = 1, IsPaid=1 WHERE Invoice_PK = @invoice
-	END
-	ELSE IF (@invoice_status=1)
-	BEGIN
-		--REJECTED
-		INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num)
-		VALUES(@project,@office,51,'Invoice '+@invNum+' in the amount of $'+CAST(@invAmt AS VARCHAR)+' rejected',@usr,GETDATE(),0)	
-		
-		Update tblSuspectInvoiceInfo SET IsApproved = 0, IsPaid=0 WHERE Invoice_PK = @invoice	
+		SELECT 0,@office,ContactNote_PK,@default_note,@usr,GETDATE(),0 FROM tblContactNote WHERE sortOrder = 804
 	END
 	ELSE IF (@invoice_status=2)
 	BEGIN
 		--REJECTED
 		INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num)
-		VALUES(@project,@office,53,'Invoice '+@invNum+' in the amount of $'+CAST(@invAmt AS VARCHAR)+' approved',@usr,GETDATE(),0)		
-
-		Update tblSuspectInvoiceInfo SET IsApproved = 1 WHERE Invoice_PK = @invoice	
+		SELECT 0,@office,ContactNote_PK,'Invoice '+@invNum+' in the amount of $'+CAST(@invAmt AS VARCHAR)+' rejected',@usr,GETDATE(),0 FROM tblContactNote WHERE sortOrder = 802	
+	END
+	ELSE IF (@invoice_status=3)
+	BEGIN
+		--Aproved
+		INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num)
+		SELECT 0,@office,ContactNote_PK,'Invoice '+@invNum+' in the amount of $'+CAST(@invAmt AS VARCHAR)+' approved',@usr,GETDATE(),0 FROM tblContactNote WHERE sortOrder = 803	
+	END
+	ELSE IF (@invoice_status=5)
+	BEGIN
+		--Reimbursement initiated
+		INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num)
+		SELECT 0,@office,ContactNote_PK,'Invoice '+@invNum+' in the amount of $'+CAST(@invAmt AS VARCHAR)+' moved for reimbursement',@usr,GETDATE(),0 FROM tblContactNote WHERE sortOrder = 805	
+	END
+	ELSE IF (@invoice_status=1)
+	BEGIN
+		--Invoice Revereted to Pending Status
+		SET @default_note = ''
+		INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num)
+		SELECT 0,@office,ContactNote_PK,@default_note,@usr,GETDATE(),0 FROM tblContactNote WHERE sortOrder = 801	
 	END
 
 	IF (@addInfo<>'')
 	BEGIN
 		INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num)
-		VALUES(@project,@office,52,@addInfo,@usr,GETDATE(),0)
+		SELECT 0,@office,ContactNote_PK,@addInfo,@usr,GETDATE(),0  FROM tblContactNote WHERE sortOrder = 800
 	END
+
 END
 GO

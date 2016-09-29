@@ -22,9 +22,11 @@ BEGIN
 			  ,IsZoneRule,Zone_PK
 			  ,IsProjectRule,Projects,ProjectGroups
 			  ,SchedulerTeam_PK,Pool_Priority,IsAutoRefreshPool,PriorityWithinPool
+			  ,IsForcedAllocationAllowed
 			  ,Offices
 		  FROM dbo.tblPool P with (nolock)
 			Outer Apply (SELECT count(1) Offices FROM tblProviderOffice PO with (nolock) WHERE PO.Pool_PK = P.Pool_PK AND ProviderOfficeBucket_PK<>0) X
+		ORDER BY P.Pool_Priority
 
 	SELECT count(1) Offices FROM tblProviderOffice PO with (nolock) WHERE PO.Pool_PK IS NULL AND ProviderOfficeBucket_PK<>0
 

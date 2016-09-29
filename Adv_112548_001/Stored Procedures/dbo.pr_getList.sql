@@ -9,7 +9,7 @@ GO
 -- Description:	To get Finance Report Summary for Dashboad
 -- =============================================
 /* Sample Executions
-pr_getList '0','0',1,0,3,5,'1/1/2014','1/1/2017',0
+pr_getList '0','0',1,0,2,5,'1/1/2014','1/1/2017',0
 */
 CREATE PROCEDURE [dbo].[pr_getList]
 	@Projects varchar(100),
@@ -109,7 +109,7 @@ BEGIN
 	ELSE IF (@UserType=2)	--Scan Tech
 	BEGIN
 		SET @SQL = '
-			SELECT Scanned_User_PK User_PK,COUNT(DISTINCT S.Suspect_PK) Scanned, 0 CNA INTO #tmp FROM tblSuspect S 
+			SELECT Scanned_User_PK User_PK,COUNT(DISTINCT S.Suspect_PK) Scanned, 0 CNA, 0 Invoices INTO #tmp FROM tblSuspect S 
 					INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
 			WHERE IsScanned=1 '
 
@@ -131,7 +131,7 @@ BEGIN
 
 			CREATE INDEX idxtmp ON #tmp (User_PK);
 			INSERT INTO #tmp
-			SELECT CNA_User_PK User_PK,0 Scanned, COUNT(DISTINCT S.Suspect_PK) CNA FROM tblSuspect S 
+			SELECT CNA_User_PK User_PK,0 Scanned, COUNT(DISTINCT S.Suspect_PK) CNA, 0 Invoices FROM tblSuspect S 
 					INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
 			WHERE IsCNA=1 ';
 					
@@ -151,8 +151,29 @@ BEGIN
 		SET @SQL = @SQL + '
 			GROUP BY CNA_User_PK
 
+			INSERT INTO #tmp
+			SELECT S.User_PK,0 Scanned, 0 CNA, COUNT(DISTINCT S.ProviderOfficeInvoice_PK) Invoices FROM tblExtractionQueueAttachLog S 
+					
+			WHERE S.IsInvoice=1 ';
+					
+		IF @User<>0
+			SET @SQL = @SQL + ' AND S.User_PK=' + CAST(@User AS VARChar);			
+		IF @DateType = 1
+			SET @SQL = @SQL + ' AND DATEPART(wk, S.dtInsert) = DATEPART(wk, GETDATE()-7) AND DATEPART(yy, S.dtInsert) = DATEPART(yy, GETDATE()-7)'
+		ELSE IF @DateType = 2
+			SET @SQL = @SQL + ' AND DATEPART(wk, S.dtInsert) = DATEPART(wk, GETDATE()) AND DATEPART(yy, S.dtInsert) = DATEPART(yy, GETDATE())'
+		ELSE IF @DateType = 3
+			SET @SQL = @SQL + ' AND Month(S.dtInsert) = Month(GETDATE()) AND Year(S.dtInsert) = Year(GETDATE())'
+		ELSE IF @DateType = 4
+			SET @SQL = @SQL + ' AND Month(S.dtInsert) = Month(DateAdd(month,-1,getdate())) AND Year(S.dtInsert) = Year(DateAdd(month,-1,getdate()))'
+		ELSE IF @DateType = 5
+			SET @SQL = @SQL + ' AND S.dtInsert>= '''+ @startDate +''' AND S.dtInsert < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
+						
+		SET @SQL = @SQL + '
+			GROUP BY S.User_PK
+
 		SELECT ROW_NUMBER() OVER(ORDER BY U.Lastname+ISNULL('', ''+U.Firstname,'''')) AS RowNumber, U.User_PK, U.Lastname+ISNULL('', ''+U.Firstname,'''') Fullname,U.Username
-			,MAX(Scanned) Scanned, MAX(CNA) CNA
+			,MAX(Scanned) Scanned, MAX(CNA) CNA, MAX(Invoices) Invoices
 		FROM #tmp T INNER JOIN tblUser U ON U.User_PK = T.User_PK'
 		IF @location <> 0
 			SET @SQL = @SQL + ' WHERE U.Location_PK=' + CAST(@location AS VARCHAR)
@@ -214,6 +235,12 @@ BEGIN
 		SET @SQL = @SQL + ' GROUP BY U.User_PK, U.Lastname, U.Firstname ,U.Username
 		'		
 	END		
+	ELSE IF (@UserType=4)		--PDF Inventory
+	BEGIN
+		SELECT COUNT(*) Files,'PDFs Assigned To Scan Techs' [Description] FROM tblExtractionQueue WHERE AssignedUser_PK IS NOT NULL UNION
+		SELECT COUNT(*),'Pending PDFs still to be attached by Scan Techs.' + IsNull(' Oldest pending date '+CAST(Min(UploadDate) AS VARCHAR),'') X FROM tblExtractionQueue WHERE AssignedUser_PK IS NULL UNION
+		SELECT COUNT(*),'Total PDFs received' FROM tblExtractionQueue  ORDER BY [Description]		
+	END
 	
 	EXEC (@SQL);
 END 

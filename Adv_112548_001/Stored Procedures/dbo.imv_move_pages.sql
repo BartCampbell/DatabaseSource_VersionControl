@@ -2,7 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
---	imv_move_pages '0,0,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22',9802,2,1
+--	imv_move_pages '0,0,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22',9802,2,1,9801,1,1
 CREATE PROCEDURE [dbo].[imv_move_pages] 
 	@ids varchar(MAX),
 	@suspect_pk bigint,
@@ -13,6 +13,9 @@ CREATE PROCEDURE [dbo].[imv_move_pages]
 	@EA int
 AS
 BEGIN	
+		--@act 1 is move pages
+		--@act 2 is copy pages
+
 		DECLARE @SQL VARCHAR(MAX)
 
 		IF (@act=1 AND @EA=0)
@@ -32,11 +35,18 @@ BEGIN
 		EXEC(@SQL);
 
 		IF @act=1
+		BEGIN
 			SET @SQL = 'UPDATE tblScannedData WITH (ROWLOCK) SET is_deleted=0,suspect_pk='+ CAST(@suspect_pk AS VARCHAR) +',CodedStatus=NULL WHERE ScannedData_PK IN ('+ @ids +')';	
+			EXEC(@SQL);
+			IF NOT EXISTS(SELECT * FROM tblScannedData WHERE suspect_pk=@Source_Suspect)
+				Update tblExtractionQueueAttachLog SET Suspect_PK = @suspect_pk WHERE Suspect_PK = @Source_Suspect
+		END
 		ELSE
+		BEGIN
 			SET @SQL = 'INSERT INTO tblScannedData(Suspect_PK,DocumentType_PK,FileName,User_PK,dtInsert,is_deleted,CodedStatus) SELECT DISTINCT '+ CAST(@suspect_pk AS VARCHAR) +' Suspect_PK,DocumentType_PK,FileName,User_PK,dtInsert,is_deleted,NULL CodedStatus FROM tblScannedData WHERE ScannedData_PK IN ('+ @ids +')';	
-	
-		EXEC(@SQL);
+			EXEC(@SQL);
+		END
+		
 
 	EXEC comman_updateSuspect 3,@Source_Suspect,0
 	EXEC comman_updateSuspect 2,@suspect_pk,@Usr
