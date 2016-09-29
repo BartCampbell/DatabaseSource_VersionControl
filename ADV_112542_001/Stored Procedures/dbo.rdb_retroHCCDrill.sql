@@ -16,7 +16,8 @@ CREATE PROCEDURE [dbo].[rdb_retroHCCDrill]
 	@User int,
 	@ProjectGroup varchar(10),
 	@HCC int,
-	@Export int
+	@Export int,
+	@Channel int
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -50,7 +51,7 @@ BEGIN
 			INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
 			INNER JOIN tblCodedData CD WITH (NOLOCK) ON S.Suspect_PK = CD.Suspect_PK
 			INNER JOIN tblModelCode MC WITH (NOLOCK) ON MC.DiagnosisCode = CD.DiagnosisCode
-			WHERE MC.V12HCC=@HCC
+			WHERE MC.V12HCC=@HCC AND (@Channel=0 OR S.Channel_PK=@Channel)
 	)
 	SELECT * FROM tbl WHERE [#]<=25 OR @Export=1 ORDER BY [#]
 

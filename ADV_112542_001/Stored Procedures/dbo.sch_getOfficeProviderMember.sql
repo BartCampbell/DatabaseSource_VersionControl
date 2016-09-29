@@ -7,7 +7,7 @@ GO
 -- Create date: Mar-12-2014
 -- Description:	RA Coder will use this sp to pull list of providers in a project
 -- =============================================
---	sch_getOfficeProviderMember @Office=1
+--	sch_getOfficeProviderMember @Office=107
 CREATE PROCEDURE [dbo].[sch_getOfficeProviderMember] 
 	@Office bigint
 AS
@@ -16,7 +16,7 @@ BEGIN
 	FROM tblProviderOffice PO
 		LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK = PO.ZipCode_PK
 	WHERE PO.ProviderOffice_PK = @Office	
-	/*
+	/*  
 	--To List All Provider of each Members
 	SELECT DISTINCT M.Member_ID,M.Lastname+IsNull(', '+M.FirstName,'') Member,M.DOB,Count(DISTINCT Suspect_PK) Charts 
 	FROM tblMember M

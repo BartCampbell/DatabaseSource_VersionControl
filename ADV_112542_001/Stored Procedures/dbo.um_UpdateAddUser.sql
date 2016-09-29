@@ -39,7 +39,10 @@ CREATE PROCEDURE [dbo].[um_UpdateAddUser]
 	@IsChangePasswordOnFirstLogin bit,
 	@location tinyint, 
 	@IsAllowDownload bit,
-	@IsSchedulerManager bit
+	@IsSchedulerManager bit,
+	@IsInvoiceAccountant bit,
+	@IsBillingAccountant bit,
+	@IsManagementUser bit
 AS
 BEGIN
 	DECLARE @only_work_selected_hours BIT
@@ -85,8 +88,8 @@ BEGIN
 			
 	IF (@id=0)
 	BEGIN
-		INSERT INTO tblUser(Username,[Password],Lastname,Firstname,Email_Address,IsClient,IsAdmin,IsScanTech,IsScheduler,IsReviewer,IsQA,IsHRA,isQCC,IsActive,only_work_selected_hours,only_work_selected_zipcodes,linked_provider_id,linked_provider_pk,sch_name,sch_tel,sch_fax,isScanTechSV,isSchedulerSV,IsChangePasswordOnFirstLogin,location_pk,isAllowDownload,IsSchedulerManager)
-		VALUES(@Username,@pwd,@Lastname,@Firstname,@email,@IsClient,@IsAdmin,@IsScanTech,@IsScheduler,@isCoder,@IsQA,@IsHRA,@isQCC,@IsActive,@only_work_selected_hours,@only_work_selected_zipcodes,@Provider_ID,@Provider_PK,@sch_name,@sch_tel,@sch_fax,@isScanTechSV,@isSchedulerSV,@IsChangePasswordOnFirstLogin,@location,@isAllowDownload,@IsSchedulerManager)
+		INSERT INTO tblUser(Username,[Password],Lastname,Firstname,Email_Address,IsClient,IsAdmin,IsScanTech,IsScheduler,IsReviewer,IsQA,IsHRA,isQCC,IsActive,only_work_selected_hours,only_work_selected_zipcodes,linked_provider_id,linked_provider_pk,sch_name,sch_tel,sch_fax,isScanTechSV,isSchedulerSV,IsChangePasswordOnFirstLogin,location_pk,isAllowDownload,IsSchedulerManager,IsInvoiceAccountant, IsBillingAccountant, IsManagementUser)
+		VALUES(@Username,@pwd,@Lastname,@Firstname,@email,@IsClient,@IsAdmin,@IsScanTech,@IsScheduler,@isCoder,@IsQA,@IsHRA,@isQCC,@IsActive,@only_work_selected_hours,@only_work_selected_zipcodes,@Provider_ID,@Provider_PK,@sch_name,@sch_tel,@sch_fax,@isScanTechSV,@isSchedulerSV,@IsChangePasswordOnFirstLogin,@location,@isAllowDownload,@IsSchedulerManager,@IsInvoiceAccountant, @IsBillingAccountant, @IsManagementUser)
 		
 		SELECT @id=@@IDENTITY;
 	END
@@ -99,6 +102,7 @@ BEGIN
 			,isScanTechSV = @isScanTechSV, isSchedulerSV = @isSchedulerSV, IsSchedulerManager=@IsSchedulerManager
 			,IsChangePasswordOnFirstLogin=@IsChangePasswordOnFirstLogin
 			,location_pk = @location, isAllowDownload = @isAllowDownload
+			,IsInvoiceAccountant=@IsInvoiceAccountant, IsBillingAccountant=@IsBillingAccountant, IsManagementUser=@IsBillingAccountant
 		WHERE User_PK=@id
 		
 		IF (@pwd<>'')

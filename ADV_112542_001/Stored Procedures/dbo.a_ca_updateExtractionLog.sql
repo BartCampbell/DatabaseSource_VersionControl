@@ -31,7 +31,7 @@ BEGIN
 		SET dtProcessed=getDate(),IsProcessed=1,PagesAlreadyScanned=@alreadyScanned,PagesInPDF=@totalPages, PagesScanned=@pagesScanned
 		WHERE IsProcessed=0 AND ProviderOfficeInvoice_PK=@id AND ExtractionQueue_PK=@fileId AND pageFrom=@from AND pageTo=@to
 
-        UPDATE tblProviderOfficeInvoice SET IsExtracted=1 WHERE ProviderOfficeInvoice_PK=@id
+        UPDATE tblProviderOfficeInvoice SET IsExtracted=1,ProviderOfficeInvoiceBucket_PK=1 WHERE ProviderOfficeInvoice_PK=@id
 
         DELETE FROM tblProviderOfficeInvoiceSuspect WHERE ProviderOfficeInvoice_PK=@id
 

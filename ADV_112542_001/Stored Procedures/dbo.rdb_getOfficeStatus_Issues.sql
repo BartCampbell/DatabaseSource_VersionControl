@@ -2,19 +2,14 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-
--- =============================================
--- Author:	Sajid Ali
--- Create date: Oct-02-2015
--- Description:	
--- =============================================
 /* Sample Executions
 rdb_getOfficeStatus_Issues 0,1,0
 */
 CREATE PROCEDURE [dbo].[rdb_getOfficeStatus_Issues]
 	@Projects varchar(20),
 	@User int,
-	@ProjectGroup varchar(10)
+	@ProjectGroup varchar(10),
+	@Channel int
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -45,6 +40,7 @@ BEGIN
 			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
+	WHERE (@Channel=0 OR S.Channel_PK=@Channel)
 	Update T SET ContactNote_PK = CNO.ContactNote_PK FROM #tmpOffice T 
 		INNER JOIN tblContactNotesOffice CNO WITH (NOLOCK) ON T.ProviderOffice_PK = CNO.Office_PK
 		INNER JOIN tblContactNote CN ON CN.ContactNote_PK = CNO.ContactNote_PK AND CN.IsIssue=1
@@ -52,7 +48,7 @@ BEGIN
 	SELECT Bucket [Status],COUNT(DISTINCT O.ProviderOffice_PK) [Count],POB.ProviderOfficeBucket_PK
 		FROM #tmpOffice O WITH (NOLOCK)
 			INNER JOIN tblProviderOfficeBucket POB ON POB.ProviderOfficeBucket_PK = O.ProviderOfficeBucket_PK
-		WHERE POB.ProviderOfficeBucket_PK IN (0,1,2,3)
+		WHERE POB.ProviderOfficeBucket_PK IN (0,1,2,3) 
 		GROUP BY Bucket,POB.ProviderOfficeBucket_PK,POB.SortOrder
 		ORDER BY POB.SortOrder
 

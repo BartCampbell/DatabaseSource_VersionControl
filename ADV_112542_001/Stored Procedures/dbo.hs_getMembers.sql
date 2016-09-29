@@ -59,7 +59,6 @@ BEGIN
 			INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK	
 			INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK	
 			'
-			SELECT * FROM tblSuspect
 	IF @IsQA=0
 			SET @SQL = @SQL + ' INNER JOIN tblProviderAssignment PA ON PA.Project_PK = S.Project_PK AND PA.Provider_PK = S.Provider_PK AND PA.User_PK = ' + CAST(@user AS VARCHAR)
 	SET @SQL = @SQL + '		OUTER APPLY (SELECT TOP 1 dt_insert FROM tblHEDIS_feedback WHERE Suspect_PK=S.Suspect_PK ORDER BY dt_insert) T'

@@ -2,18 +2,14 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
--- =============================================
--- Author:	Sajid Ali
--- Create date: Oct-02-2015
--- Description:	
--- =============================================
 /* Sample Executions
 rdb_getRetroBurndown 0,1,1
 */
 CREATE PROCEDURE [dbo].[rdb_getRetroBurndown]
 	@Projects varchar(20),
 	@User int,
-	@ProjectGroup varchar(10)
+	@ProjectGroup varchar(10),
+	@Channel int
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -42,7 +38,7 @@ BEGIN
 			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
-	WHERE PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL
+	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL) AND (@Channel=0 OR S.Channel_PK=@Channel)
 	GROUP BY S.Project_PK,S.Provider_PK
 	CREATE CLUSTERED INDEX  idxTProjectPK ON #tmp (Project_PK,Provider_PK)
 
@@ -53,19 +49,19 @@ BEGIN
 			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			LEFT JOIN #tmp T ON S.Project_PK = T.Project_PK AND S.Provider_PK = T.Provider_PK	
-		WHERE T.Sch_Date IS NOT NULL
+		WHERE T.Sch_Date IS NOT NULL AND (@Channel=0 OR S.Channel_PK=@Channel)
 		GROUP BY Year(T.Sch_Date),DATEPART(WK,T.Sch_Date)
 		UNION
 		SELECT Year(Scanned_Date) DYear,DATEPART(WK,Scanned_Date) DWeek,NULL Scheduled, COUNT(DISTINCT S.Suspect_PK) Extracted, NULL Coded, MAX(Scanned_Date) Dt,NULL ScheduledGoal, NULL ExtractedGoal, NULL CodedGoal
 		FROM tblSuspect S WITH (NOLOCK)
 		INNER JOIN #tmp T ON S.Project_PK = T.Project_PK AND S.Provider_PK = T.Provider_PK
-		WHERE Scanned_Date IS NOT NULL
+		WHERE Scanned_Date IS NOT NULL AND (@Channel=0 OR S.Channel_PK=@Channel)
 		GROUP BY Year(Scanned_Date),DATEPART(WK,Scanned_Date)
 		UNION
 		SELECT Year(Coded_Date) DYear,DATEPART(WK,Coded_Date) DWeek,NULL Scheduled, NULL Extracted, COUNT(DISTINCT S.Suspect_PK) Coded, MAX(Coded_Date) Dt,NULL ScheduledGoal, NULL ExtractedGoal, NULL CodedGoal
 		FROM tblSuspect S WITH (NOLOCK)
 		INNER JOIN #tmp T ON S.Project_PK = T.Project_PK AND S.Provider_PK = T.Provider_PK
-		WHERE Coded_Date IS NOT NULL
+		WHERE Coded_Date IS NOT NULL AND (@Channel=0 OR S.Channel_PK=@Channel)
 		GROUP BY Year(Coded_Date),DATEPART(WK,Coded_Date)
 		UNION
 		SELECT Year(dtGoal) DYear,DATEPART(WK,dtGoal) DWeek,NULL Scheduled, NULL Extracted, NULL Coded, MAX(dtGoal) Dt
@@ -81,6 +77,7 @@ BEGIN
 --PRINT 'COUNT'
 	SELECT COUNT(SUSPECT_PK) FROM tblSuspect S WITH (NOLOCK)
 			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
+	WHERE (@Channel=0 OR S.Channel_PK=@Channel)
 --PRINT 'DONE'
 END
 GO
