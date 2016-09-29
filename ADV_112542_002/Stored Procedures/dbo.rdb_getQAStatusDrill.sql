@@ -16,7 +16,8 @@ CREATE PROCEDURE [dbo].[rdb_getQAStatusDrill]
 	@User int,
 	@ProjectGroup varchar(10),
 	@DrillType int,
-	@Export int
+	@Export int,
+	@Channel int
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -63,7 +64,8 @@ BEGIN
 			LEFT JOIN tblUser U_QA WITH (NOLOCK) ON U_QA.User_PK = QA.QA_User_PK
 			
 
-			WHERE (
+			WHERE (@Channel=0 OR S.Channel_PK=@Channel)
+				AND (
 				(@DrillType=0) --Total Coded Diagnosis
 				OR (@DrillType=1 AND QA.CodedData_PK IS NOT NULL) --QA Sample
 				OR (@DrillType=2 AND IsConfirmed=1) --Confirmed 

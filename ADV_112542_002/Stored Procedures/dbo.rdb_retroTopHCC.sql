@@ -2,19 +2,14 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-
--- =============================================
--- Author:	Sajid Ali
--- Create date: Oct-02-2015
--- Description:	
--- =============================================
 /* Sample Executions
 rdb_retroTopHCC 0,1
 */
 Create PROCEDURE [dbo].[rdb_retroTopHCC]
 	@Projects varchar(20),
 	@User int,
-	@ProjectGroup varchar(10)
+	@ProjectGroup varchar(10),
+	@Channel int
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -39,6 +34,7 @@ BEGIN
 		INNER JOIN tblSuspect S WITH (NOLOCK) ON CD.Suspect_PK = S.Suspect_PK
 		INNER JOIN tblHCC H WITH (NOLOCK) ON H.HCC = MC.V12HCC AND H.PaymentModel=12
 		INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
+	WHERE (@Channel=0 OR S.Channel_PK=@Channel)
 	GROUP BY H.HCC,H.HCC_Desc ORDER BY COUNT(DISTINCT CD.Suspect_PK) DESC
 END
 GO

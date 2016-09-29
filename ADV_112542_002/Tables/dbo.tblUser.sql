@@ -38,7 +38,10 @@ CREATE TABLE [dbo].[tblUser]
 [EmploymentAgency] [tinyint] NULL,
 [isAllowDownload] [bit] NULL,
 [CoderLevel] [tinyint] NULL,
-[IsSchedulerManager] [bit] NULL
+[IsSchedulerManager] [bit] NULL,
+[IsInvoiceAccountant] [bit] NULL,
+[IsBillingAccountant] [bit] NULL,
+[IsManagementUser] [bit] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblUser] ADD CONSTRAINT [PK_tblUser] PRIMARY KEY CLUSTERED  ([User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]

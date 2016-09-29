@@ -16,7 +16,8 @@ CREATE PROCEDURE [dbo].[sch_getOffice_map]
 	@followup_bucket int,
 	@user int,
 	@PoolPK int,
-	@ZonePK int
+	@ZonePK int,
+	@address varchar(100)
 AS
 BEGIN
 	DECLARE @scheduler AS INT = 0
@@ -58,6 +59,7 @@ BEGIN
 			AND (@scheduler=0 OR PO.AssignedUser_PK=@scheduler)
 			AND (@followup_bucket=0 OR follow_up<=GetDate())
 			AND (@OFFICE=0 OR PO.ProviderOffice_PK=@OFFICE)
+			AND (@address='' OR PO.Address LIKE '%'+@address+'%')
 		GROUP BY PO.ProviderOffice_PK
 
 	SELECT 0 Project_PK,cPO.ProviderOffice_PK,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,Isnull(PO.EMR_Type_PK,0) EMR_Type_PK

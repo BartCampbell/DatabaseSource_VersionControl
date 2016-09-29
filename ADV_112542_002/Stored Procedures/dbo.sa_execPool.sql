@@ -32,6 +32,7 @@ BEGIN
 	DECLARE @Pool_Priority int
 	DECLARE @IsAutoRefreshPool int
 	DECLARE @PriorityWithinPool int
+	DECLARE @IsForcedAllocationAllowed int = 1
 
 	SELECT @IsBucketRule=IsBucketRule--,@ProviderOfficeBucket_PK=ProviderOfficeBucket_PK
 			,@IsFollowupRule=IsFollowupRule
@@ -41,6 +42,7 @@ BEGIN
 			,@IsZoneRule=IsZoneRule,@Zone_PK=Zone_PK
 			,@IsProjectRule=IsProjectRule,@Projects=Projects,@ProjectGroups=ProjectGroups
 			,@SchedulerTeam_PK=SchedulerTeam_PK,@Pool_Priority=Pool_Priority,@IsAutoRefreshPool=IsAutoRefreshPool,@PriorityWithinPool=PriorityWithinPool
+			,@IsForcedAllocationAllowed = IsForcedAllocationAllowed
 	FROM dbo.tblPool WHERE Pool_PK = @PoolPK
 
 	CREATE TABLE #tmpSchedule(ProviderOffice_PK BIGINT,ScheduleDate DATE,ScheduleType tinyint)
@@ -84,7 +86,8 @@ BEGIN
 		LEFT JOIN #tmpSchedule tS ON tS.ProviderOffice_PK = PO.ProviderOffice_PK
 		LEFT JOIN #tmpZone Z ON tS.ProviderOffice_PK = PO.ProviderOffice_PK
 		LEFT JOIN tblPoolBucket PB ON PO.ProviderOfficeBucket_PK = PB.ProviderOfficeBucket_PK AND PB.Pool_PK = @PoolPK
-		WHERE PO.Pool_PK IS NULL
+		WHERE IsNull(RemainingCharts,0)>0
+			AND (PO.Pool_PK IS NULL OR @IsForcedAllocationAllowed=1)
 			AND (@IsBucketRule=0 OR PB.Pool_PK IS NOT NULL)
 			AND (@IsFollowupRule=0 OR cPO.FollowUpDate<=GetDate())
 			AND (@IsLastScheduledRule=0 OR DATEDIFF(day,ScheduleDate,GetDate())>=@DaysSinceLastScheduled)
@@ -95,7 +98,5 @@ BEGIN
 					OR (@RemainingChartsMoreOrEqual=1 AND RemainingCharts>=@RemainingCharts)
 					OR (@RemainingChartsMoreOrEqual=0 AND RemainingCharts<=@RemainingCharts)
 				)
---
---SELECT * FROM tblProviderOffice WHERE Pool_PK IS NOT NULL
 END
 GO

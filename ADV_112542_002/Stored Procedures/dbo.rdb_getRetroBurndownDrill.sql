@@ -2,12 +2,6 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-
--- =============================================
--- Author:	Sajid Ali
--- Create date: Oct-02-2015
--- Description:	
--- =============================================
 /* Sample Executions
 rdb_getRetroBurndownDrill 0,1,'0',1,'08/26/2015',0
 */
@@ -17,7 +11,8 @@ CREATE PROCEDURE [dbo].[rdb_getRetroBurndownDrill]
 	@ProjectGroup varchar(10),
 	@DrillType int,
 	@Dt date,
-	@Export int
+	@Export int,
+	@Channel int
 AS
 BEGIN
 	SET @Dt = DateAdd(day,1,@Dt);
@@ -44,7 +39,7 @@ BEGIN
 			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
-	WHERE PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL
+	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL) AND (@Channel=0 OR S.Channel_PK=@Channel)
 	GROUP BY S.Suspect_PK
 
 	--Overall Progress for All Projects
@@ -61,9 +56,12 @@ BEGIN
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			INNER JOIN tblProject Pr WITH (NOLOCK) ON Pr.Project_PK = S.Project_PK
 			LEFT JOIN #tmp T ON T.Suspect_PK = S.Suspect_PK
-				WHERE  (@DrillType=1 AND IsNull(IsNull(T.Sch_Date,S.Scanned_Date),S.CNA_Date)<@Dt)
+				WHERE (@Channel=0 OR S.Channel_PK=@Channel) 
+					AND ( 
+					(@DrillType=1 AND IsNull(IsNull(T.Sch_Date,S.Scanned_Date),S.CNA_Date)<@Dt)
 					OR (@DrillType=2 AND S.Scanned_Date<@Dt)
 					OR (@DrillType=3 AND S.Coded_Date<@Dt)
+					)
 		GROUP BY S.Project_PK,Pr.Project_Name
 		ORDER BY Pr.Project_Name
 	END
@@ -89,10 +87,13 @@ BEGIN
 				LEFT JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON PO.ProviderOfficeBucket_PK = POB.ProviderOfficeBucket_PK
 				LEFT JOIN tblZipCode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK
 				LEFT JOIN #tmp T ON T.Suspect_PK = S.Suspect_PK
-				WHERE  (@DrillType=1 AND IsNull(T.Sch_Date,S.Scanned_Date)<@Dt)
+				WHERE  (@Channel=0 OR S.Channel_PK=@Channel)
+					AND (
+					(@DrillType=1 AND IsNull(T.Sch_Date,S.Scanned_Date)<@Dt)
 					OR (@DrillType=2 AND S.Scanned_Date<@Dt)
 					OR (@DrillType=3 AND S.Coded_Date<@Dt)
 					OR (@DrillType=4 AND S.CNA_Date<@Dt)
+					)
 		)
 		SELECT * FROM tbl WHERE [#]<=25 OR @Export=1 ORDER BY [#]
 
