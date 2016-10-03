@@ -36,7 +36,7 @@ BEGIN
 		EXEC ('INSERT INTO #tmpProject(Project_PK) SELECT Project_PK FROM tblProject WHERE Project_PK IN ('+@Projects+') AND ('+@ProjectGroup+'=0 OR ProjectGroup_PK='+@ProjectGroup+')');
 	-- PROJECT SELECTION
 
-	SELECT POS.Project_PK,POS.ProviderOffice_PK,Day(Sch_Start) SchDay,[Sch_Start],[Sch_End],U.Lastname+', '+U.Firstname ScanTech 
+	SELECT 0 Project_PK,POS.ProviderOffice_PK,Day(Sch_Start) SchDay,[Sch_Start],[Sch_End],U.Lastname+', '+U.Firstname ScanTech 
 	,PO.Address ALine1, City+' '+County+', '+ZipCode+' '+State ALine2,ContactPerson, ContactNumber
 	,Count(DISTINCT S.Suspect_PK) Charts
 	,Count(DISTINCT S.Scanned_User_PK) Scanned
@@ -51,6 +51,6 @@ BEGIN
 	LEFT  JOIN tblZipCode ZC WITH (NOLOCK) ON PO.ZipCode_PK = ZC.ZipCode_PK
 	WHERE Year(Sch_Start)=@Year AND Month(Sch_Start)=@Month
 		AND (@ScanTech=0 OR U.User_PK=@ScanTech)
-	GROUP BY POS.Project_PK,POS.ProviderOffice_PK,Day(Sch_Start),[Sch_Start],[Sch_End],U.Lastname+', '+U.Firstname,PO.Address, City+' '+County+', '+ZipCode+' '+State,ContactPerson, ContactNumber
+	GROUP BY POS.ProviderOffice_PK,Day(Sch_Start),[Sch_Start],[Sch_End],U.Lastname+', '+U.Firstname,PO.Address, City+' '+County+', '+ZipCode+' '+State,ContactPerson, ContactNumber
 END
 GO
