@@ -33,9 +33,9 @@ BEGIN
 		SELECT CodedData_PK Data_PK,DiagnosisCode,DOS_From,DOS_Thru,2 DataType,Coded_User_PK User_PK, NT.NoteType NoteType 
 			FROM tblCodedData CD WITH (NOLOCK)  LEFT JOIN tblNoteType NT WITH (NOLOCK) ON CD.CodedSource_PK = NT.NoteType_PK  
 			WHERE Suspect_PK=@Suspect AND Year(DOS_Thru)>=Year(GetDate())-2 AND IsNull(CD.Is_Deleted,0)=0 AND CD.CoderLevel <> @level AND @IsBlindCoding=0
-		--UNION
-		--SELECT ClaimData_PK Data_PK,DiagnosisCode,DOS_From,DOS_Thru,3 DataType,0 User_PK, '' NoteType  FROM tblClaimData CD WITH (NOLOCK) 			
-		--	WHERE Member_PK=@Member AND Year(DOS_Thru)>=Year(GetDate())-2 AND CD.ProviderMaster_PK=@ProviderMaster_PK
+		UNION
+		SELECT ClaimData_PK Data_PK,DiagnosisCode,DOS_From,DOS_Thru,3 DataType,0 User_PK, '' NoteType  FROM tblClaimData CD WITH (NOLOCK) 			
+			WHERE CD.Suspect_PK=@Suspect AND Year(DOS_Thru)>=Year(GetDate())-2 --AND CD.ProviderMaster_PK=@ProviderMaster_PK
 
 		--SELECT ClaimData_PK Data_PK,DiagnosisCode,DOS_From,DOS_Thru,3 DataType,0 User_PK, '' NoteType  FROM tblClaimData WITH (NOLOCK) WHERE Member_PK=@Member AND Year(DOS_Thru)>=Year(GetDate())-2
 		--UNION
