@@ -16,33 +16,48 @@ CREATE PROCEDURE [dbo].[rdb_getRetroBurndownDrill]
 AS
 BEGIN
 	SET @Dt = DateAdd(day,1,@Dt);
-	-- PROJECT SELECTION
+	-- PROJECT/Channel SELECTION
 	CREATE TABLE #tmpProject (Project_PK INT)
-	IF @Projects='0'
+	CREATE INDEX idxProjectPK ON #tmpProject (Project_PK)
+
+	CREATE TABLE #tmpChannel (Channel_PK INT)
+	CREATE INDEX idxChannelPK ON #tmpChannel (Channel_PK)
+
+	IF Exists (SELECT * FROM tblUser WHERE IsAdmin=1 AND User_PK=@User)	--For Admins
 	BEGIN
-		IF Exists (SELECT * FROM tblUser WHERE IsAdmin=1 AND User_PK=@User)	--For Admins
-			INSERT INTO #tmpProject(Project_PK)
-			SELECT DISTINCT Project_PK FROM tblProject P WHERE P.IsRetrospective=1 AND (@ProjectGroup=0 OR ProjectGroup_PK=@ProjectGroup)
-		ELSE
-			INSERT INTO #tmpProject(Project_PK)
-			SELECT DISTINCT P.Project_PK FROM tblProject P LEFT JOIN tblUserProject UP ON UP.Project_PK = P.Project_PK
-			WHERE P.IsRetrospective=1 AND UP.User_PK=@User AND (@ProjectGroup=0 OR ProjectGroup_PK=@ProjectGroup)
+		INSERT INTO #tmpProject(Project_PK) SELECT DISTINCT Project_PK FROM tblProject P WHERE P.IsRetrospective=1
+		INSERT INTO #tmpChannel(Channel_PK) SELECT DISTINCT Channel_PK FROM tblChannel 
 	END
 	ELSE
-		EXEC ('INSERT INTO #tmpProject(Project_PK) SELECT Project_PK FROM tblProject WHERE Project_PK IN ('+@Projects+') AND ('+@ProjectGroup+'=0 OR ProjectGroup_PK='+@ProjectGroup+')');
+	BEGIN
+		INSERT INTO #tmpProject(Project_PK) SELECT DISTINCT Project_PK FROM tblUserProject WHERE User_PK=@User
+		INSERT INTO #tmpChannel(Channel_PK) SELECT DISTINCT Channel_PK FROM tblUserChannel WHERE User_PK=@User
+	END
+
+	IF (@Projects<>'0')
+		EXEC ('DELETE FROM #tmpProject WHERE Project_PK NOT IN ('+@Projects+')')
+		
+	IF (@ProjectGroup<>'0')
+		DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK<>@ProjectGroup
+		
+	IF (@Channel<>0)
+		DELETE T FROM #tmpChannel T WHERE Channel_PK<>@Channel				 
+	-- PROJECT/Channel SELECTION
 
 	--Schedule Info
 	CREATE TABLE #tmp(Suspect_PK [bigint] NOT NULL primary key,Sch_Date date)
 	INSERT INTO #tmp
 	SELECT DISTINCT S.Suspect_PK,MIN(IsNull(PO.LastUpdated_Date,S.Scanned_Date)) Sch_Date--, MIN(PO.sch_type)
 	FROM tblSuspect S WITH (NOLOCK)
-			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
+			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
-	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL) AND (@Channel=0 OR S.Channel_PK=@Channel)
-	GROUP BY S.Suspect_PK
+	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL)
+	GROUP BY S.Suspect_PK;
 
 	--Overall Progress for All Projects
+	/*
 	IF (SELECT COUNT(*) FROM #tmpProject)>1
 	BEGIN
 		SELECT 
@@ -52,12 +67,12 @@ BEGIN
 			COUNT(CASE WHEN S.IsScanned=0 AND S.IsCNA=1 THEN S.Suspect_PK ELSE NULL END) CNA,
 			COUNT(CASE WHEN S.IsCoded=1 THEN S.Suspect_PK ELSE NULL END) Coded
 		FROM tblSuspect S WITH (NOLOCK) 
-			INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
+			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			INNER JOIN tblProject Pr WITH (NOLOCK) ON Pr.Project_PK = S.Project_PK
 			LEFT JOIN #tmp T ON T.Suspect_PK = S.Suspect_PK
-				WHERE (@Channel=0 OR S.Channel_PK=@Channel) 
-					AND ( 
+				WHERE ( 
 					(@DrillType=1 AND IsNull(IsNull(T.Sch_Date,S.Scanned_Date),S.CNA_Date)<@Dt)
 					OR (@DrillType=2 AND S.Scanned_Date<@Dt)
 					OR (@DrillType=3 AND S.Coded_Date<@Dt)
@@ -67,6 +82,7 @@ BEGIN
 	END
 	ELSE
 	BEGIN	
+	*/
 		With tbl AS(
 			SELECT 
 				ROW_NUMBER() OVER(ORDER BY M.Lastname ASC) AS [#],
@@ -79,7 +95,8 @@ BEGIN
 				CNA_Date CNA,
 				Coded_Date Coded
 			FROM tblSuspect S WITH (NOLOCK) 
-				INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
+				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 				INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 				INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
@@ -87,8 +104,7 @@ BEGIN
 				LEFT JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON PO.ProviderOfficeBucket_PK = POB.ProviderOfficeBucket_PK
 				LEFT JOIN tblZipCode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK
 				LEFT JOIN #tmp T ON T.Suspect_PK = S.Suspect_PK
-				WHERE  (@Channel=0 OR S.Channel_PK=@Channel)
-					AND (
+				WHERE (
 					(@DrillType=1 AND IsNull(T.Sch_Date,S.Scanned_Date)<@Dt)
 					OR (@DrillType=2 AND S.Scanned_Date<@Dt)
 					OR (@DrillType=3 AND S.Coded_Date<@Dt)
@@ -97,7 +113,7 @@ BEGIN
 		)
 		SELECT * FROM tbl WHERE [#]<=25 OR @Export=1 ORDER BY [#]
 
-		SELECT P.Project_Name FROM tblProject P INNER JOIN #tmpProject tP ON tP.Project_PK=P.Project_PK
-	END
+	--	SELECT P.Project_Name FROM tblProject P INNER JOIN #tmpProject tP ON tP.Project_PK=P.Project_PK
+	--END
 END
 GO
