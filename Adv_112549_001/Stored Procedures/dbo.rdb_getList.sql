@@ -7,18 +7,27 @@ CREATE PROCEDURE [dbo].[rdb_getList]
 	@User int
 AS
 BEGIN
-	-- PROJECT SELECTION
+	-- PROJECT/Channel SELECTION
 	CREATE TABLE #tmpProject (Project_PK INT)
 	CREATE INDEX idxProjectPK ON #tmpProject (Project_PK)
 
+	CREATE TABLE #tmpChannel (Channel_PK INT)
+	CREATE INDEX idxChannelPK ON #tmpChannel (Channel_PK)
+
 	IF Exists (SELECT * FROM tblUser WHERE IsAdmin=1 AND User_PK=@User)	--For Admins
-		INSERT INTO #tmpProject(Project_PK)
-		SELECT DISTINCT Project_PK FROM tblProject P WHERE P.IsRetrospective=1
+	BEGIN
+		INSERT INTO #tmpProject(Project_PK) SELECT DISTINCT Project_PK FROM tblProject P WHERE P.IsRetrospective=1
+		INSERT INTO #tmpChannel(Channel_PK) SELECT DISTINCT Channel_PK FROM tblChannel 
+	END
 	ELSE
-		INSERT INTO #tmpProject(Project_PK)
-		SELECT DISTINCT P.Project_PK FROM tblProject P LEFT JOIN tblUserProject UP ON UP.Project_PK = P.Project_PK
-		WHERE P.IsRetrospective=1 AND UP.User_PK=@User
-	-- PROJECT SELECTION
+	BEGIN
+		INSERT INTO #tmpProject(Project_PK) SELECT DISTINCT Project_PK FROM tblUserProject WHERE User_PK=@User
+		INSERT INTO #tmpChannel(Channel_PK) SELECT DISTINCT Channel_PK FROM tblUserChannel WHERE User_PK=@User
+	END
+	-- PROJECT/Channel
+
+	SELECT DISTINCT S.Channel_PK,S.Project_PK INTO #tmpChannelProject FROM tblSuspect S WITH (NOLOCK) 
+	CREATE INDEX idxChannelProjectPK ON #tmpChannelProject (Channel_PK,Project_PK)
 
 	SELECT P.* FROM tblProject P WITH (NOLOCK) 
 		INNER JOIN #tmpProject tP ON tP.Project_PK = P.Project_PK 
@@ -28,9 +37,10 @@ BEGIN
 		INNER JOIN #tmpProject tP ON tP.Project_PK = P.Project_PK 
 	ORDER BY ProjectGroup;
 
-	SELECT DISTINCT C.Channel_PK, C.Channel_Name FROM tblSuspect S WITH (NOLOCK) 
-		INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
+	SELECT DISTINCT C.Channel_PK, C.Channel_Name,S.Project_PK FROM tblSuspect S WITH (NOLOCK) 
 		INNER JOIN tblChannel C ON C.Channel_PK = S.Channel_PK
+		INNER JOIN #tmpProject P ON P.Project_PK = S.Project_PK
+		INNER JOIN #tmpChannel tC ON tC.Channel_PK = S.Channel_PK
 	ORDER BY C.Channel_Name
 END
 GO

@@ -125,6 +125,7 @@ BEGIN
 	
 	DELETE FROM tblUserPage WHERE USER_PK = @id
 	DELETE FROM tblUserProject WHERE USER_PK = @id
+	DELETE FROM tblUserChannel WHERE USER_PK = @id
 	if (@Modules<>'')
 	BEGIN
 		SET @Modules = replace(@Modules,'#id#',cast(@id as varchar));
