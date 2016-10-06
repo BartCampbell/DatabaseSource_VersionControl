@@ -2,12 +2,6 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-
--- =============================================
--- Author:		Sajid Ali
--- Create date: Mar-12-2014
--- Description:	RA Coder will use this sp to pull list of providers in a project
--- =============================================
 -- [um_getUserAreaHours] 22
 CREATE PROCEDURE [dbo].[um_getUserAreaHours] 
 	@id int
@@ -17,6 +11,6 @@ BEGIN
 	SELECT * FROM tblUserWorkingHour WHERE USER_PK = @id
 	SELECT Page_PK FROM tblUserPage WHERE USER_PK = @id
 	SELECT Project_PK FROM tblUserProject WHERE USER_PK = @id
+	SELECT Channel_PK FROM tblUserChannel WHERE USER_PK = @id
 END
-
 GO
