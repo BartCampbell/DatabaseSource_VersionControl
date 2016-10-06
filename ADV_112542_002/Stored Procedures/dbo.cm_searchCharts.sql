@@ -67,7 +67,7 @@ BEGIN
 	WHERE (@Provider=0 OR P.Provider_PK=@Provider)
 		AND (@Member=0 OR M.Member_PK = @Member)
 		AND (@Office=0 OR P.ProviderOffice_PK = @Office)
-		AND (@ChaseID='' OR S.ChaseID LIKE '%'+ChaseID+'%')
+		AND (@ChaseID='' OR S.ChaseID LIKE '%'+@ChaseID+'%')
 		AND (@MemberID='' OR M.Member_ID LIKE '%'+@MemberID+'%')
 		AND (@MemberName='' OR M.Lastname+IsNull(', '+M.Firstname,'') LIKE '%'+@MemberName+'%')
 		AND (@MemberDOB IS NULL OR M.DOB = @MemberDOB)

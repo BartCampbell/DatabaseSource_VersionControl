@@ -3,7 +3,7 @@ GO
 SET ANSI_NULLS ON
 GO
 /* Sample Executions
-rdb_getOfficeStatus_Issues 0,1,0
+rdb_getOfficeStatus_Issues 0,1,0,0
 */
 CREATE PROCEDURE [dbo].[rdb_getOfficeStatus_Issues]
 	@Projects varchar(20),

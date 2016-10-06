@@ -99,7 +99,7 @@ BEGIN
 	CREATE INDEX idxProviderOffice_PK ON #tmpOffices (ProviderOffice_PK)
 
 	INSERT INTO #tmpOffices(ProviderOffice_PK,Providers, Charts, LastContact, FollowUpDate,Offices)
-	SELECT PO.ProviderOffice_PK,Sum(DISTINCT S.Provider_PK) Providers, Sum(CASE WHEN IsScanned=0 AND IsCNA=0 THEN 1 ELSE 0 END) Charts,MAX(dtLastContact) LastContact,MAX(follow_up) FollowUpDate,Count(DISTINCT S.Project_PK) Offices 
+	SELECT PO.ProviderOffice_PK,COUNT(DISTINCT S.Provider_PK) Providers, COUNT(DISTINCT CASE WHEN IsScanned=0 AND IsCNA=0 THEN S.Suspect_PK ELSE NULL END) Charts,MAX(dtLastContact) LastContact,MAX(follow_up) FollowUpDate,Count(DISTINCT S.Project_PK) Offices 
 		FROM tblProviderOffice PO WITH (NOLOCK)
 		INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON cPO.ProviderOffice_PK = PO.ProviderOffice_PK
 		INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
