@@ -15,7 +15,7 @@ BEGIN
 		-- 103 Phone Number</option>
 		-- 104 Fax Number</option>   
 		SELECT ROW_NUMBER() OVER(ORDER BY PO.Address ASC) AS RowNumber,
-				PO.ProviderOffice_PK,PO.LocationID,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,PO.ContactNumber,PO.FaxNumber
+				PO.ProviderOffice_PK,PO.LocationID,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,PO.ContactNumber,PO.FaxNumber,PO.ContactPerson
 				,Count(DISTINCT S.Provider_PK) Providers
 				,Count(DISTINCT S.Suspect_PK) Charts
 			FROM tblProviderOffice PO WITH (NOLOCK) 
@@ -28,7 +28,7 @@ BEGIN
 			(@search_type=102 AND PO.LocationID Like '%'+@search_value+'%') OR
 			(@search_type=103 AND PO.ContactNumber Like '%'+@search_value+'%') OR
 			(@search_type=104 AND PO.FaxNumber Like '%'+@search_value+'%')
-		GROUP BY PO.ProviderOffice_PK,PO.LocationID,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,PO.ContactNumber,PO.FaxNumber
+		GROUP BY PO.ProviderOffice_PK,PO.LocationID,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,PO.ContactNumber,PO.FaxNumber,PO.ContactPerson
 	END
 	ELSE IF (@search_type>200 AND @search_type<300)
 	BEGIN
@@ -39,7 +39,7 @@ BEGIN
 		SELECT ROW_NUMBER() OVER(ORDER BY PM.Lastname+IsNull(', '+PM.Firstname,'') ASC) AS RowNumber,
 				PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider,PM.NPI,PM.PIN [Plan Provider ID]
 				,S.Provider_PK,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,PM.ProviderGroup
-				,Count(DISTINCT S.Suspect_PK) Charts
+				,Count(DISTINCT S.Suspect_PK) Charts,PM.Lastname,PM.Firstname,P.ProviderMaster_PK
 			FROM tblProviderOffice PO WITH (NOLOCK) 
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 				INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
@@ -51,8 +51,8 @@ BEGIN
 			(@search_type=203 AND PM.NPI Like '%'+@search_value+'%') OR
 			(@search_type=204 AND PM.Lastname+IsNull(' '+PM.Firstname,'') Like '%'+@search_value+'%') OR
 			(@search_type=205 AND PM.PIN Like '%'+@search_value+'%')
-		GROUP BY PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,''),PM.NPI,PM.PIN
-				,S.Provider_PK,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,PM.ProviderGroup
+		GROUP BY PM.Provider_ID,PM.Lastname,PM.Firstname,PM.NPI,PM.PIN
+				,S.Provider_PK,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,PM.ProviderGroup,P.ProviderMaster_PK
 	END
 	ELSE IF (@search_type>300 AND @search_type<400)
 	BEGIN

@@ -22,20 +22,33 @@ BEGIN
 		SET @Sch_Type = @DrillType-10
 		SET @DrillType = 1
 	END
-	-- PROJECT SELECTION
+	-- PROJECT/Channel SELECTION
 	CREATE TABLE #tmpProject (Project_PK INT)
-	IF @Projects='0'
+	CREATE INDEX idxProjectPK ON #tmpProject (Project_PK)
+
+	CREATE TABLE #tmpChannel (Channel_PK INT)
+	CREATE INDEX idxChannelPK ON #tmpChannel (Channel_PK)
+
+	IF Exists (SELECT * FROM tblUser WHERE IsAdmin=1 AND User_PK=@User)	--For Admins
 	BEGIN
-		IF Exists (SELECT * FROM tblUser WHERE IsAdmin=1 AND User_PK=@User)	--For Admins
-			INSERT INTO #tmpProject(Project_PK)
-			SELECT DISTINCT Project_PK FROM tblProject P WHERE P.IsRetrospective=1 AND (@ProjectGroup=0 OR ProjectGroup_PK=@ProjectGroup)
-		ELSE
-			INSERT INTO #tmpProject(Project_PK)
-			SELECT DISTINCT P.Project_PK FROM tblProject P LEFT JOIN tblUserProject UP ON UP.Project_PK = P.Project_PK
-			WHERE P.IsRetrospective=1 AND UP.User_PK=@User AND (@ProjectGroup=0 OR ProjectGroup_PK=@ProjectGroup)
+		INSERT INTO #tmpProject(Project_PK) SELECT DISTINCT Project_PK FROM tblProject P WHERE P.IsRetrospective=1
+		INSERT INTO #tmpChannel(Channel_PK) SELECT DISTINCT Channel_PK FROM tblChannel 
 	END
 	ELSE
-		EXEC ('INSERT INTO #tmpProject(Project_PK) SELECT Project_PK FROM tblProject WHERE Project_PK IN ('+@Projects+') AND ('+@ProjectGroup+'=0 OR ProjectGroup_PK='+@ProjectGroup+')');
+	BEGIN
+		INSERT INTO #tmpProject(Project_PK) SELECT DISTINCT Project_PK FROM tblUserProject WHERE User_PK=@User
+		INSERT INTO #tmpChannel(Channel_PK) SELECT DISTINCT Channel_PK FROM tblUserChannel WHERE User_PK=@User
+	END
+
+	IF (@Projects<>'0')
+		EXEC ('DELETE FROM #tmpProject WHERE Project_PK NOT IN ('+@Projects+')')
+		
+	IF (@ProjectGroup<>'0')
+		DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK<>@ProjectGroup
+		
+	IF (@Channel<>0)
+		DELETE T FROM #tmpChannel T WHERE Channel_PK<>@Channel				 
+	-- PROJECT/Channel SELECTION
 
 	--Schedule Info
 	CREATE TABLE #tmp(Project_PK [int] NOT NULL,Provider_PK bigint NOT NULL,Sch_Date DateTime,schedule_type tinyint)
@@ -43,14 +56,16 @@ BEGIN
 	INSERT INTO #tmp
 	SELECT DISTINCT S.Project_PK,S.Provider_PK,MIN(IsNull(PO.LastUpdated_Date,S.Scanned_Date)),IsNull(MIN(PO.sch_type),1)
 	FROM tblSuspect S WITH (NOLOCK)
-			--INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
+			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
-	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL) AND (@Channel=0 OR S.Channel_PK=@Channel)
+	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL)
 	GROUP BY S.Project_PK,S.Provider_PK
 	CREATE CLUSTERED INDEX  idxTProjectPK ON #tmp (Project_PK,Provider_PK)
 
 	--Overall Progress for All Projects
+/*
 	IF (SELECT COUNT(*) FROM #tmpProject)>1
 	BEGIN
 		IF @DrillType=1 AND @Priority=''
@@ -64,9 +79,11 @@ BEGIN
 				,SUM(CASE WHEN cPO.schedule_type=4 THEN 1 ELSE 0 END) [Invoice]
 				,SUM(CASE WHEN cPO.schedule_type=5 THEN 1 ELSE 0 END) [EMR/Remote]
 			INTO #tbl
-			FROM #tmp cPO INNER JOIN tblProject P WITH (NOLOCK) ON P.Project_PK=cPO.Project_PK 
+			FROM #tmp cPO 
+				INNER JOIN tblProject P WITH (NOLOCK) ON P.Project_PK=cPO.Project_PK 
 				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Project_PK = cPO.Project_PK AND S.Provider_PK = cPO.Provider_PK
-			WHERE (@Channel=0 OR S.Channel_PK=@Channel)
+				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			GROUP BY P.Project_PK,Project_Name,P.ProjectGroup
 
 			SELECT Project_PK,[Project],[Total Chases]
@@ -88,6 +105,7 @@ BEGIN
 		END
 		ELSE
 		BEGIN
+		
 			SELECT 
 				S.Project_PK,Pr.Project_Name + IsNull(' '+Pr.ProjectGroup,'') Project,
 				COUNT(*) Chases,
@@ -107,6 +125,7 @@ BEGIN
 	END
 	ELSE
 	BEGIN
+	*/
 		SELECT MAX(CN.ContactNote_Text) CNA_Note,CNO.Project_PK,CNO.Office_PK INTO #OfficeCNA FROM tblContactNote CN WITH (NOLOCK) INNER JOIN tblContactNotesOffice CNO WITH (NOLOCK) ON CNO.ContactNote_PK = CN.ContactNote_PK INNER JOIN #tmpProject P ON P.Project_PK = CNO.Project_PK WHERE CN.IsCNA=1 GROUP BY CNO.Project_PK,CNO.Office_PK;
 
 		With tbl AS(
@@ -130,7 +149,8 @@ BEGIN
 				Coded_Date Coded,
 				S.ChartPriority [Chart Priority]
 			FROM tblSuspect S WITH (NOLOCK) 
-				INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
+				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 				INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 				INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
@@ -155,6 +175,6 @@ BEGIN
 		SELECT * FROM tbl WHERE [#]<=25 OR @Export=1 ORDER BY [#]
 
 		SELECT P.Project_Name + IsNull(' '+P.ProjectGroup,'') FROM tblProject P INNER JOIN #tmpProject tP ON tP.Project_PK=P.Project_PK
-	END
+	--END
 END
 GO
