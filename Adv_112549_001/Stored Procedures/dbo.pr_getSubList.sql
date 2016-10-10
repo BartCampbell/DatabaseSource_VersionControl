@@ -157,8 +157,9 @@ BEGIN
 	ELSE IF (@UserType=3)		--Coder	-- Reviewer
 	BEGIN
 			SET @SQL = '
-				SELECT S.Suspect_PK, M.Lastname+ISNULL('', ''+M.Firstname,'''') Member, PM.Lastname+ISNULL('', ''+PM.Firstname,'''') Provider,  S.Coded_Date DT
+				SELECT S.Suspect_PK, M.Lastname+ISNULL('', ''+M.Firstname,'''') Member, PM.Lastname+ISNULL('', ''+PM.Firstname,'''') Provider,  SLC.dtInserted DT
 					FROM tblSuspect S 
+						INNER JOIN tblSuspectLevelCoded SLC ON SLC.Suspect_PK = S.Suspect_PK
 						INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
 						INNER JOIN tblMember M ON M.Member_PK = S.Member_PK
 						INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
@@ -166,17 +167,17 @@ BEGIN
 			WHERE IsCoded=1 ';
 		
 		IF @User<>0
-			SET @SQL = @SQL + ' AND S.Coded_User_PK=' + CAST(@User AS VARChar);			
+			SET @SQL = @SQL + ' AND SLC.User_PK=' + CAST(@User AS VARChar);			
 		IF @DateType = 1
-			SET @SQL = @SQL + ' AND DATEPART(wk, S.Coded_Date) = DATEPART(wk, GETDATE()-7) AND DATEPART(yy, S.Coded_Date) = DATEPART(yy, GETDATE()-7)'
+			SET @SQL = @SQL + ' AND DATEPART(wk, SLC.dtInserted) = DATEPART(wk, GETDATE()-7) AND DATEPART(yy, SLC.dtInserted) = DATEPART(yy, GETDATE()-7)'
 		ELSE IF @DateType = 2
-			SET @SQL = @SQL + ' AND DATEPART(wk, S.Coded_Date) = DATEPART(wk, GETDATE()) AND DATEPART(yy, S.Coded_Date) = DATEPART(yy, GETDATE())'
+			SET @SQL = @SQL + ' AND DATEPART(wk, SLC.dtInserted) = DATEPART(wk, GETDATE()) AND DATEPART(yy, SLC.dtInserted) = DATEPART(yy, GETDATE())'
 		ELSE IF @DateType = 3
-			SET @SQL = @SQL + ' AND Month(S.Coded_Date) = Month(GETDATE()) AND Year(S.Coded_Date) = Year(GETDATE())'
+			SET @SQL = @SQL + ' AND Month(SLC.dtInserted) = Month(GETDATE()) AND Year(SLC.dtInserted) = Year(GETDATE())'
 		ELSE IF @DateType = 4
-			SET @SQL = @SQL + ' AND Month(S.Coded_Date) = Month(DateAdd(month,-1,getdate())) AND Year(S.Coded_Date) = Year(DateAdd(month,-1,getdate()))'
+			SET @SQL = @SQL + ' AND Month(SLC.dtInserted) = Month(DateAdd(month,-1,getdate())) AND Year(SLC.dtInserted) = Year(DateAdd(month,-1,getdate()))'
 		ELSE IF @DateType = 5
-			SET @SQL = @SQL + ' AND S.Coded_Date>= '''+ @startDate +''' AND S.Coded_Date < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
+			SET @SQL = @SQL + ' AND SLC.dtInserted>= '''+ @startDate +''' AND SLC.dtInserted < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
 	END		
 	
 	EXEC (@SQL);
