@@ -185,25 +185,26 @@ BEGIN
 	BEGIN
 		SET @SQL = '	
 
-			SELECT Coded_User_PK User_PK,COUNT(DISTINCT S.Suspect_PK) Coded, 0 Assigned INTO #tmp FROM tblSuspect S
-					INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
-			WHERE IsCoded=1 ';
-	
+			SELECT S.User_PK User_PK,COUNT(DISTINCT S.Suspect_PK) Coded, 0 Assigned INTO #tmp FROM tblSuspectLevelCoded S
+					INNER JOIN tblSuspect SC ON SC.Suspect_PK = S.Suspect_PK
+					INNER JOIN #tmpProject Pr ON SC.Project_PK = Pr.Project_PK
+			WHERE IsCompleted=1 ';
+--SELECT * FROM tblSuspectLevelCoded	
 		IF @User<>0
-			SET @SQL = @SQL + ' AND S.Coded_User_PK=' + CAST(@User AS VARChar);			
+			SET @SQL = @SQL + ' AND S.User_PK=' + CAST(@User AS VARChar);			
 		IF @DateType = 1
-			SET @SQL = @SQL + ' AND DATEPART(wk, S.Coded_Date) = DATEPART(wk, GETDATE()-7) AND DATEPART(yy, S.Coded_Date) = DATEPART(yy, GETDATE()-7)'
+			SET @SQL = @SQL + ' AND DATEPART(wk, S.dtInserted) = DATEPART(wk, GETDATE()-7) AND DATEPART(yy, S.dtInserted) = DATEPART(yy, GETDATE()-7)'
 		ELSE IF @DateType = 2
-			SET @SQL = @SQL + ' AND DATEPART(wk, S.Coded_Date) = DATEPART(wk, GETDATE()) AND DATEPART(yy, S.Coded_Date) = DATEPART(yy, GETDATE())'
+			SET @SQL = @SQL + ' AND DATEPART(wk, S.dtInserted) = DATEPART(wk, GETDATE()) AND DATEPART(yy, S.dtInserted) = DATEPART(yy, GETDATE())'
 		ELSE IF @DateType = 3
-			SET @SQL = @SQL + ' AND Month(S.Coded_Date) = Month(GETDATE()) AND Year(S.Coded_Date) = Year(GETDATE())'
+			SET @SQL = @SQL + ' AND Month(S.dtInserted) = Month(GETDATE()) AND Year(S.dtInserted) = Year(GETDATE())'
 		ELSE IF @DateType = 4
-			SET @SQL = @SQL + ' AND Month(S.Coded_Date) = Month(DateAdd(month,-1,getdate())) AND Year(S.Coded_Date) = Year(DateAdd(month,-1,getdate()))'
+			SET @SQL = @SQL + ' AND Month(S.dtInserted) = Month(DateAdd(month,-1,getdate())) AND Year(S.dtInserted) = Year(DateAdd(month,-1,getdate()))'
 		ELSE IF @DateType = 5
-			SET @SQL = @SQL + ' AND S.Coded_Date>= '''+ @startDate +''' AND S.Coded_Date < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
+			SET @SQL = @SQL + ' AND S.dtInserted>= '''+ @startDate +''' AND S.dtInserted < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
 						
 		SET @SQL = @SQL + '
-			GROUP BY Coded_User_PK;
+			GROUP BY S.User_PK;
 
 			CREATE INDEX idxtmp ON #tmp (User_PK);
 			INSERT INTO #tmp

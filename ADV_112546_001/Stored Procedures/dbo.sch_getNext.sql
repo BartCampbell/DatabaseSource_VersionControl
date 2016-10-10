@@ -68,6 +68,6 @@ BEGIN
 
 	UPDATE tblProviderOffice SET AssignedUser_PK=@user,AssignedDate=GetDate() WHERE ProviderOffice_PK=@ProviderOffice_PK
 
-	EXEC sch_getOffice @Projects='0', @ProjectGroup='0', @Page=1, @PageSize=1, @Alpha='', @Sort='', @Order='', @Provider=0, @bucket=-1, @followup_bucket=0, @user=@user, @scheduler=0, @PoolPK=0, @ZonePK=0, @OFFICE=@ProviderOffice_PK,@address=''
+	EXEC sch_getOffice @channel=0, @Projects='0', @ProjectGroup='0', @Page=1, @PageSize=1, @Alpha='', @Sort='', @Order='', @Provider=0, @bucket=-1, @followup_bucket=0, @user=@user, @scheduler=0, @PoolPK=0, @ZonePK=0, @OFFICE=@ProviderOffice_PK,@address=''
 END
 GO

@@ -30,7 +30,7 @@ CREATE TABLE [dbo].[tblSuspect]
 [ChartRec_InComp_Date] [smalldatetime] NULL,
 [IsHighPriority] [bit] NULL,
 [IsInComp_Replied] [bit] NULL,
-[ChaseID] [bigint] NULL,
+[ChaseID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [REN_PROVIDER_SPECIALTY] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ChartPriority] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ChartRec_Date] [smalldatetime] NULL,

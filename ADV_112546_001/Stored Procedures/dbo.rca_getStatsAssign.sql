@@ -14,7 +14,8 @@ CREATE PROCEDURE [dbo].[rca_getStatsAssign]
 	@ProjectGroup int,
 	@charts2Assign int,
 	@coders varchar(1000),
-	@IsBlindCoding tinyint
+	@IsBlindCoding tinyint,
+	@IsHCCOnly tinyint
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -43,9 +44,12 @@ BEGIN
 			INNER JOIN tblScannedData SD WITH (NOLOCK) ON SD.Suspect_PK = S.Suspect_PK
 			LEFT JOIN tblCoderAssignment CA WITH (NOLOCK) ON CA.Suspect_PK = S.Suspect_PK AND CA.CoderLevel = @level
 			LEFT JOIN tblSuspectLevelCoded SLC WITH (NOLOCK) ON SLC.Suspect_PK = S.Suspect_PK AND SLC.CoderLevel = @level-1 AND SLC.IsCompleted=1
+			LEFT JOIN tblClaimData CD WITH (NOLOCK) ON CD.Suspect_PK = S.Suspect_PK
+			LEFT JOIN tblModelCode MC WITH (NOLOCK) ON MC.DiagnosisCode = CD.DiagnosisCode AND MC.V12HCC IS NOT NULL
 		WHERE IsScanned=1 AND IsCoded=0 AND IsNull(SD.is_deleted,0)=0 AND CA.Suspect_PK IS NULL
 			AND (@priority='' OR S.ChartPriority=@priority)
 			AND (@IsBlindCoding=1 OR @level=1 OR SLC.Suspect_PK IS NOT NULL)
+			AND (@IsHCCOnly=0 OR MC.DiagnosisCode IS NOT NULL)
 		GROUP BY S.Suspect_PK,S.Member_PK
 		HAVING 
 			@less_more='' 
@@ -87,7 +91,7 @@ BEGIN
 			DEALLOCATE db_cursor				
 
 			Drop Table #Suspects
-			exec rca_getStatsAssign @level,@only_incomplete,@pages,@less_more,@priority,@Projects,@ProjectGroup,0,'',@IsBlindCoding;
+			exec rca_getStatsAssign @level,@only_incomplete,@pages,@less_more,@priority,@Projects,@ProjectGroup,0,'',@IsBlindCoding,@IsHCCOnly;
 			exec rca_getLists @level,1,@IsBlindCoding;
 		END	
 END

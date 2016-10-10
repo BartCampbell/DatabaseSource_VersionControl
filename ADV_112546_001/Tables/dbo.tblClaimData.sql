@@ -8,7 +8,8 @@ CREATE TABLE [dbo].[tblClaimData]
 [CPT] [varchar] (12) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProviderMaster_PK] [bigint] NULL,
 [IsICD10] [bit] NULL,
-[Claim_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[Claim_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Suspect_PK] [bigint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblClaimData] ADD CONSTRAINT [PK_tblClaimData] PRIMARY KEY CLUSTERED  ([ClaimData_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]

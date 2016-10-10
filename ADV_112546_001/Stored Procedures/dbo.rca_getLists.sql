@@ -26,6 +26,6 @@ BEGIN
 
 	--SELECT DISTINCT ProjectGroup,ProjectGroup_PK FROM tblProject WHERE IsRetrospective=1 ORDER BY ProjectGroup
 
-	exec rca_getStatsAssign @level=1,@only_incomplete=0,@pages=1,@less_more='',@priority='',@Projects='0',@ProjectGroup='0',@charts2Assign=0,@coders='',@IsBlindCoding=@IsBlindCoding
+	exec rca_getStatsAssign @level=1,@only_incomplete=0,@pages=1,@less_more='',@priority='',@Projects='0',@ProjectGroup='0',@charts2Assign=0,@coders='',@IsBlindCoding=@IsBlindCoding,@IsHCCOnly=0
 END
 GO

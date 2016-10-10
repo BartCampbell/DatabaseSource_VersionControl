@@ -23,7 +23,7 @@ BEGIN
 			  ,IsProjectRule,Projects,ProjectGroups
 			  ,SchedulerTeam_PK,Pool_Priority,IsAutoRefreshPool,PriorityWithinPool
 			  ,IsForcedAllocationAllowed
-			  ,Offices
+			  ,Offices,P.Channel_PK
 		  FROM dbo.tblPool P with (nolock)
 			Outer Apply (SELECT count(1) Offices FROM tblProviderOffice PO with (nolock) WHERE PO.Pool_PK = P.Pool_PK AND ProviderOfficeBucket_PK<>0) X
 		ORDER BY P.Pool_Priority
@@ -39,12 +39,6 @@ BEGIN
 
 		SELECT Zone_PK,Zone_Name FROM tblZone ORDER BY Zone_Name
 
-		SELECT Project_PK, Project_Name, ProjectGroup_PK FROM tblProject WITH (NOLOCK) WHERE IsRetrospective=1 ORDER BY PROJECT_NAME
-		
-		SELECT DISTINCT ProjectGroup,ProjectGroup_PK FROM tblProject WITH (NOLOCK) WHERE IsRetrospective=1 ORDER BY ProjectGroup
-
-		SELECT SchedulerTeam_PK,Team_Name FROM tblSchedulerTeam ORDER BY Team_Name
-
-		
+		SELECT SchedulerTeam_PK,Team_Name FROM tblSchedulerTeam ORDER BY Team_Name	
 END
 GO
