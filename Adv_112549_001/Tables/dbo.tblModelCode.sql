@@ -13,3 +13,5 @@ CREATE TABLE [dbo].[tblModelCode]
 GO
 CREATE CLUSTERED INDEX [IX_tblModelCode] ON [dbo].[tblModelCode] ([DiagnosisCode]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_V12HCC] ON [dbo].[tblModelCode] ([V12HCC]) INCLUDE ([DiagnosisCode]) ON [PRIMARY]
+GO

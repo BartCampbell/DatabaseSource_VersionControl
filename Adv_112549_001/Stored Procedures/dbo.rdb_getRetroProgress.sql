@@ -3,13 +3,13 @@ GO
 SET ANSI_NULLS ON
 GO
 /* Sample Executions
-rdb_getRetroProgress '0',1,'0'
+rdb_getRetroProgress '0',1,'0',0
 PrepareCacheProviderOffice
 */
 CREATE PROCEDURE [dbo].[rdb_getRetroProgress]
-	@Projects varchar(20),
+	@Projects varchar(500),
 	@User int,
-	@ProjectGroup varchar(10),
+	@ProjectGroup varchar(100),
 	@Channel int
 AS
 BEGIN
@@ -66,7 +66,7 @@ BEGIN
 		*/
 
 	--Overall Progress
-		SELECT S.ChartPriority, COUNT(*) Chases
+		SELECT IsNULL(S.ChartPriority,'X') ChartPriority, COUNT(*) Chases
 			,SUM(CASE WHEN T.Provider_PK IS NULL THEN 0 ELSE 1 END) Scheduled
 			,SUM(CASE WHEN S.IsScanned=1 THEN 1 ELSE 0 END) Extracted
 			,SUM(CASE WHEN S.IsScanned=0 AND S.IsCNA=1 THEN 1 ELSE 0 END) CNA
@@ -87,7 +87,7 @@ BEGIN
 
 		SELECT * FROM #tmpX ORDER BY CASE WHEN ChartPriority='' THEN 'ZZZZZZ' ELSE ChartPriority END
 
-		SELECT S.ChartPriority, SLC.CoderLevel, COUNT(*) Chases
+		SELECT IsNULL(S.ChartPriority,'X') ChartPriority, SLC.CoderLevel, COUNT(*) Chases
 		FROM tblSuspectLevelCoded SLC WITH (NOLOCK) 
 			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Suspect_PK = SLC.Suspect_PK
 			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
