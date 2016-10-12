@@ -22,5 +22,7 @@ CREATE NONCLUSTERED INDEX [IX_tblClaimDataMember] ON [dbo].[tblClaimData] ([Memb
 GO
 CREATE NONCLUSTERED INDEX [IX_tblClaimDataProvider] ON [dbo].[tblClaimData] ([ProviderMaster_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_SuspectPK] ON [dbo].[tblClaimData] ([Suspect_PK]) INCLUDE ([DiagnosisCode]) ON [PRIMARY]
+GO
 ALTER TABLE [dbo].[tblClaimData] ADD CONSTRAINT [FK_tblClaimData_tblSuspect] FOREIGN KEY ([Suspect_PK]) REFERENCES [dbo].[tblSuspect] ([Suspect_PK])
 GO
