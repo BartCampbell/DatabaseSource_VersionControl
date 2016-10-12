@@ -29,8 +29,9 @@ BEGIN
 	ELSE
 		EXEC ('INSERT INTO #tmpProject(Project_PK) SELECT Project_PK FROM tblProject WHERE Project_PK IN ('+@Projects+') AND ('+@ProjectGroup+'=0 OR ProjectGroup_PK='+@ProjectGroup+')');
 	-- PROJECT SELECTION
-
+	
 	Create table #Suspects (RN Int,Suspect_PK BigInt);
+	CREATE INDEX idxSuspect_PK ON #Suspects (Suspect_PK)
 	if (@only_incomplete=1)
 	BEGIN
 		INSERT INTO #Suspects(RN,Suspect_PK)
@@ -51,13 +52,14 @@ BEGIN
 			AND (@IsBlindCoding=1 OR @level=1 OR SLC.Suspect_PK IS NOT NULL)
 			AND (@IsHCCOnly=0 OR MC.DiagnosisCode IS NOT NULL)
 		GROUP BY S.Suspect_PK,S.Member_PK
-		HAVING 
-			@less_more='' 
-			OR (@less_more='l' AND count(*)<=@pages)
-			OR (@less_more='g' AND count(*)>=@pages)
+--		HAVING 
+--			@less_more='' 
+--			OR (@less_more='l' AND count(DISTINCT SD.Suspect_PK)<=@pages)
+--			OR (@less_more='g' AND count(DISTINCT SD.Suspect_PK)>=@pages)
 		ORDER BY S.Member_PK
-	END	
+	END
 
+	--
 	if (@coders='')
 		SELECT COUNT(1) X FROM #Suspects
 	else

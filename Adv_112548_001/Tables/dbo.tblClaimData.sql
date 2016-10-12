@@ -20,5 +20,7 @@ CREATE NONCLUSTERED INDEX [IDX_ClaimDataPK_Cols] ON [dbo].[tblClaimData] ([DOS_T
 GO
 CREATE NONCLUSTERED INDEX [IX_tblClaimDataMember] ON [dbo].[tblClaimData] ([Member_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_tblClaimDataProvider] ON [dbo].[tblClaimData] ([ProviderMaster_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tblClaimDataSUspect] ON [dbo].[tblClaimData] ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_SuspectPK] ON [dbo].[tblClaimData] ([Suspect_PK]) INCLUDE ([DiagnosisCode]) ON [PRIMARY]
 GO
