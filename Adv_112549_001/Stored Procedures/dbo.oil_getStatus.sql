@@ -44,15 +44,20 @@ BEGIN
 		DELETE T FROM #tmpChannel T WHERE Channel_PK<>@Channel				 
 	-- PROJECT/Channel SELECTION
 		
-	SELECT POS.OfficeIssueStatus [status], COUNT(DISTINCT POS.ProviderOffice_PK) Cnt
+	--SELECT POS.OfficeIssueStatus [status], COUNT(DISTINCT POS.ProviderOffice_PK) Cnt
+	SELECT POS.OfficeIssueStatus,POS.ProviderOffice_PK INTO #tbl
 			FROM tblProviderOffice PO WITH (NOLOCK) 
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
 				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 				INNER JOIN tblProviderOfficeStatus POS ON POS.ProviderOffice_PK = PO.ProviderOffice_PK
-				--Outer APPLY (SELECT TOP 1 * FROM tblProviderOfficeStatus WHERE ProviderOffice_PK = PO.ProviderOffice_PK) POS
-				LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
-	GROUP BY POS.OfficeIssueStatus
+				--LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
+	GROUP BY POS.OfficeIssueStatus,POS.ProviderOffice_PK
+	Having COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END)>0
+
+	SELECT OfficeIssueStatus [status], COUNT(DISTINCT ProviderOffice_PK) Cnt
+	FROM #tbl
+	GROUP BY OfficeIssueStatus
 END
 GO
