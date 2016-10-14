@@ -54,7 +54,7 @@ BEGIN
 
 	IF (@Page<>0)
 	BEGIN
-		With tbl AS(
+		--With tbl AS(
 		SELECT ROW_NUMBER() OVER(
 			ORDER BY 
 				CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'AD' THEN PO.Address WHEN 'CT' THEN ZC.City WHEN 'CN' THEN ZC.County WHEN 'ST' THEN ZC.State WHEN 'ZC' THEN ZC.Zipcode WHEN 'CP' THEN PO.ContactPerson WHEN 'CNU' THEN PO.ContactNumber WHEN 'FN' THEN PO.FaxNumber ELSE NULL END END ASC,
@@ -67,6 +67,7 @@ BEGIN
 				,COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END) Charts
 				,MIN(PO.ProviderOfficeBucket_PK) OfficeStatus
 				,MIN(POS.OfficeIssueStatus) OfficeIssueStatus
+			INTO #tbl
 			FROM tblProviderOffice PO WITH (NOLOCK) 
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
@@ -80,21 +81,13 @@ BEGIN
 				AND (@OFFICE<>0 OR POS.OfficeIssueStatus IS NOT NULL)
 				AND (@OFFICE<>0 OR (@filter_type=0 OR POS.OfficeIssueStatus=@filter_type))
 			GROUP BY PO.ProviderOffice_PK,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,Isnull(PO.EMR_Type_PK,0)
-		)
+			HAVING @filter_type=0 OR COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END)>0
+		--)
 	
-		SELECT * FROM tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
+		SELECT * FROM #tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
 	
 		SELECT UPPER(LEFT(PO.Address,1)) alpha1, UPPER(RIGHT(LEFT(PO.Address,2),1)) alpha2,Count(DISTINCT PO.ProviderOffice_PK) records
-			FROM tblProviderOffice PO WITH (NOLOCK) 
-				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
-				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
-				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
-				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
-				INNER JOIN tblProviderOfficeStatus POS ON POS.ProviderOffice_PK = PO.ProviderOffice_PK
-				--Outer APPLY (SELECT TOP 1 * FROM tblProviderOfficeStatus WHERE ProviderOffice_PK = PO.ProviderOffice_PK) POS
-			WHERE (@OFFICE=0 OR PO.ProviderOffice_PK=@OFFICE)
-				AND (@OFFICE<>0 OR POS.OfficeIssueStatus IS NOT NULL)
-				AND (@OFFICE<>0 OR (@filter_type=0 OR POS.OfficeIssueStatus=@filter_type))
+			FROM #tbl PO
 			GROUP BY LEFT(PO.Address,1), RIGHT(LEFT(PO.Address,2),1)			
 			ORDER BY alpha1, alpha2;
 	END
