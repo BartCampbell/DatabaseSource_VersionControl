@@ -50,4 +50,7 @@ BEGIN
 		FROM tblProviderOffice C WITH (ROWLock) 
 			INNER JOIN #tmp3 T ON T.ProviderOffice_PK = C.ProviderOffice_PK AND T.Remaining>0 AND T.Charts>T.Remaining
 END
+
+GO
+GRANT EXECUTE ON  [dbo].[prepareCacheProviderOffice] TO [INTERNAL\Paul.Johnson]
 GO
