@@ -9,11 +9,11 @@ GO
 -- =============================================
 --	sch_searchSimilarOffices 7,1,0,0,0
 CREATE PROCEDURE [dbo].[sch_searchSimilarOffices] 
+	@Channel VARCHAR(1000),
+	@Projects varchar(1000),
+	@ProjectGroup varchar(1000),
 	@OFFICE BIGINT,
-	@user int,
-	@Projects varchar(20),
-	@ProjectGroup varchar(10),
-	@Channel int
+	@user int
 AS
 BEGIN
 	-- PROJECT/Channel SELECTION
@@ -38,10 +38,10 @@ BEGIN
 		EXEC ('DELETE FROM #tmpProject WHERE Project_PK NOT IN ('+@Projects+')')
 		
 	IF (@ProjectGroup<>'0')
-		DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK<>@ProjectGroup
+		EXEC ('DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK NOT IN ('+@ProjectGroup+')')
 		
-	IF (@Channel<>0)
-		DELETE T FROM #tmpChannel T WHERE Channel_PK<>@Channel				 
+	IF (@Channel<>'0')
+		EXEC ('DELETE T FROM #tmpChannel T WHERE Channel_PK NOT IN ('+@Channel+')')			 
 	-- PROJECT/Channel SELECTION
 	
 	--Office can merge
@@ -59,7 +59,9 @@ BEGIN
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON POB.ProviderOfficeBucket_PK = PO.ProviderOfficeBucket_PK
-			INNER JOIN tblProviderOffice PO2 WITH (NOLOCK) ON (Replace(Replace(Replace(Replace(PO2.ContactNumber,' ',''),'-',''),')',''),'(','') LIKE Replace(Replace(Replace(Replace(PO.ContactNumber,' ',''),'-',''),')',''),'(','')
+			INNER JOIN tblProviderOffice PO2 WITH (NOLOCK) ON 
+				(RTRIM(PO.ContactNumber)<>'' AND (Replace(Replace(Replace(Replace(PO2.ContactNumber,' ',''),'-',''),')',''),'(','') LIKE Replace(Replace(Replace(Replace(PO.ContactNumber,' ',''),'-',''),')',''),'(',''))
+				OR (RTRIM(PO2.Address)=RTRIM(PO.Address))
 				OR (PO2.GroupName = PO.GroupName AND IsNull(PO2.GroupName,'') NOT LIKE ''))
 				AND PO2.ProviderOffice_PK = @OFFICE AND PO.ProviderOffice_PK <> @OFFICE
 	GROUP BY cPO.ProviderOffice_PK,IsNull(PO.GroupName+' ',''),PO.Address,PO.ZipCode_PK,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,PO.EMR_Type,POB.Bucket
