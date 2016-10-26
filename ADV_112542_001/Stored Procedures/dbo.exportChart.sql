@@ -43,11 +43,15 @@ BEGIN
 				,REN_PIN				varchar(20)
 				,PID					varchar(20)
 				,[CHART NAME]			varchar(100)
-				,MemTempID				int IDENTITY(1,1) NOT NULL,
+				,MemTempID				int IDENTITY(1,1) NOT NULL
+				,DOB					varchar(20)
+				,ProviderName	        VARCHAR(100)
+				,ProviderContact        VARCHAR(100)
 				CONSTRAINT [PK_MemTemp] PRIMARY KEY CLUSTERED 
 					(
 						MemTempID ASC
 					)
+			
 					WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 			) ON [PRIMARY]
 			
@@ -63,7 +67,10 @@ BEGIN
 				,REN_TIN			
 				,REN_PIN			
 				,PID				
-				,[CHART NAME]		
+				,[CHART NAME]
+				,DOB
+				,ProviderName
+				,ProviderContact		
 			)
 		SELECT DISTINCT
 				s.Member_PK
@@ -77,6 +84,9 @@ BEGIN
 				,pm.PIN REN_PIN
 				,m.PID
 				,M.Member_ID+'_'+ pm.Provider_ID [CHART NAME]
+				,m.DOB
+				,pm.Lastname+', ' + pm.Firstname [ProviderName]
+				,po.ContactNumber
 		FROM	tblSuspect s
 				INNER JOIN tblProvider p WITH (NOLOCK)
 					ON s.Provider_PK = p.Provider_PK
@@ -86,9 +96,11 @@ BEGIN
 					ON s.Member_PK = m.Member_PK
 				LEFT JOIN tmpExportChases t 
 					ON s.Suspect_PK = t.Suspect_PK
-		WHERE	t.Suspect_PK IS NULL
-				AND
+				INNER JOIN dbo.tblProviderOffice po
+					ON po.ProviderOffice_PK = p.ProviderOffice_PK
+		WHERE	t.Suspect_PK IS NULL AND
 				s.IsScanned = 1
+		
 
 
 		--*****************************************************************************
@@ -106,6 +118,9 @@ BEGIN
 				  ,[ChaseID]
 				  ,[InDummy]
 				  ,[InNormal]
+				  ,DOB
+				  ,ProviderName
+				  ,ProviderContact
 			)
 		SELECT DISTINCT 
 				[Member ID]
@@ -117,6 +132,9 @@ BEGIN
 				,ChaseID
 				,NULL
 				,NULL
+				,tf.DOB
+				,tf.ProviderName
+				,tf.ProviderContact
 		FROM	#Chart tf
 	
 --SELECT 'tmpExportChartStaging', COUNT(1) FROM tmpExportChartStaging

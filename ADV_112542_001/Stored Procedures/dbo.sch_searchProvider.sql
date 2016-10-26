@@ -40,13 +40,13 @@ BEGIN
 		DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK<>@ProjectGroup		 
 	-- PROJECT/Channel SELECTION
 	
-	SELECT TOP 15 PM.Provider_ID,PM.Lastname+', '+PM.Firstname ProviderName,P.Provider_PK,Count(S.Member_PK) Charts
+	SELECT TOP 15 PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') ProviderName,P.Provider_PK,Count(S.Member_PK) Charts
 	FROM tblProvider P
 		INNER JOIN tblSuspect S ON S.Provider_PK = P.Provider_PK 
 		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
 		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
-	WHERE PM.Provider_ID+' '+PM.Lastname+' '+PM.Firstname LIKE '%'+@provider+'%'
-	GROUP BY P.Provider_PK,PM.Provider_ID,PM.Lastname+', '+PM.Firstname
+	WHERE PM.Provider_ID+' '+PM.Lastname+' '+IsNull(PM.Firstname,'') LIKE '%'+@provider+'%'
+	GROUP BY P.Provider_PK,PM.Provider_ID,PM.Lastname,PM.Firstname
 END
 GO

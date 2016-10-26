@@ -19,7 +19,8 @@ BEGIN
 
 
 --LOADED MEMBERS THAT HAVE IMAGES
-SELECT DISTINCT M.Lastname+', '+M.Firstname Member,[Member ID],[Member Individual ID],[REN Provider ID],S.Member_PK,S.Suspect_PK,[CHART NAME],S.ChaseID,InDummy,InNormal 
+SELECT DISTINCT M.Lastname+', '+M.Firstname Member,[Member ID],[Member Individual ID],[REN Provider ID],S.Member_PK,S.Suspect_PK,[CHART NAME],S.ChaseID,InDummy,InNormal
+,M.DOB, ProviderName, ProviderContact
 FROM tmpExportChartStaging S INNER JOIN tblMember M ON S.Member_PK = M.Member_PK
 WHERE S.Suspect_PK IN (
 
