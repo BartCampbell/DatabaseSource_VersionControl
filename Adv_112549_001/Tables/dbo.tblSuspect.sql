@@ -36,7 +36,8 @@ CREATE TABLE [dbo].[tblSuspect]
 [InvoiceExt_Date] [smalldatetime] NULL,
 [ContractCode] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [REN_PROVIDER_SPECIALTY] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Channel_PK] [int] NULL
+[Channel_PK] [int] NULL,
+[EDGEMemberID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
 SET QUOTED_IDENTIFIER ON
