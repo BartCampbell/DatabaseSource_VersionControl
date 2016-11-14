@@ -22,6 +22,8 @@ ALTER TABLE [dbo].[tblExtractionQueueAttachLog] ADD CONSTRAINT [PK_tblExtraction
 GO
 CREATE NONCLUSTERED INDEX [IX_tblExtractionQueueAttachLogID] ON [dbo].[tblExtractionQueueAttachLog] ([ExtractionQueue_PK]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_IsProcessedIsInvoice] ON [dbo].[tblExtractionQueueAttachLog] ([IsProcessed], [IsInvoice]) INCLUDE ([ExtractionQueue_PK], [PageFrom], [PageTo], [ProviderOfficeInvoice_PK], [User_PK]) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IX_tblExtractionQueueAttachLogInvoice] ON [dbo].[tblExtractionQueueAttachLog] ([ProviderOfficeInvoice_PK]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_tblExtractionQueueAttachLogSuspect] ON [dbo].[tblExtractionQueueAttachLog] ([Suspect_PK]) ON [PRIMARY]
