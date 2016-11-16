@@ -4,5 +4,5 @@ CREATE TABLE [tSQLt].[Private_Configurations]
 [Value] [sql_variant] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [tSQLt].[Private_Configurations] ADD CONSTRAINT [PK__Private___737584F7D13B1B2E] PRIMARY KEY CLUSTERED  ([Name]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [tSQLt].[Private_Configurations] ADD CONSTRAINT [PK__Private___737584F7F0058349] PRIMARY KEY CLUSTERED  ([Name]) ON [PRIMARY]
 GO

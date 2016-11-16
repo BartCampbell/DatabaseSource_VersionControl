@@ -2,11 +2,11 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
---  sch_getStatus '0',0,0,1,0,0,1
+--  sch_getStatus '0','0','0',0,1,0,0,1
 CREATE PROCEDURE [dbo].[sch_getStatus]
-	@channel int,
-	@Projects varchar(500),
-	@ProjectGroup varchar(10),
+	@Channel VARCHAR(1000),
+	@Projects varchar(1000),
+	@ProjectGroup varchar(1000),
 	@scheduler int,
 	@user int,
 	@PoolPK int,
@@ -14,6 +14,7 @@ CREATE PROCEDURE [dbo].[sch_getStatus]
 	@isMap int
 AS
 BEGIN
+	--SET ARITHABORT ON
 	-- PROJECT/Channel SELECTION
 	CREATE TABLE #tmpProject (Project_PK INT)
 	CREATE INDEX idxProjectPK ON #tmpProject (Project_PK)
@@ -36,12 +37,11 @@ BEGIN
 		EXEC ('DELETE FROM #tmpProject WHERE Project_PK NOT IN ('+@Projects+')')
 		
 	IF (@ProjectGroup<>'0')
-		DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK<>@ProjectGroup
+		EXEC ('DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK NOT IN ('+@ProjectGroup+')')
 		
-	IF (@Channel<>0)
-		DELETE T FROM #tmpChannel T WHERE Channel_PK<>@Channel				 
+	IF (@Channel<>'0')
+		EXEC ('DELETE T FROM #tmpChannel T WHERE Channel_PK NOT IN ('+@Channel+')')			 
 	-- PROJECT/Channel SELECTION
-
 
 	DECLARE @IsScheduler AS BIT = 0
 	DECLARE @IsSupervisor AS BIT = 0
@@ -105,5 +105,4 @@ BEGIN
 	GROUP BY POB.ProviderOfficeBucket_PK, POB.Bucket,POB.sortOrder
 	ORDER BY POB.sortOrder	
 END
-
 GO

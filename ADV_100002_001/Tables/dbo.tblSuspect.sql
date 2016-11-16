@@ -36,7 +36,8 @@ CREATE TABLE [dbo].[tblSuspect]
 [InvoiceExt_Date] [smalldatetime] NULL,
 [ContractCode] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [REN_PROVIDER_SPECIALTY] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Channel_PK] [int] NULL
+[Channel_PK] [int] NULL,
+[ChaseStatus_PK] [int] NULL
 ) ON [PRIMARY]
 GO
 SET QUOTED_IDENTIFIER ON
@@ -83,6 +84,10 @@ END
 GO
 ALTER TABLE [dbo].[tblSuspect] ADD CONSTRAINT [PK_tblSuspect] PRIMARY KEY CLUSTERED  ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IX_tblSuspectChaseStatus] ON [dbo].[tblSuspect] ([ChaseStatus_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_CodedDate] ON [dbo].[tblSuspect] ([Coded_Date]) INCLUDE ([Channel_PK], [ChaseStatus_PK], [Project_PK], [Provider_PK], [Suspect_PK]) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IDX_IsCoded] ON [dbo].[tblSuspect] ([IsCoded]) INCLUDE ([Coded_Date], [Coded_User_PK], [Member_PK], [Project_PK], [Provider_PK], [QA_Date], [QA_User_PK], [Scanned_User_PK], [Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IDX_MemberSuspect_PK] ON [dbo].[tblSuspect] ([IsScanned], [IsCoded]) INCLUDE ([Member_PK], [Suspect_PK]) ON [PRIMARY]
@@ -96,6 +101,8 @@ GO
 CREATE NONCLUSTERED INDEX [IX_ProjectPKProviderPK] ON [dbo].[tblSuspect] ([Project_PK], [Provider_PK]) INCLUDE ([CNA_User_PK], [Coded_User_PK], [LastAccessed_Date], [Member_PK], [Scanned_User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_tblSuspectProvider] ON [dbo].[tblSuspect] ([Provider_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_ScannedDate] ON [dbo].[tblSuspect] ([Scanned_Date]) INCLUDE ([Channel_PK], [ChaseStatus_PK], [Project_PK], [Provider_PK], [Suspect_PK]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IDX_SuspectPK_ScanDate] ON [dbo].[tblSuspect] ([Suspect_PK]) INCLUDE ([Scanned_Date]) ON [PRIMARY]
 GO

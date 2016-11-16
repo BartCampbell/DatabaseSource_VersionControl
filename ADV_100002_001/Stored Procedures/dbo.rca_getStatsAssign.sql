@@ -31,6 +31,7 @@ BEGIN
 	-- PROJECT SELECTION
 
 	Create table #Suspects (RN Int,Suspect_PK BigInt);
+	CREATE INDEX idxSuspect_PK ON #Suspects (Suspect_PK)
 	if (@only_incomplete=1)
 	BEGIN
 		INSERT INTO #Suspects(RN,Suspect_PK)
@@ -53,8 +54,8 @@ BEGIN
 		GROUP BY S.Suspect_PK,S.Member_PK
 		HAVING 
 			@less_more='' 
-			OR (@less_more='l' AND count(*)<=@pages)
-			OR (@less_more='g' AND count(*)>=@pages)
+			OR (@less_more='l' AND count(DISTINCT SD.Suspect_PK)<=@pages)
+			OR (@less_more='g' AND count(DISTINCT SD.Suspect_PK)>=@pages)
 		ORDER BY S.Member_PK
 	END	
 
@@ -95,5 +96,4 @@ BEGIN
 			exec rca_getLists @level,1,@IsBlindCoding;
 		END	
 END
-
 GO

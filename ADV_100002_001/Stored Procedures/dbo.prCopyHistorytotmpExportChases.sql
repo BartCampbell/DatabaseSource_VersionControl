@@ -14,9 +14,9 @@ BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
 	-- interfering with SELECT statements.
 	SET NOCOUNT ON;
-	--SELECT * FROM tmpExportChases
-		INSERT INTO tmpExportChases
-		SELECT [Member ID], [Member Individual ID], [REN Provider ID], Member_PK, Suspect_PK, [CHART NAME],ChaseID, InDummy, InNormal, CONVERT(varchar(8), getdate(), 112) FROM [dbo].[tmpExportChartStaging]
-END
 
+
+		INSERT INTO tmpExportChases
+		SELECT [Member ID], [Member Individual ID], [REN Provider ID], Member_PK, Suspect_PK, [CHART NAME],ChaseID, InDummy, InNormal, CONVERT(varchar(8), getdate(), 112) FROM tmpExportChartStaging
+END
 GO

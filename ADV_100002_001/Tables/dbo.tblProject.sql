@@ -6,7 +6,7 @@ CREATE TABLE [dbo].[tblProject]
 [IsCode] [bit] NULL,
 [Client_PK] [smallint] NULL,
 [dtInsert] [datetime] NULL,
-[IsProspective] [bit] NULL CONSTRAINT [DF__tblProjec__IsPro__22751F6C] DEFAULT ((0)),
+[IsProspective] [bit] NULL CONSTRAINT [DF__tblProjec__IsPro__546180BB] DEFAULT ((0)),
 [IsRetrospective] [bit] NULL,
 [IsHEDIS] [bit] NULL,
 [ProjectGroup] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -19,5 +19,5 @@ CREATE NONCLUSTERED INDEX [IX_tblProjectClient] ON [dbo].[tblProject] ([Client_P
 GO
 CREATE NONCLUSTERED INDEX [IDX_ProjectPK_IsRetro] ON [dbo].[tblProject] ([IsRetrospective], [Project_PK]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_Project_PK] ON [dbo].[tblProject] ([Project_PK]) INCLUDE ([IsProspective], [IsRetrospective], [Project_Name], [ProjectGroup]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_Project_PK] ON [dbo].[tblProject] ([Project_PK]) INCLUDE ([IsProspective], [IsRetrospective], [Project_Name], [ProjectGroup]) ON [PRIMARY]
 GO

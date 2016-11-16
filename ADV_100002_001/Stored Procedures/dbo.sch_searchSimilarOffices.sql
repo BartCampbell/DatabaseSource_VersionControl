@@ -9,11 +9,11 @@ GO
 -- =============================================
 --	sch_searchSimilarOffices 7,1,0,0,0
 CREATE PROCEDURE [dbo].[sch_searchSimilarOffices] 
-	@OFFICE BIGINT,
-	@user int,
+	@Channel VARCHAR(1000),
 	@Projects varchar(1000),
 	@ProjectGroup varchar(1000),
-	@Channel varchar(1000)
+	@OFFICE BIGINT,
+	@user int
 AS
 BEGIN
 	-- PROJECT/Channel SELECTION
@@ -58,7 +58,7 @@ BEGIN
 			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
-			INNER JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON POB.ProviderOfficeBucket_PK = PO.ProviderOfficeBucket_PK
+			INNER JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON POB.ProviderOfficeBucket_PK = IsNull(PO.ProviderOfficeBucket_PK,0)
 			INNER JOIN tblProviderOffice PO2 WITH (NOLOCK) ON 
 				(RTRIM(PO.ContactNumber)<>'' AND (Replace(Replace(Replace(Replace(PO2.ContactNumber,' ',''),'-',''),')',''),'(','') LIKE Replace(Replace(Replace(Replace(PO.ContactNumber,' ',''),'-',''),')',''),'(',''))
 				OR (RTRIM(PO2.Address)=RTRIM(PO.Address))
@@ -72,12 +72,11 @@ BEGIN
 			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON tPO.ProviderOffice_PK=PO.ProviderOffice_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = tPO.ProviderOffice_PK
 			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
-			INNER JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON POB.ProviderOfficeBucket_PK = PO.ProviderOfficeBucket_PK
+			INNER JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON POB.ProviderOfficeBucket_PK = IsNull(PO.ProviderOfficeBucket_PK,0)
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN tblProject Pr ON Pr.Project_PK = S.Project_PK
 	WHERE tPO.ProviderOffice_PK = @OFFICE
 	GROUP BY Pr.Project_Name,Pr.ProjectGroup,POB.Bucket
 END
-
 GO

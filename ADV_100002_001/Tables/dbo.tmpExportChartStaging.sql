@@ -8,9 +8,6 @@ CREATE TABLE [dbo].[tmpExportChartStaging]
 [CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [InDummy] [int] NULL,
-[InNormal] [int] NULL,
-[DOB] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[ProviderName] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[ProviderContact] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[InNormal] [int] NULL
 ) ON [PRIMARY]
 GO

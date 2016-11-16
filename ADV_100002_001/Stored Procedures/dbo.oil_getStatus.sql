@@ -10,10 +10,10 @@ GO
 -- =============================================
 --	oil_getStatus 0,1,1,1
 CREATE PROCEDURE [dbo].[oil_getStatus]
-	@Projects varchar(100),
-	@ProjectGroup varchar(10),
-	@user int,
-	@Channel int
+	@Channel VARCHAR(1000),
+	@Projects varchar(1000),
+	@ProjectGroup varchar(1000),
+	@user int
 AS
 BEGIN
 	-- PROJECT/Channel SELECTION
@@ -38,10 +38,10 @@ BEGIN
 		EXEC ('DELETE FROM #tmpProject WHERE Project_PK NOT IN ('+@Projects+')')
 		
 	IF (@ProjectGroup<>'0')
-		DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK<>@ProjectGroup
+		EXEC ('DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK NOT IN ('+@ProjectGroup+')')
 		
-	IF (@Channel<>0)
-		DELETE T FROM #tmpChannel T WHERE Channel_PK<>@Channel				 
+	IF (@Channel<>'0')
+		EXEC ('DELETE T FROM #tmpChannel T WHERE Channel_PK NOT IN ('+@Channel+')')			 
 	-- PROJECT/Channel SELECTION
 		
 	--SELECT POS.OfficeIssueStatus [status], COUNT(DISTINCT POS.ProviderOffice_PK) Cnt
@@ -60,5 +60,4 @@ BEGIN
 	FROM #tbl
 	GROUP BY OfficeIssueStatus
 END
-
 GO

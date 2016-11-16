@@ -45,13 +45,12 @@ BEGIN
 	FROM tblProviderOfficeSchedule POS WITH (NOLOCK)
 	INNER JOIN tblUser U WITH (NOLOCK) ON POS.Sch_User_PK = U.User_PK 
 	INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK = POS.ProviderOffice_PK
-	INNER JOIN #tmpProject Pr ON Pr.Project_PK = POS.Project_PK
-	LEFT  JOIN tblProvider P WITH (NOLOCK) ON PO.ProviderOffice_PK = P.ProviderOffice_PK
-	LEFT  JOIN tblSuspect S WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK AND S.Project_PK = POS.Project_PK
+	INNER  JOIN tblProvider P WITH (NOLOCK) ON PO.ProviderOffice_PK = P.ProviderOffice_PK
+	INNER  JOIN tblSuspect S WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK --AND S.Project_PK = POS.Project_PK
+	INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
 	LEFT  JOIN tblZipCode ZC WITH (NOLOCK) ON PO.ZipCode_PK = ZC.ZipCode_PK
 	WHERE Year(Sch_Start)=@Year AND Month(Sch_Start)=@Month
 		AND (@ScanTech=0 OR U.User_PK=@ScanTech)
 	GROUP BY POS.ProviderOffice_PK,Day(Sch_Start),[Sch_Start],[Sch_End],U.Lastname+', '+U.Firstname,PO.Address, City+' '+County+', '+ZipCode+' '+State,ContactPerson, ContactNumber
 END
-
 GO

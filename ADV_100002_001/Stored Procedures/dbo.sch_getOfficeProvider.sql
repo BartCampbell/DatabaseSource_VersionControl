@@ -9,11 +9,11 @@ GO
 -- =============================================
 --	sch_getOfficeProvider 1,1
 CREATE PROCEDURE [dbo].[sch_getOfficeProvider] 
-	@Projects varchar(100),
-	@ProjectGroup varchar(10),
+	@Channel VARCHAR(1000),
+	@Projects varchar(1000),
+	@ProjectGroup varchar(1000),
 	@Office bigint,
-	@user int,
-	@channel int
+	@user int
 AS
 BEGIN
 	-- PROJECT/Channel SELECTION
@@ -38,10 +38,10 @@ BEGIN
 		EXEC ('DELETE FROM #tmpProject WHERE Project_PK NOT IN ('+@Projects+')')
 		
 	IF (@ProjectGroup<>'0')
-		DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK<>@ProjectGroup
+		EXEC ('DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK NOT IN ('+@ProjectGroup+')')
 		
-	IF (@Channel<>0)
-		DELETE T FROM #tmpChannel T WHERE Channel_PK<>@Channel				 
+	IF (@Channel<>'0')
+		EXEC ('DELETE T FROM #tmpChannel T WHERE Channel_PK NOT IN ('+@Channel+')')			 
 	-- PROJECT/Channel SELECTION
 
 	SELECT PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') ProviderName,P.Provider_PK,Count(S.Member_PK) Charts,SUM(CASE WHEN IsScanned=0 AND IsCNA=0 THEN 1 ELSE 0 END) Remaining
@@ -54,11 +54,11 @@ BEGIN
 	GROUP BY P.Provider_PK,PM.Provider_ID,PM.Lastname,PM.Firstname
 
 	--Office location is scheduled for total xx charts. 31 charts recieved correctly. 10 charts recieved incomplete. 5 charts invoices recieved
-	SELECT COUNT(S.Suspect_PK) Charts
-		,SUM(CASE WHEN Scanned_Date IS NOT NULL OR ChartRec_Date IS NOT NULL THEN 1 ELSE 0 END) ChartRec
-		,SUM(CASE WHEN Scanned_Date IS NULL AND InvoiceRec_Date IS NULL AND ChartRec_Date IS NULL AND ChartRec_InComp_Date IS NOT NULL THEN 1 ELSE 0 END) ChartRec_InComp
-		,SUM(CASE WHEN Scanned_Date IS NULL AND ChartRec_Date IS NULL AND InvoiceRec_Date IS NOT NULL THEN 1 ELSE 0 END) InvoiceRec
-		,SUM(CASE WHEN Scanned_Date IS NULL AND InvoiceRec_Date IS NULL AND ChartRec_Date IS NULL AND IsCNA=1 THEN 1 ELSE 0 END) CNA
+	SELECT COUNT(DISTINCT S.Suspect_PK) Charts
+		,COUNT(DISTINCT CASE WHEN Scanned_Date IS NOT NULL OR ChartRec_Date IS NOT NULL THEN S.Suspect_PK ELSE NULL END) ChartRec
+		,COUNT(DISTINCT CASE WHEN Scanned_Date IS NULL AND InvoiceRec_Date IS NULL AND ChartRec_Date IS NULL AND ChartRec_InComp_Date IS NOT NULL THEN S.Suspect_PK ELSE NULL END) ChartRec_InComp
+		,COUNT(DISTINCT CASE WHEN Scanned_Date IS NULL AND ChartRec_Date IS NULL AND InvoiceRec_Date IS NOT NULL THEN S.Suspect_PK ELSE NULL END) InvoiceRec
+		,COUNT(DISTINCT CASE WHEN Scanned_Date IS NULL AND InvoiceRec_Date IS NULL AND ChartRec_Date IS NULL AND IsCNA=1 THEN S.Suspect_PK ELSE NULL END) CNA
 	FROM tblProvider P
 		INNER JOIN tblSuspect S ON S.Provider_PK = P.Provider_PK 
 		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
@@ -66,5 +66,4 @@ BEGIN
 		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 	WHERE P.ProviderOffice_PK=@Office
 END
-
 GO
