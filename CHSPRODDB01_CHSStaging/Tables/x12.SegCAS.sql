@@ -1,0 +1,30 @@
+CREATE TABLE [x12].[SegCAS]
+(
+[CAS_RowID] [int] NULL,
+[CAS_RowIDParent] [int] NULL,
+[CAS_CentauriClientID] [int] NULL,
+[CAS_FileLogID] [int] NULL,
+[CAS_TransactionImplementationConventionReference] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_TransactionControlNumber] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_LoopID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_ClaimAdjustmentGroupCode_CAS01] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_ClaimAdjustmentReasonCode_CAS02] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_MonetaryAmount_CAS03] [varchar] (18) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_Quantity_CAS04] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_ClaimAdjustmentReasonCode_CAS05] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_MonetaryAmount_CAS06] [varchar] (18) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_Quantity_CAS07] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_ClaimAdjustmentReasonCode_CAS08] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_MonetaryAmount_CAS09] [varchar] (18) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_Quantity_CAS10] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_ClaimAdjustmentReasonCode_CAS11] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_MonetaryAmount_CAS12] [varchar] (18) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_Quantity_CAS13] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_ClaimAdjustmentReasonCode_CAS14] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_MonetaryAmount_CAS15] [varchar] (18) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_Quantity_CAS16] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_ClaimAdjustmentReasonCode_CAS17] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_MonetaryAmount_CAS18] [varchar] (18) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CAS_Quantity_CAS19] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+) ON [PRIMARY]
+GO

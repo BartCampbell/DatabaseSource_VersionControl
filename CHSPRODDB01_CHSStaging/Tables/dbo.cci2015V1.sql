@@ -1,0 +1,8 @@
+CREATE TABLE [dbo].[cci2015V1]
+(
+[ICD-9-CM CODE'] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+['ICD-9-CM CODE DESCRIPTION'] [varchar] (2000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+['CATEGORY DESCRIPTION'] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+['BODY SYSTEM'] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+) ON [PRIMARY]
+GO
