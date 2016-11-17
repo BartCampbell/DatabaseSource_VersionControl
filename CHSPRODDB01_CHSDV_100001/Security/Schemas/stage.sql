@@ -1,0 +1,3 @@
+CREATE SCHEMA [stage]
+AUTHORIZATION [INTERNAL\dwight.staggs]
+GO
