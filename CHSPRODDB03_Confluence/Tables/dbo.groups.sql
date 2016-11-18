@@ -1,0 +1,10 @@
+CREATE TABLE [dbo].[groups]
+(
+[id] [numeric] (19, 0) NOT NULL,
+[groupname] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CS_AS NOT NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[groups] ADD CONSTRAINT [PK__groups__3213E83F5DACE637] PRIMARY KEY CLUSTERED  ([id]) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[groups] ADD CONSTRAINT [UQ__groups__ED1647CC652BF281] UNIQUE NONCLUSTERED  ([groupname]) ON [PRIMARY]
+GO

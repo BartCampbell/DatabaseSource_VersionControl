@@ -1,0 +1,17 @@
+CREATE TABLE [dbo].[logininfo]
+(
+[id] [numeric] (19, 0) NOT NULL,
+[CURFAILED] [int] NULL,
+[TOTALFAILED] [int] NULL,
+[SUCCESSDATE] [datetime] NULL,
+[PREVSUCCESSDATE] [datetime] NULL,
+[FAILEDDATE] [datetime] NULL,
+[USERNAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CS_AS NOT NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[logininfo] ADD CONSTRAINT [PK__logininf__3213E83FD18B6465] PRIMARY KEY CLUSTERED  ([id]) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[logininfo] ADD CONSTRAINT [UQ__logininf__B15BE12E260636B7] UNIQUE NONCLUSTERED  ([USERNAME]) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[logininfo] ADD CONSTRAINT [FK_logininfo_USERNAME] FOREIGN KEY ([USERNAME]) REFERENCES [dbo].[user_mapping] ([user_key])
+GO
