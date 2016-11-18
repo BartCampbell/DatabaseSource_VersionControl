@@ -1,0 +1,28 @@
+CREATE TABLE [dim].[Time]
+(
+[ID] [int] NOT NULL IDENTITY(1, 1),
+[Time] [char] (8) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Hour] [char] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[MilitaryHour] [char] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Minute] [char] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[Second] [char] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[AmPm] [char] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[StandardTime] [char] (11) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dim].[Time] ADD CONSTRAINT [PK_dim_Time] PRIMARY KEY CLUSTERED  ([ID]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_dim_Time_AmPm] ON [dim].[Time] ([AmPm]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_dim_Time_Hour] ON [dim].[Time] ([Hour]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_dim_Time_MilitaryHour] ON [dim].[Time] ([MilitaryHour]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_dim_Time_Minute] ON [dim].[Time] ([Minute]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_dim_Time_Second] ON [dim].[Time] ([Second]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_dim_Time_StandardTime] ON [dim].[Time] ([StandardTime]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IDX_dim_Time_Time] ON [dim].[Time] ([Time]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
