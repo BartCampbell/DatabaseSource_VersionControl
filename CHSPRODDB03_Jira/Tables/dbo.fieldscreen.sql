@@ -1,0 +1,9 @@
+CREATE TABLE [dbo].[fieldscreen]
+(
+[ID] [numeric] (18, 0) NOT NULL,
+[NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[DESCRIPTION] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[fieldscreen] ADD CONSTRAINT [PK_fieldscreen] PRIMARY KEY CLUSTERED  ([ID]) ON [PRIMARY]
+GO

@@ -1,0 +1,19 @@
+CREATE TABLE [dbo].[trustedapp]
+(
+[ID] [numeric] (18, 0) NOT NULL,
+[APPLICATION_ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[PUBLIC_KEY] [ntext] COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[IP_MATCH] [ntext] COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[URL_MATCH] [ntext] COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[TIMEOUT] [numeric] (18, 0) NULL,
+[CREATED] [datetime] NULL,
+[CREATED_BY] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[UPDATED] [datetime] NULL,
+[UPDATED_BY] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[trustedapp] ADD CONSTRAINT [PK_trustedapp] PRIMARY KEY CLUSTERED  ([ID]) ON [PRIMARY]
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [trustedapp_id] ON [dbo].[trustedapp] ([APPLICATION_ID]) ON [PRIMARY]
+GO

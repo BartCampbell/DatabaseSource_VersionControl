@@ -1,0 +1,11 @@
+CREATE TABLE [dbo].[upgradehistory]
+(
+[ID] [numeric] (18, 0) NULL,
+[UPGRADECLASS] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
+[TARGETBUILD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[STATUS] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[DOWNGRADETASKREQUIRED] [nchar] (1) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[upgradehistory] ADD CONSTRAINT [PK_upgradehistory] PRIMARY KEY CLUSTERED  ([UPGRADECLASS]) ON [PRIMARY]
+GO

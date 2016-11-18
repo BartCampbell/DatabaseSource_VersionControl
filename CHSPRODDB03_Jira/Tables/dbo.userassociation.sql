@@ -1,0 +1,16 @@
+CREATE TABLE [dbo].[userassociation]
+(
+[SOURCE_NAME] [nvarchar] (60) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
+[SINK_NODE_ID] [numeric] (18, 0) NOT NULL,
+[SINK_NODE_ENTITY] [nvarchar] (60) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
+[ASSOCIATION_TYPE] [nvarchar] (60) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
+[SEQUENCE] [int] NULL,
+[CREATED] [datetime] NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[userassociation] ADD CONSTRAINT [PK_userassociation] PRIMARY KEY CLUSTERED  ([SOURCE_NAME], [SINK_NODE_ID], [SINK_NODE_ENTITY], [ASSOCIATION_TYPE]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [user_sink] ON [dbo].[userassociation] ([SINK_NODE_ID], [SINK_NODE_ENTITY]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [user_source] ON [dbo].[userassociation] ([SOURCE_NAME]) ON [PRIMARY]
+GO

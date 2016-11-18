@@ -1,0 +1,9 @@
+CREATE TABLE [dbo].[qrtz_calendars]
+(
+[ID] [numeric] (18, 0) NULL,
+[CALENDAR_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
+[CALENDAR] [ntext] COLLATE SQL_Latin1_General_CP437_CI_AI NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[qrtz_calendars] ADD CONSTRAINT [PK_qrtz_calendars] PRIMARY KEY CLUSTERED  ([CALENDAR_NAME]) ON [PRIMARY]
+GO
