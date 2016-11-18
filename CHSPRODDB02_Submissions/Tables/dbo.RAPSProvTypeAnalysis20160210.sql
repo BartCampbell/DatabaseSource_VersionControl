@@ -1,0 +1,31 @@
+CREATE TABLE [dbo].[RAPSProvTypeAnalysis20160210]
+(
+[HPlan] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ClaimNumber] [int] NULL,
+[MemberID] [varchar] (30) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MemberHICN] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MemberLast] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MemberFirst] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MemberDOB] [datetime] NULL,
+[MemberGender] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[EligDateFrom] [datetime] NULL,
+[EligDateTo] [datetime] NULL,
+[EligType] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DOSFrom] [datetime] NULL,
+[DOSTo] [datetime] NULL,
+[PlaceOfService] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[BillTypeCode] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderNPI] [int] NULL,
+[ProviderTaxonomyCode] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderSpecialtyCode] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderTypeDesc] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[RAPSProviderTypeCode] [char] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ClaimTypeCode] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[AdmissionDate] [datetime] NULL,
+[DischargeDate] [datetime] NULL,
+[DXCode] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DXCodeVersion] [int] NULL,
+[SubmittableFlag] [bit] NULL,
+[RAPSClusterStagingID] [int] NOT NULL IDENTITY(1, 1)
+) ON [PRIMARY]
+GO
