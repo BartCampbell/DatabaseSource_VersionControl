@@ -30,7 +30,7 @@ BEGIN
 			,IsNull(CDNT.Note_Text,'') NoteText
 			,CD.OpenedPage, CD.ScannedData_PK,MC.V12HCC
 		FROM tblCodedData CD WITH (NOLOCK)
-			INNER JOIN tblModelCode MC WITH (NOLOCK) ON MC.DiagnosisCode = CD.DiagnosisCode --AND MC.IsICD10 = CD.IsICD10
+			INNER JOIN tblModelCode MC WITH (NOLOCK) ON MC.DiagnosisCode = CD.DiagnosisCode  AND MC.start_date<=DOS_From AND MC.end_date>=DOS_From
 			LEFT JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = CD.Provider_PK
 			LEFT JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
 			LEFT JOIN tblCodedDataNoteText CDNT WITH (NOLOCK) ON CDNT.CodedData_PK = CD.CodedData_PK
@@ -44,7 +44,7 @@ BEGIN
 			,'' NoteText				
 			,0 OpenedPage,0 ScannedData_PK,MC.V12HCC
 			FROM tblClaimData CD 
-				INNER JOIN tblModelCode MC ON MC.DiagnosisCode = CD.DiagnosisCode
+				INNER JOIN tblModelCode MC ON MC.DiagnosisCode = CD.DiagnosisCode AND MC.start_date<=DOS_From AND MC.end_date>=DOS_From
 				LEFT JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = CD.ProviderMaster_PK
 		WHERE CD.Suspect_PK=@Suspect AND CD.DOS_Thru = @DOS--	AND PM.Provider_ID=@Provider	
 	) T GROUP By DiagnosisCode,Code_Description,DOS_From,DOS_Thru,IsICD10
