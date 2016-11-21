@@ -29,7 +29,7 @@ BEGIN
 	ELSE
 		EXEC ('INSERT INTO #tmpProject(Project_PK) SELECT Project_PK FROM tblProject WHERE Project_PK IN ('+@Projects+') AND ('+@ProjectGroup+'=0 OR ProjectGroup_PK='+@ProjectGroup+')');
 	-- PROJECT SELECTION
-	
+
 	Create table #Suspects (RN Int,Suspect_PK BigInt);
 	CREATE INDEX idxSuspect_PK ON #Suspects (Suspect_PK)
 	if (@only_incomplete=1)
@@ -44,22 +44,24 @@ BEGIN
 			INNER JOIN #tmpProject P WITH (NOLOCK) ON P.Project_PK = S.Project_PK 
 			INNER JOIN tblScannedData SD WITH (NOLOCK) ON SD.Suspect_PK = S.Suspect_PK
 			LEFT JOIN tblCoderAssignment CA WITH (NOLOCK) ON CA.Suspect_PK = S.Suspect_PK AND CA.CoderLevel = @level
+			LEFT JOIN tblSuspectLevelCoded SLC_This WITH (NOLOCK) ON SLC_This.Suspect_PK = S.Suspect_PK AND SLC_This.CoderLevel = @level AND SLC_This.IsCompleted=1
 			LEFT JOIN tblSuspectLevelCoded SLC WITH (NOLOCK) ON SLC.Suspect_PK = S.Suspect_PK AND SLC.CoderLevel = @level-1 AND SLC.IsCompleted=1
 			LEFT JOIN tblClaimData CD WITH (NOLOCK) ON CD.Suspect_PK = S.Suspect_PK
 			LEFT JOIN tblModelCode MC WITH (NOLOCK) ON MC.DiagnosisCode = CD.DiagnosisCode AND MC.V12HCC IS NOT NULL
-		WHERE IsScanned=1 AND IsCoded=0 AND IsNull(SD.is_deleted,0)=0 AND CA.Suspect_PK IS NULL
+		WHERE IsScanned=1 --
+			AND SLC_This.Suspect_PK IS NULL --Replaced 'AND IsCoded=0' to this to Show only not coded charts by this level. 
+			AND IsNull(SD.is_deleted,0)=0 AND CA.Suspect_PK IS NULL
 			AND (@priority='' OR S.ChartPriority=@priority)
 			AND (@IsBlindCoding=1 OR @level=1 OR SLC.Suspect_PK IS NOT NULL)
 			AND (@IsHCCOnly=0 OR MC.DiagnosisCode IS NOT NULL)
 		GROUP BY S.Suspect_PK,S.Member_PK
---		HAVING 
---			@less_more='' 
---			OR (@less_more='l' AND count(DISTINCT SD.Suspect_PK)<=@pages)
---			OR (@less_more='g' AND count(DISTINCT SD.Suspect_PK)>=@pages)
+		HAVING 
+			@less_more='' 
+			OR (@less_more='l' AND count(DISTINCT SD.Suspect_PK)<=@pages)
+			OR (@less_more='g' AND count(DISTINCT SD.Suspect_PK)>=@pages)
 		ORDER BY S.Member_PK
-	END
+	END	
 
-	--
 	if (@coders='')
 		SELECT COUNT(1) X FROM #Suspects
 	else
