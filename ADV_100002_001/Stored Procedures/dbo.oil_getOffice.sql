@@ -2,21 +2,20 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
---	oil_getOffice '0','0','0',1,25,'','FU','DESC',0,0,1,301,'458194431'
+--	oil_getOffice 0,0,1,25,'','FU','DESC',0,0,0,1,1
 CREATE PROCEDURE [dbo].[oil_getOffice]
-	@Channel VARCHAR(1000),
-	@Projects varchar(1000),
-	@ProjectGroup varchar(1000),
+	@Projects varchar(100),
+	@ProjectGroup varchar(10),
 	@Page int,
 	@PageSize int,
 	@Alpha Varchar(2),
 	@Sort Varchar(150),
 	@Order Varchar(4),
+	@Provider BigInt,
 	@filter_type int,
 	@filter_type_sub int,
 	@user int,
-	@search_type int,
-	@search_value varchar(1000)
+	@Channel int
 AS
 BEGIN
 	-- PROJECT/Channel SELECTION
@@ -41,14 +40,13 @@ BEGIN
 		EXEC ('DELETE FROM #tmpProject WHERE Project_PK NOT IN ('+@Projects+')')
 		
 	IF (@ProjectGroup<>'0')
-		EXEC ('DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK NOT IN ('+@ProjectGroup+')')
+		DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK<>@ProjectGroup
 		
-	IF (@Channel<>'0')
-		EXEC ('DELETE T FROM #tmpChannel T WHERE Channel_PK NOT IN ('+@Channel+')')			 
+	IF (@Channel<>0)
+		DELETE T FROM #tmpChannel T WHERE Channel_PK<>@Channel				 
 	-- PROJECT/Channel SELECTION
 		
 	DECLARE @OFFICE AS BIGINT
-	DECLARE @Provider AS INT = 0
 	if (@Provider=0)
 		SET @OFFICE = 0;
 	else
@@ -56,7 +54,7 @@ BEGIN
 
 	IF (@Page<>0)
 	BEGIN
-		--With tbl AS(
+		With tbl AS(
 		SELECT ROW_NUMBER() OVER(
 			ORDER BY 
 				CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'AD' THEN PO.Address WHEN 'CT' THEN ZC.City WHEN 'CN' THEN ZC.County WHEN 'ST' THEN ZC.State WHEN 'ZC' THEN ZC.Zipcode WHEN 'CP' THEN PO.ContactPerson WHEN 'CNU' THEN PO.ContactNumber WHEN 'FN' THEN PO.FaxNumber ELSE NULL END END ASC,
@@ -69,42 +67,34 @@ BEGIN
 				,COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END) Charts
 				,MIN(PO.ProviderOfficeBucket_PK) OfficeStatus
 				,MIN(POS.OfficeIssueStatus) OfficeIssueStatus
-			INTO #tbl
 			FROM tblProviderOffice PO WITH (NOLOCK) 
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
-				INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
 				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
-				INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
 				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
-				LEFT JOIN tblProviderOfficeStatus POS ON POS.ProviderOffice_PK = PO.ProviderOffice_PK
+				INNER JOIN tblProviderOfficeStatus POS ON POS.ProviderOffice_PK = PO.ProviderOffice_PK
+				--Outer APPLY (SELECT TOP 1 * FROM tblProviderOfficeStatus WHERE ProviderOffice_PK = PO.ProviderOffice_PK) POS
 				LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
 			WHERE IsNull(PO.Address,0) Like @Alpha+'%'
-				AND (@filter_type=0 OR POS.OfficeIssueStatus=@filter_type)
-				AND (@search_type>0 OR POS.ProviderOffice_PK IS NOT NULL)
-				AND (@search_type=0 OR
-					(@search_type=101 AND PO.Address Like '%'+@search_value+'%') OR
-					(@search_type=102 AND PO.LocationID Like '%'+@search_value+'%') OR
-					(@search_type=103 AND PO.ContactNumber Like '%'+@search_value+'%') OR
-					(@search_type=104 AND PO.FaxNumber Like '%'+@search_value+'%') OR
-					(@search_type=201 AND PM.ProviderGroup Like '%'+@search_value+'%') OR
-					(@search_type=202 AND PM.Provider_ID Like '%'+@search_value+'%') OR
-					(@search_type=203 AND PM.NPI Like '%'+@search_value+'%') OR
-					(@search_type=204 AND PM.Lastname+IsNull(' '+PM.Firstname,'') Like '%'+@search_value+'%') OR
-					(@search_type=205 AND PM.PIN Like '%'+@search_value+'%') OR
-					(@search_type=301 AND M.Member_ID Like '%'+@search_value+'%') OR
-					(@search_type=302 AND M.Lastname+IsNull(' '+M.Firstname,'') Like '%'+@search_value+'%') OR
-					(@search_type=303 AND M.HICNumber Like '%'+@search_value+'%') OR
-					(@search_type=304 AND S.ChaseID Like '%'+@search_value+'%')
-				)
+				AND (@OFFICE=0 OR PO.ProviderOffice_PK=@OFFICE)
+				AND (@OFFICE<>0 OR POS.OfficeIssueStatus IS NOT NULL)
+				AND (@OFFICE<>0 OR (@filter_type=0 OR POS.OfficeIssueStatus=@filter_type))
 			GROUP BY PO.ProviderOffice_PK,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,Isnull(PO.EMR_Type_PK,0)
-			HAVING @filter_type=0 OR COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END)>0 OR @search_type>0
-		--)
+		)
 	
-		SELECT * FROM #tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
+		SELECT * FROM tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
 	
 		SELECT UPPER(LEFT(PO.Address,1)) alpha1, UPPER(RIGHT(LEFT(PO.Address,2),1)) alpha2,Count(DISTINCT PO.ProviderOffice_PK) records
-			FROM #tbl PO
+			FROM tblProviderOffice PO WITH (NOLOCK) 
+				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
+				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
+				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
+				INNER JOIN tblProviderOfficeStatus POS ON POS.ProviderOffice_PK = PO.ProviderOffice_PK
+				--Outer APPLY (SELECT TOP 1 * FROM tblProviderOfficeStatus WHERE ProviderOffice_PK = PO.ProviderOffice_PK) POS
+			WHERE (@OFFICE=0 OR PO.ProviderOffice_PK=@OFFICE)
+				AND (@OFFICE<>0 OR POS.OfficeIssueStatus IS NOT NULL)
+				AND (@OFFICE<>0 OR (@filter_type=0 OR POS.OfficeIssueStatus=@filter_type))
 			GROUP BY LEFT(PO.Address,1), RIGHT(LEFT(PO.Address,2),1)			
 			ORDER BY alpha1, alpha2;
 	END

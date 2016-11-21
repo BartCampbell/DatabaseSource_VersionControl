@@ -23,7 +23,7 @@ BEGIN
 
 	--Diagnosis Data
 	SELECT MAX(Data_PK) Data_PK
-		,T.DiagnosisCode,MIN(DOS_From) DOS_From,DOS_Thru,MIN(DataType) DataType,Year(DOS_Thru) DOS_Year, MAX(NoteType) NoteType
+		,T.DiagnosisCode DiagnosisCode,MIN(DOS_From) DOS_From,DOS_Thru,MIN(DataType) DataType,Year(DOS_Thru) DOS_Year, MAX(NoteType) NoteType
 		,V12HCC,V21HCC,V22HCC,RxHCC,IsICD10,CASE WHEN MIN(DataType)=1 THEN CASE WHEN @ValidateType='HCC' THEN CAST(V21HCC AS varchar) ELSE T.DiagnosisCode END END Validated 
 	FROM (
 		SELECT CodedData_PK Data_PK,DiagnosisCode,DOS_From,DOS_Thru,1 DataType,Coded_User_PK User_PK, NT.NoteType NoteType 
@@ -41,7 +41,7 @@ BEGIN
 		--UNION
 		--SELECT RAPSData_PK  Data_PK,DiagnosisCode,DOS_From,DOS_Thru,2 DataType,0 User_PK, '' NoteType  FROM tblRAPSData WITH (NOLOCK) WHERE Member_PK=@Member AND Year(DOS_Thru)>=Year(GetDate())-2
 	) T
-	LEFT JOIN tblModelCode C WITH (NOLOCK) ON C.DiagnosisCode = T.DiagnosisCode
+	LEFT JOIN tblModelCode C WITH (NOLOCK) ON C.DiagnosisCode = T.DiagnosisCode AND C.start_date<=DOS_From AND C.end_date>=DOS_From
 	GROUP BY T.DiagnosisCode,V12HCC,V21HCC,V22HCC,RxHCC, DOS_Thru,IsICD10
 	ORDER BY DOS_Thru,MAX(Data_PK) DESC
 
@@ -76,5 +76,4 @@ BEGIN
 	ELSE IF (@ValidateType='NLP')
 		SELECT DISTINCT MC.DiagnosisCode Code,MC.Code_Description Code_Desc FROM tblNPL2Validate V INNER JOIN tblModelCode MC ON MC.DiagnosisCode = V.DiagnosisCode WHERE V.Suspect_PK = @Suspect
 END
-
 GO

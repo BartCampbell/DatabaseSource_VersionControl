@@ -1,4 +1,4 @@
-CREATE TABLE [stage].[CCAI_RetrospectiveMA_ChaseProviderAddress]
+CREATE TABLE [stage].[CCAI_RetrospectiveMA_ChaseProviderAddress2]
 (
 [ServicingProviderNPI] [char] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProviderAddress] [char] (55) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,

@@ -10,10 +10,10 @@ GO
 -- =============================================
 --	oil_getStatus 0,1,1,1
 CREATE PROCEDURE [dbo].[oil_getStatus]
-	@Channel VARCHAR(1000),
-	@Projects varchar(1000),
-	@ProjectGroup varchar(1000),
-	@user int
+	@Projects varchar(100),
+	@ProjectGroup varchar(10),
+	@user int,
+	@Channel int
 AS
 BEGIN
 	-- PROJECT/Channel SELECTION
@@ -38,26 +38,21 @@ BEGIN
 		EXEC ('DELETE FROM #tmpProject WHERE Project_PK NOT IN ('+@Projects+')')
 		
 	IF (@ProjectGroup<>'0')
-		EXEC ('DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK NOT IN ('+@ProjectGroup+')')
+		DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK<>@ProjectGroup
 		
-	IF (@Channel<>'0')
-		EXEC ('DELETE T FROM #tmpChannel T WHERE Channel_PK NOT IN ('+@Channel+')')			 
+	IF (@Channel<>0)
+		DELETE T FROM #tmpChannel T WHERE Channel_PK<>@Channel				 
 	-- PROJECT/Channel SELECTION
 		
-	--SELECT POS.OfficeIssueStatus [status], COUNT(DISTINCT POS.ProviderOffice_PK) Cnt
-	SELECT POS.OfficeIssueStatus,POS.ProviderOffice_PK INTO #tbl
+	SELECT POS.OfficeIssueStatus [status], COUNT(DISTINCT POS.ProviderOffice_PK) Cnt
 			FROM tblProviderOffice PO WITH (NOLOCK) 
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
 				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 				INNER JOIN tblProviderOfficeStatus POS ON POS.ProviderOffice_PK = PO.ProviderOffice_PK
-				--LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
-	GROUP BY POS.OfficeIssueStatus,POS.ProviderOffice_PK
-	Having COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END)>0
-
-	SELECT OfficeIssueStatus [status], COUNT(DISTINCT ProviderOffice_PK) Cnt
-	FROM #tbl
-	GROUP BY OfficeIssueStatus
+				--Outer APPLY (SELECT TOP 1 * FROM tblProviderOfficeStatus WHERE ProviderOffice_PK = PO.ProviderOffice_PK) POS
+				LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
+	GROUP BY POS.OfficeIssueStatus
 END
 GO
