@@ -14,6 +14,9 @@ CREATE TABLE [stage].[CCAI_RetrospectiveMA_ChaseProviderAddress]
 [Q_Office_PK] [bigint] NULL,
 [QRAD] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [NewAddress] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[NewZIP] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[NewZIP] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Phone] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[FAX] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[FAXDEL] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
