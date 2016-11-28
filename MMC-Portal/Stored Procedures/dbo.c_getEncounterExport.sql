@@ -68,7 +68,7 @@ BEGIN
 		FROM tblEncounter E WITH (NOLOCK)
 		INNER JOIN tblDepartment D WITH (NOLOCK) ON D.department_pk = E.department_pk
 		INNER JOIN tblProvider P WITH (NOLOCK) ON P.provider_pk = E.provider_pk
-		INNER JOIN tblSpecialty Sp WITH (NOLOCK) ON Sp.id = E.specialty
+		LEFT JOIN tblSpecialty Sp WITH (NOLOCK) ON Sp.id = E.specialty
 		INNER JOIN tblMember M WITH (NOLOCK) ON M.member_pk = E.member_pk
 		INNER JOIN tblUser C WITH (NOLOCK) ON C.User_PK = E.inserted_user_pk
 		left JOIN tblcase Ca WITH (NOLOCK) ON Ca.case_pk = E.case_pk
@@ -124,7 +124,7 @@ BEGIN
 		FROM tblEncounter E WITH (NOLOCK)
 			INNER JOIN tblDepartment D WITH (NOLOCK) ON D.department_pk = E.department_pk
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.provider_pk = E.provider_pk
-			INNER JOIN tblSpecialty Sp WITH (NOLOCK) ON Sp.id = E.specialty
+			LEFT JOIN tblSpecialty Sp WITH (NOLOCK) ON Sp.id = E.specialty
 			INNER JOIN tblMember M WITH (NOLOCK) ON M.member_pk = E.member_pk
 			INNER JOIN tblUser C WITH (NOLOCK) ON C.User_PK = E.inserted_user_pk
 			left JOIN tblcase Ca WITH (NOLOCK) ON Ca.case_pk = E.case_pk
