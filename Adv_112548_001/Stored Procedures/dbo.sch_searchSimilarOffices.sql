@@ -9,11 +9,11 @@ GO
 -- =============================================
 --	sch_searchSimilarOffices 7,1,0,0,0
 CREATE PROCEDURE [dbo].[sch_searchSimilarOffices] 
-	@OFFICE BIGINT,
-	@user int,
+	@Channel VARCHAR(1000),
 	@Projects varchar(1000),
 	@ProjectGroup varchar(1000),
-	@Channel varchar(1000)
+	@OFFICE BIGINT,
+	@user int
 AS
 BEGIN
 	-- PROJECT/Channel SELECTION

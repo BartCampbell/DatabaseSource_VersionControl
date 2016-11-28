@@ -37,7 +37,9 @@ CREATE TABLE [dbo].[tblSuspect]
 [ContractCode] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [REN_PROVIDER_SPECIALTY] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Channel_PK] [int] NULL,
-[EDGEMemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[EDGEMemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ChaseStatus_PK] [int] NULL,
+[PlanLID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
 SET QUOTED_IDENTIFIER ON
@@ -82,6 +84,8 @@ BEGIN
 END
 GO
 ALTER TABLE [dbo].[tblSuspect] ADD CONSTRAINT [PK_tblSuspect] PRIMARY KEY CLUSTERED  ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IX_tblSuspectChaseStatus] ON [dbo].[tblSuspect] ([ChaseStatus_PK]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IDX_IsCoded] ON [dbo].[tblSuspect] ([IsCoded]) INCLUDE ([Coded_Date], [Coded_User_PK], [Member_PK], [Project_PK], [Provider_PK], [QA_Date], [QA_User_PK], [Scanned_User_PK], [Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO

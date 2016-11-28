@@ -10,7 +10,8 @@ CREATE PROCEDURE [dbo].[sch_saveOfficeContactNote]
 	@aditionaltext varchar(max),
 	@User_PK int,
 	@contact_num int,
-	@Followup int
+	@Followup int,
+	@priority_supervisor int
 AS
 BEGIN   
 			DECLARE @IsCNA AS BIT = 0
@@ -24,26 +25,28 @@ BEGIN
 			BEGIN
 				IF (@Followup=-1)
 					SET @FollowDate = NULL
+				ELSE IF (@Followup=-2)
+					SET @FollowDate = GETDATE()
 				ELSE
 					SET @FollowDate = DATEADD(day,@Followup,GETDATE())
------------Transaction Starts-------------------
-			RETRY1: -- Transaction RETRY
-			BEGIN TRANSACTION
-			BEGIN TRY
-				UPDATE cacheProviderOffice WITH (ROWLOCK) SET follow_up = @FollowDate WHERE ProviderOffice_PK=@office --Project_PK=@project AND 
-				UPDATE tblContactNotesOffice WITH (ROWLOCK) SET followup = @FollowDate WHERE Office_PK=@office --Project_PK=@project AND 
-				Update tblProviderOfficeStatus WITH (ROWLOCK) SET OfficeIssueStatus=5 WHERE ProviderOffice_PK=@office AND OfficeIssueStatus=2
-				COMMIT TRANSACTION
-			END TRY
-			BEGIN CATCH
-				ROLLBACK TRANSACTION
-				IF ERROR_NUMBER() = 1205 -- Deadlock Error Number
-				BEGIN
-					WAITFOR DELAY '00:00:00.05' -- Wait for 5 ms
-					GOTO RETRY1 -- Go to Label RETRY
-				END
-			END CATCH
------------Transaction Starts-------------------
+	-----------Transaction Starts-------------------
+				RETRY1: -- Transaction RETRY
+				BEGIN TRANSACTION
+				BEGIN TRY
+					UPDATE cacheProviderOffice WITH (ROWLOCK) SET follow_up = @FollowDate WHERE ProviderOffice_PK=@office --Project_PK=@project AND 
+					UPDATE tblContactNotesOffice WITH (ROWLOCK) SET followup = @FollowDate WHERE Office_PK=@office --Project_PK=@project AND 
+					Update tblProviderOfficeStatus WITH (ROWLOCK) SET OfficeIssueStatus=5 WHERE ProviderOffice_PK=@office AND OfficeIssueStatus=2
+					COMMIT TRANSACTION
+				END TRY
+				BEGIN CATCH
+					ROLLBACK TRANSACTION
+					IF ERROR_NUMBER() = 1205 -- Deadlock Error Number
+					BEGIN
+						WAITFOR DELAY '00:00:00.05' -- Wait for 5 ms
+						GOTO RETRY1 -- Go to Label RETRY
+					END
+				END CATCH
+	-----------Transaction Starts-------------------
 			END
 
 			IF (@IsIssue=1 OR @IsDataIssue=1 OR @IsCopyCenter=1)
@@ -199,5 +202,25 @@ BEGIN
 				If NOT EXISTS(SELECT * FROM tblExclude_iFax WITH (NOLOCK) WHERE ProviderOffice_PK=@office)
 					INSERT INTO tblExclude_iFax(ProviderOffice_PK) VALUES(@office)
 			END
+
+		IF (@priority_supervisor>0)
+		BEGIN
+-----------Transaction Starts-------------------
+			RETRY_UpdateOffice: -- Transaction RETRY
+			BEGIN TRANSACTION
+			BEGIN TRY
+				UPDATE tblProviderOffice SET AssignedUser_PK=@priority_supervisor, AssignedDate = GETDATE(), ProviderOfficeBucket_PK=12 WHERE ProviderOffice_PK=@office
+				COMMIT TRANSACTION
+			END TRY
+			BEGIN CATCH
+				ROLLBACK TRANSACTION
+				IF ERROR_NUMBER() = 1205 -- Deadlock Error Number
+				BEGIN
+					WAITFOR DELAY '00:00:00.05' -- Wait for 5 ms
+					GOTO RETRY_UpdateOffice -- Go to Label RETRY
+				END
+			END CATCH
+-----------Transaction Starts-------------------
+		END
 END
 GO
