@@ -17,3 +17,5 @@ CREATE NONCLUSTERED INDEX [IX_tblExtractionQueue_User] ON [dbo].[tblExtractionQu
 GO
 CREATE NONCLUSTERED INDEX [IX_tblExtractionQueueUserSource] ON [dbo].[tblExtractionQueue] ([ExtractionQueueSource_PK]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_OfficeExtractUploadDate] ON [dbo].[tblExtractionQueue] ([OfficeFaxOrID], [ExtractionQueueSource_PK], [UploadDate]) ON [PRIMARY]
+GO
