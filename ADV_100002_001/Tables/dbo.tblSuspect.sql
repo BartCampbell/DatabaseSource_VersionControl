@@ -37,7 +37,8 @@ CREATE TABLE [dbo].[tblSuspect]
 [ContractCode] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [REN_PROVIDER_SPECIALTY] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Channel_PK] [int] NULL,
-[ChaseStatus_PK] [int] NULL
+[ChaseStatus_PK] [int] NULL,
+[PlanLID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
 SET QUOTED_IDENTIFIER ON
@@ -80,7 +81,6 @@ BEGIN
 	DROP TABLE #tmp2
 	DROP TABLE #tmp
 END
-
 GO
 ALTER TABLE [dbo].[tblSuspect] ADD CONSTRAINT [PK_tblSuspect] PRIMARY KEY CLUSTERED  ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
