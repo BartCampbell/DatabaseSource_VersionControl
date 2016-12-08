@@ -188,7 +188,7 @@ BEGIN
 			SELECT S.User_PK User_PK,COUNT(DISTINCT S.Suspect_PK) Coded, 0 Assigned INTO #tmp FROM tblSuspectLevelCoded S
 					INNER JOIN tblSuspect SC ON SC.Suspect_PK = S.Suspect_PK
 					INNER JOIN #tmpProject Pr ON SC.Project_PK = Pr.Project_PK
-			WHERE IsCompleted=1 ';
+			WHERE S.IsCompleted=1 ';
 --SELECT * FROM tblSuspectLevelCoded	
 		IF @User<>0
 			SET @SQL = @SQL + ' AND S.User_PK=' + CAST(@User AS VARChar);			
