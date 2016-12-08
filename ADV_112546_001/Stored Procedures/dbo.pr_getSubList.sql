@@ -164,7 +164,7 @@ BEGIN
 						INNER JOIN tblMember M ON M.Member_PK = S.Member_PK
 						INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
 						INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
-			WHERE IsCoded=1 ';
+			WHERE SLC.IsCompleted=1 ';
 		
 		IF @User<>0
 			SET @SQL = @SQL + ' AND SLC.User_PK=' + CAST(@User AS VARChar);			
