@@ -118,10 +118,10 @@ BEGIN
 		WHERE (
 			(@DrillType=0)
 			OR (@DrillType=1 AND S.IsScanned=0 AND S.IsCNA=0 AND T.Provider_PK IS NULL)						--Not Yet Scheduled = total number of charts in offices not yet contacted (this number will initially be high but then will go down as the number of charts scheduled goes up)
-			OR (@DrillType=2 AND T.Sch_Date IS NOT NULL AND S.IsScanned=0 AND S.IsCNA=0)					--Scheduled for Extraction = total number of charts in offices that have been scheduled, but not yet extracted (this number will go down as the number of charts extracted goes up)
-			OR (@DrillType=3 AND S.IsScanned=1)																--Extracted Not Yet Coded [with option to hide the words “not yet coded” if we’re not coding for that project] = total number of charts extracted by Scan Techs (this number will go down as the number of charts coded goes up) but not yet coded OR just the number of charts extracted by Scan Techs if we are not coding
+			OR (@DrillType=2 AND S.IsScanned=0 AND S.IsCNA=0 AND T.Provider_PK IS NOT NULL)					--Scheduled for Extraction = total number of charts in offices that have been scheduled, but not yet extracted (this number will go down as the number of charts extracted goes up)
+			OR (@DrillType=3 AND S.IsScanned=1 AND S.IsCoded=0)												--Extracted Not Yet Coded [with option to hide the words “not yet coded” if we’re not coding for that project] = total number of charts extracted by Scan Techs (this number will go down as the number of charts coded goes up) but not yet coded OR just the number of charts extracted by Scan Techs if we are not coding
 			OR (@DrillType=4 AND S.IsCNA=1 AND S.IsScanned=0)												--CNA = total number of charts not available
-			OR (@DrillType=5 AND S.IsCoded=1)																--Coded = total number of charts coded
+			OR (@DrillType=5 AND S.IsCoded=1 AND S.IsScanned=1)												--Coded = total number of charts coded
 			OR (@DrillType=101 AND (T.Sch_Date IS NOT NULL OR S.IsScanned=1 OR S.IsCNA=1 OR S.IsCoded=1))	--In Progress = CNA + Scheduled for Extraction + Extracted Not Yet Coded + Coded
 			OR (@DrillType=102 AND (S.IsScanned=1 OR S.IsCNA=1 OR S.IsCoded=1))								--Outreach Complete = CNA + Extracted Not Yet Coded + Coded
 			OR (@DrillType=103 AND (S.IsScanned=1 OR S.IsCoded=1))											--Charts Extracted = Extracted Not Yet Coded + Coded
