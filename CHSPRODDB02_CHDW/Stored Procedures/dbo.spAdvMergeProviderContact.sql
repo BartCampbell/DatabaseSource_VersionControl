@@ -39,6 +39,31 @@ AS
             INSERT ( ProviderID, Phone, Fax, EmailAddress )
             VALUES ( ProviderID, Phone, Fax, EmailAddress );
 
+			
+
+				SELECT ProviderID INTO #po FROM dim.ProviderContact GROUP BY ProviderID 
+				
+				SELECT a.ProviderID,MAX(a.LastUpdate) AS LU INTO #mp
+				FROM dim.ProviderContact  a 
+				INNER JOIN #po b ON b.ProviderID = a.ProviderID 
+				GROUP BY a.ProviderID
+
+				UPDATE a
+				SET a.RecordEndDate = NULL
+				FROM dim.ProviderContact  a 
+				INNER JOIN #mp b
+				ON b.ProviderID = a.ProviderID AND a.LastUpdate = b.LU
+				WHERE a.RecordEndDate IS NOT NULL
+
+				UPDATE a
+				SET a.RecordEndDate = GETDATE()
+				FROM dim.ProviderContact  a 
+				LEFT OUTER JOIN #mp b
+				ON b.ProviderID = a.ProviderID AND a.LastUpdate = b.LU
+				WHERE b.ProviderID IS NULL AND a.RecordEndDate IS NULL
+
+				DROP TABLE #po
+				DROP table #mp
     END;     
 
 

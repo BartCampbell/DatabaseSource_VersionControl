@@ -10,6 +10,7 @@ GO
 --Udpate 10/06/2016 adding in SuspectLoad tabel to avoid dupes PJ 
 --Update 10/17/2016 adding iscentauri flag PJ
 --Update 10/25/2016 adding ClientID and ProviderOfficeID PJ
+--Update 12/09/2016 Update to iscentauri flag to use channel_pk for WellCare PJ
 -- Description:	merges the stage to dim for advance Suspect 
  -- Usage:				  EXECUTE dbo.spAdvMergeSuspect
 -- =============================================
@@ -357,20 +358,34 @@ AS
                    );
 
        
+	--   SELECT  a.SuspectID INTO #tmp
+ --   FROM [CHSDW].[fact].[Suspect] a
+ --   --INNER JOIN  dim.ProviderClient c ON c.ProviderID = a.ProviderID AND c.RecordEndDate='2999-12-31'
+	--INNER JOIN  dim.Client d  ON d.ClientID = a.ClientID AND d.ClientName ='WellCare'
+ --   WHERE ChaseID LIKE '%CENT' AND a.iscentauri IS NULL
+	
+	--INSERT INTO #tmp 
+	--SELECT a.SuspectID
+	--FROM [CHSDW].[fact].[Suspect] a
+ --   --INNER JOIN  dim.ProviderClient c ON c.ProviderID = a.ProviderID AND c.RecordEndDate='2999-12-31'
+	--INNER JOIN  dim.Client d  ON d.ClientID = a.ClientID AND d.ClientName ='WellCare'
+	--INNER join dim.ADVProject p ON p.ClientID = d.ClientID AND p.ProjectID = a.ProjectID AND p.ProjectGroup='Chase List 02'
+ --   WHERE  a.iscentauri IS NULL
+	
+
 	   SELECT  a.SuspectID INTO #tmp
     FROM [CHSDW].[fact].[Suspect] a
     --INNER JOIN  dim.ProviderClient c ON c.ProviderID = a.ProviderID AND c.RecordEndDate='2999-12-31'
 	INNER JOIN  dim.Client d  ON d.ClientID = a.ClientID AND d.ClientName ='WellCare'
-    WHERE ChaseID LIKE '%CENT' AND a.iscentauri IS NULL
+    WHERE a.Channel_PK=10 --AND a.iscentauri IS NULL
+
 	
-	INSERT INTO #tmp 
-	SELECT a.SuspectID
-	FROM [CHSDW].[fact].[Suspect] a
+	   SELECT  a.SuspectID INTO #tmp2
+    FROM [CHSDW].[fact].[Suspect] a
     --INNER JOIN  dim.ProviderClient c ON c.ProviderID = a.ProviderID AND c.RecordEndDate='2999-12-31'
 	INNER JOIN  dim.Client d  ON d.ClientID = a.ClientID AND d.ClientName ='WellCare'
-	INNER join dim.ADVProject p ON p.ClientID = d.ClientID AND p.ProjectID = a.ProjectID AND p.ProjectGroup='Chase List 02'
-    WHERE  a.iscentauri IS NULL
-	
+    WHERE a.Channel_PK<>10 --AND a.iscentauri IS NULL
+
 
 	INSERT INTO #tmp 
      SELECT  a.SuspectID 
@@ -380,6 +395,7 @@ AS
   INNER JOIN  dim.Client d  ON d.ClientID = a.ClientID AND d.ClientName <>'WellCare'
     WHERE  a.iscentauri IS NULL
 
+	
 	  UPDATE fact.Suspect 
 		SET iscentauri =1
 	WHERE SuspectID IN (SELECT SuspectID FROM #tmp)
@@ -388,5 +404,13 @@ AS
 		SET iscentauri =0
 	WHERE iscentauri IS NULL  AND SuspectID NOT IN (SELECT SuspectID FROM #tmp)
 
+	
+	UPDATE fact.Suspect
+		SET iscentauri =0
+	WHERE  SuspectID IN (SELECT SuspectID FROM #tmp2)
+
+	
+
 	 END; 
+	
 GO

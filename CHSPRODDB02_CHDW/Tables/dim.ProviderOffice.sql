@@ -10,5 +10,7 @@ CREATE TABLE [dim].[ProviderOffice]
 GO
 ALTER TABLE [dim].[ProviderOffice] ADD CONSTRAINT [PK_ProviderOffice] PRIMARY KEY CLUSTERED  ([ProviderOfficeID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_CPI] ON [dim].[ProviderOffice] ([CentauriProviderOfficeID]) INCLUDE ([ProviderID]) ON [PRIMARY]
+GO
 ALTER TABLE [dim].[ProviderOffice] ADD CONSTRAINT [FK_ProviderOffice_Provider] FOREIGN KEY ([ProviderID]) REFERENCES [dim].[Provider] ([ProviderID])
 GO

@@ -13,7 +13,8 @@ CREATE TABLE [dim].[ProviderLocation]
 [Advance_Phone] [varchar] (120) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Advance_Fax] [varchar] (120) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CreateDate] [datetime] NULL CONSTRAINT [DF_ProviderLocation_CreateDate] DEFAULT (getdate()),
-[LastUpdate] [datetime] NULL CONSTRAINT [DF_ProviderLocation_LastUpdate] DEFAULT (getdate())
+[LastUpdate] [datetime] NULL CONSTRAINT [DF_ProviderLocation_LastUpdate] DEFAULT (getdate()),
+[RecordEndDate] [datetime] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dim].[ProviderLocation] ADD CONSTRAINT [PK_ProviderLocation] PRIMARY KEY CLUSTERED  ([ProviderLocationID]) ON [PRIMARY]

@@ -18,6 +18,8 @@ CREATE TABLE [fact].[ProviderOfficeSchedule]
 GO
 ALTER TABLE [fact].[ProviderOfficeSchedule] ADD CONSTRAINT [PK_ProviderOfficeSchedule] PRIMARY KEY CLUSTERED  ([ProviderOfficeScheduleID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_LastUpdatedDate] ON [fact].[ProviderOfficeSchedule] ([LastUpdated_Date]) INCLUDE ([CentauriProviderOfficeID], [LastUserID]) ON [PRIMARY]
+GO
 ALTER TABLE [fact].[ProviderOfficeSchedule] ADD CONSTRAINT [FK_ProviderOfficeSchedule_LastUser] FOREIGN KEY ([LastUserID]) REFERENCES [dim].[User] ([UserID])
 GO
 ALTER TABLE [fact].[ProviderOfficeSchedule] ADD CONSTRAINT [FK_ProviderOfficeSchedule_Project] FOREIGN KEY ([ProjectID]) REFERENCES [dim].[ADVProject] ([ProjectID])

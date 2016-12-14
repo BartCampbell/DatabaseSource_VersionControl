@@ -50,6 +50,32 @@ AS
 					County
                    );
 
+
+
+			SELECT ProviderID INTO #po FROM dim.ProviderLocation GROUP BY ProviderID 
+
+			SELECT a.ProviderID,MAX(a.LastUpdate) AS LU INTO #mp
+			FROM dim.ProviderLocation  a 
+			INNER JOIN #po b ON b.ProviderID = a.ProviderID 
+			GROUP BY a.ProviderID
+
+			UPDATE a
+			SET a.RecordEndDate = NULL
+			FROM dim.ProviderLocation  a 
+			INNER JOIN #mp b
+			ON b.ProviderID = a.ProviderID AND a.LastUpdate = b.LU
+			WHERE a.RecordEndDate IS NOT NULL
+
+			UPDATE a
+			SET a.RecordEndDate = GETDATE()
+			FROM dim.ProviderLocation  a 
+			LEFT OUTER JOIN #mp b
+			ON b.ProviderID = a.ProviderID AND a.LastUpdate = b.LU
+			WHERE b.ProviderID IS NULL AND a.RecordEndDate IS NULL
+
+
+			DROP TABLE #po
+			DROP table #mp
     END;     
 
 

@@ -18,6 +18,8 @@ CREATE TABLE [fact].[ContactNotesOffice]
 GO
 ALTER TABLE [fact].[ContactNotesOffice] ADD CONSTRAINT [PK_ContactNotesOffice] PRIMARY KEY CLUSTERED  ([ContactNotesOfficeID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_LastUpdatedDate] ON [fact].[ContactNotesOffice] ([LastUpdated_Date]) INCLUDE ([CentauriProviderOfficeID], [UserID]) ON [PRIMARY]
+GO
 ALTER TABLE [fact].[ContactNotesOffice] ADD CONSTRAINT [FK_ContactNotesOffice_ContactNote] FOREIGN KEY ([ContactNoteID]) REFERENCES [dim].[ContactNote] ([ContactNoteID])
 GO
 ALTER TABLE [fact].[ContactNotesOffice] ADD CONSTRAINT [FK_ContactNotesOffice_Project] FOREIGN KEY ([ProjectID]) REFERENCES [dim].[ADVProject] ([ProjectID])

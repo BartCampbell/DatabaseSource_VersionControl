@@ -48,6 +48,8 @@ CREATE TABLE [fact].[Suspect]
 GO
 ALTER TABLE [fact].[Suspect] ADD CONSTRAINT [PK_Suspect] PRIMARY KEY CLUSTERED  ([SuspectID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_IsCentauri] ON [fact].[Suspect] ([IsCentauri]) INCLUDE ([ClientID], [ProviderOfficeID]) ON [PRIMARY]
+GO
 ALTER TABLE [fact].[Suspect] ADD CONSTRAINT [FK_Suspect_CNA_User] FOREIGN KEY ([CNA_UserID]) REFERENCES [dim].[User] ([UserID])
 GO
 ALTER TABLE [fact].[Suspect] ADD CONSTRAINT [FK_Suspect_Coded_User] FOREIGN KEY ([Coded_UserID]) REFERENCES [dim].[User] ([UserID])

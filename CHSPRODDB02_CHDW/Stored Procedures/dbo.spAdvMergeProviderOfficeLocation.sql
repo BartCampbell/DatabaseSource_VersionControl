@@ -49,6 +49,36 @@ AS
 					County
                    );
 
+
+				   
+
+
+			SELECT ProviderOfficeID INTO #po FROM dim.ProviderOfficeLocation GROUP BY ProviderOfficeID 
+
+			SELECT a.ProviderOfficeID,MAX(a.LastUpdate) AS LU INTO #mp
+			FROM dim.ProviderOfficeLocation  a 
+			INNER JOIN #po b ON b.ProviderOfficeID = a.ProviderOfficeID 
+			GROUP BY a.ProviderOfficeID
+
+			
+			UPDATE a
+			SET a.RecordEndDate = NULL
+			FROM dim.ProviderOfficeLocation  a 
+			INNER JOIN #mp b
+			ON b.ProviderOfficeID = a.ProviderOfficeID AND a.LastUpdate = b.LU
+			WHERE a.RecordEndDate IS NOT NULL
+
+			UPDATE a
+			SET a.RecordEndDate = GETDATE()
+			 FROM dim.ProviderOfficeLocation  a 
+			LEFT OUTER JOIN #mp b
+			ON b.ProviderOfficeID = a.ProviderOfficeID AND a.LastUpdate = b.LU
+			WHERE b.ProviderOfficeID IS NULL AND a.RecordEndDate IS NULL
+
+			DROP TABLE #po
+			DROP table #mp
+
+
     END;     
 
 

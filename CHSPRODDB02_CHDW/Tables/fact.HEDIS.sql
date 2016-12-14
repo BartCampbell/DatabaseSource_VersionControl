@@ -1,8 +1,6 @@
-CREATE TABLE [stage].[HEDIS]
+CREATE TABLE [fact].[HEDIS]
 (
-[HEDIS_BK] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[S_HEDISDetail_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[H_HEDIS_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[HEDISID] [bigint] NOT NULL IDENTITY(1, 1),
 [CLIENT] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [CLIENT_MEMBER_STATUS] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [PRODUCT_ROLLUP_ID] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
@@ -473,11 +471,18 @@ CREATE TABLE [stage].[HEDIS]
 [PCP ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [LoadDate] [datetime] NULL,
-[CentauriClientID] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CentauriMemberID] [int] NULL,
-[CentauriProviderID] [int] NULL,
-[CentauriNetworkID] [int] NULL
+[ClientID] [int] NULL,
+[ProviderID] [int] NULL,
+[MemberID] [int] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [stage].[HEDIS] ADD CONSTRAINT [PK_HEDIS] PRIMARY KEY CLUSTERED  ([CLIENT], [CLIENT_MEMBER_STATUS], [PRODUCT_ROLLUP_ID], [MEM_NBR], [RecordSource]) ON [PRIMARY]
+ALTER TABLE [fact].[HEDIS] ADD CONSTRAINT [PK_HEDIS] PRIMARY KEY CLUSTERED  ([HEDISID]) ON [PRIMARY]
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IDX_BizKey] ON [fact].[HEDIS] ([CLIENT], [CLIENT_MEMBER_STATUS], [PRODUCT_ROLLUP_ID], [MEM_NBR], [RecordSource]) ON [PRIMARY]
+GO
+ALTER TABLE [fact].[HEDIS] ADD CONSTRAINT [FK_HEDIS_Client] FOREIGN KEY ([ClientID]) REFERENCES [dim].[Client] ([ClientID])
+GO
+ALTER TABLE [fact].[HEDIS] ADD CONSTRAINT [FK_HEDIS_Member] FOREIGN KEY ([MemberID]) REFERENCES [dim].[Member] ([MemberID])
+GO
+ALTER TABLE [fact].[HEDIS] ADD CONSTRAINT [FK_HEDIS_Provider] FOREIGN KEY ([ProviderID]) REFERENCES [dim].[Provider] ([ProviderID])
 GO

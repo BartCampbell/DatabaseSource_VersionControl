@@ -8,7 +8,8 @@ CREATE TABLE [dim].[ProviderOfficeContact]
 [AdvanceFax] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CreateDate] [datetime] NULL CONSTRAINT [DF_ProviderOfficeContact_CreateDate] DEFAULT (getdate()),
 [LastUpdate] [datetime] NULL CONSTRAINT [DF_ProviderOfficeContact_LastUpdate] DEFAULT (getdate()),
-[EmailAddress] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[EmailAddress] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[RecordEndDate] [datetime] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dim].[ProviderOfficeContact] ADD CONSTRAINT [PK_ProviderOfficeContact] PRIMARY KEY CLUSTERED  ([ProviderOfficeContactID]) ON [PRIMARY]
