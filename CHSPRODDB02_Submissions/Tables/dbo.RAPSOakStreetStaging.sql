@@ -15,6 +15,7 @@ CREATE TABLE [dbo].[RAPSOakStreetStaging]
 [DOSTo] [datetime] NULL,
 [RAPSProviderTypeCode] [char] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DXCode] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DXCodeVersion] [int] NULL,
 [SubmittableFlag] [bit] NULL,
 [RAPSOakStreetStagingID] [int] NOT NULL IDENTITY(1, 1)
 ) ON [PRIMARY]
