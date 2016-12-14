@@ -1,0 +1,41 @@
+CREATE TABLE [dbo].[WellCare_DailyStatus]
+(
+[RecID] [int] NOT NULL IDENTITY(1, 1),
+[ProjectGroup] [varchar] (55) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[InternalSuspectPK] [int] NULL,
+[ProjectName] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[LocationGroupID] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ChartID] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Resolution] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ResolutionDate] [date] NULL,
+[DocumentStatus] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Measure] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DocumentPageCount] [int] NULL CONSTRAINT [DF__WellCare___Docum__09CD65E6] DEFAULT ((0)),
+[ClientMemberID] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MemberLastName] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MemberFirstName] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MemberDOB] [date] NULL,
+[GroupName] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderAddressline1] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderAddressline2] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderCity] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderState] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderZipCode] [varchar] (25) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderPhoneNumber] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderFaxNumber] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ClientProviderID] [varchar] (25) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderLastName] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderFirstName] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderType] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[POS] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PendStatus] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Comments] [text] COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[RetrievalMethod] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Rerouted_CopyCenter] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[IssueFlag] [int] NULL CONSTRAINT [DF__WellCare___Issue__0AC18A1F] DEFAULT ((0)),
+[ScannedFlag] [int] NULL CONSTRAINT [DF__WellCare___Scann__0BB5AE58] DEFAULT ((0)),
+[LoadDate] [date] NULL
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[WellCare_DailyStatus] ADD CONSTRAINT [UQ__WellCare__360414FEC6E803B9] UNIQUE NONCLUSTERED  ([RecID]) ON [PRIMARY]
+GO

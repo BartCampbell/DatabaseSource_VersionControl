@@ -1,0 +1,9 @@
+CREATE TABLE [dbo].[HCSCIVA_ExtractedPDF]
+(
+[HCSCIVAExtractID] [int] NOT NULL IDENTITY(1, 1),
+[ChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DateExtracted] [datetime] NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[HCSCIVA_ExtractedPDF] ADD CONSTRAINT [PK_HCSCIVA_ExtractedPDF] PRIMARY KEY CLUSTERED  ([HCSCIVAExtractID]) ON [PRIMARY]
+GO

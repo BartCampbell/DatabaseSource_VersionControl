@@ -1,0 +1,3 @@
+CREATE SCHEMA [adv]
+AUTHORIZATION [INTERNAL\paul.johnson]
+GO

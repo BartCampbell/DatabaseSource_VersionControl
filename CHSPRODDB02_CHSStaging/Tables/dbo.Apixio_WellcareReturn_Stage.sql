@@ -1,0 +1,28 @@
+CREATE TABLE [dbo].[Apixio_WellcareReturn_Stage]
+(
+[REFERENCE_NBR] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PROVIDER_NPI] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PROVIDER_LAST] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PROVIDER_FIRST] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DATE_OF_SERVICE] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PROVIDER_TYPE] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEMBER_ID] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEMBER_HICN] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEMBER_LAST] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEMBER_FIRST] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEMBER_DOB] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEMBER_GENDER] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[HCC] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ICD9] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ICD10] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PATIENT_UUID] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DOCUMENT_UUID] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CHART_ID] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PAGE] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[COMMENTS] [varchar] (8000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CODER_HISTORY] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CODER_ANNOTATION_HISTORY] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CODER_ANNOTATION_DATE] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DELIVERED] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+) ON [PRIMARY]
+GO

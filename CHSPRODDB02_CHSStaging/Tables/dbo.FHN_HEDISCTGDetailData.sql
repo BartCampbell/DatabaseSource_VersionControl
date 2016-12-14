@@ -1,0 +1,52 @@
+CREATE TABLE [dbo].[FHN_HEDISCTGDetailData]
+(
+[MEASURE_DESC] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEM_NBR] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DENOM] [float] NULL,
+[EE] [float] NULL,
+[SAMPLE] [float] NULL,
+[SAMPLE_NUMBER] [float] NULL,
+[MEM_LNAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEM_FNAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEM_DOB] [datetime] NULL,
+[MEM_GENDER] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEM_ADDR1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEM_ADDR2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEM_CITY] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEM_STATE] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEM_ZIP] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MEM_PHONE] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[GUARD_LNAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[GUARD_FNAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[GUARD_ADDR1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[GUARD_ADDR2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[GUARD_CITY] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[GUARD_STATE] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[GUARD_ZIP] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PCP ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PCP HFS Num] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PCP Name] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PHO ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PHO Network] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PCP Months] [float] NULL,
+[DELIVERY_DT] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[NUM DOS] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PCP Closed Gap] [float] NULL,
+[c-Gap_PCP ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[c-Gap_PCP HFS Num] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[c-Gap_PCP Name] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[c-Gap_PHO ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[c-Gap_PHO Network] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[NUM_1] [float] NULL,
+[NUM_2] [float] NULL,
+[NUM_3] [float] NULL,
+[NUM_4] [float] NULL,
+[RPT_RunDate] [datetime] NULL,
+[FullMeasureDescription] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[RecID] [int] NOT NULL IDENTITY(1, 1)
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[FHN_HEDISCTGDetailData] ADD CONSTRAINT [pk_recid] PRIMARY KEY CLUSTERED  ([RecID]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [NonClusteredIndex-20160816-134538] ON [dbo].[FHN_HEDISCTGDetailData] ([FullMeasureDescription], [DENOM], [PCP ID]) ON [PRIMARY]
+GO
