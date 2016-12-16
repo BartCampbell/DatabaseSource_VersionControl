@@ -15,6 +15,7 @@ GO
 --Upated 09/27/2016 Removed RecordEnddate for L_SuspectUser PJ
  --Update 09/27/2016 Adding LoadDate to Primary Key PJ
  --Update 10/04/2016 Replace RecordEndDate/LoadDate with Link Satellite PJ
+ --Update 10/25/2016 Adding provideroffice to LS_SuspectProvider PJ
 -- Description:	Load all Link Tables from the tblSuspectWCStage table
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_Suspect_LoadLinks]
@@ -146,7 +147,7 @@ AS --DECLARE  @CCI VARCHAR(50)
                         a.RecordSource ,
                         NULL
                    FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
-				        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK FROM dbo.L_ProviderMasterOffice l INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK ) b
+				        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK FROM dbo.L_ProviderMasterOffice l INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK AND d.RecordEndDate IS NULL ) b
 									ON CAST(a.Provider_PK AS VARCHAR) = b.Provider_PK
                         --INNER JOIN CHSDV.dbo.R_Provider b WITH ( NOLOCK ) ON CAST(a.Provider_PK AS VARCHAR)= b.ClientProviderID
                         --                                      AND b.ClientID = a.CCI
@@ -174,41 +175,51 @@ AS --DECLARE  @CCI VARCHAR(50)
                   [L_SuspectProvider_RK] ,
                   [H_Suspect_RK] ,
                   [H_Provider_RK] ,
+				  [H_ProviderOffice_RK],
                   [Active] ,
                   [HashDiff] ,
                   [RecordSource]
                 )
                 SELECT  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
-                                                                       RTRIM(LTRIM(COALESCE(a.[LoadDate], '')))))), 2)) ,
+														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':',
+														   RTRIM(LTRIM(COALESCE(a.[LoadDate], '')))))), 2)) ,
                         a.LoadDate ,
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, '')))))), 2)) ,
                         a.SuspectHashKey ,
                         b.H_Provider_RK ,
+						b.[H_ProviderOffice_RK],
                         'Y' ,
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':Y'))), 2)) ,
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
+														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':Y'))), 2)) ,
                         a.RecordSource
                    FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
-                        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK FROM dbo.L_ProviderMasterOffice l INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK ) b
+                        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK,l.H_ProviderOffice_RK FROM dbo.L_ProviderMasterOffice l 
+						INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK  WHERE d.RecordEndDate IS null ) b
 									ON CAST(a.Provider_PK AS VARCHAR) = b.Provider_PK
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':Y'))), 2)) NOT IN (
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
+														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':Y'))), 2)) NOT IN (
                         SELECT  HashDiff
                         FROM    LS_SuspectProvider
                         WHERE   RecordEndDate IS NULL )
                         AND a.CCI = @CCI
                 GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(a.[LoadDate], '')))))), 2)) ,
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
+														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':',
+														   RTRIM(LTRIM(COALESCE(a.[LoadDate], '')))))), 2)) ,
                         a.LoadDate ,
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, '')))))), 2)) ,
                         a.SuspectHashKey ,
                         b.H_Provider_RK ,
+						b.[H_ProviderOffice_RK],
+                        
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':Y'))), 2)) ,
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
+														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':Y'))), 2)) ,
                         a.RecordSource; 
 
 		--RECORD END DATE CLEANUP

@@ -3,13 +3,13 @@ CREATE TABLE [dbo].[S_Contact]
 [S_Contact_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [LoadDate] [datetime] NOT NULL,
 [H_Contact_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Phone] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Fax] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Phone] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Fax] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [HashDiff] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordEndDate] [datetime] NULL,
-[EmailAddress] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Cell] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[EmailAddress] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Cell] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ContactPerson] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO

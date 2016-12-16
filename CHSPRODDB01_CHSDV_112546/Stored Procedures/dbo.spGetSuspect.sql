@@ -10,6 +10,7 @@ GO
 -- Update 09/26/2016 Adding RecordEndDate filter PJ
 --Update 09/29/2018 Adding Channel_PK and EDGEMemberID  PJ
 --Update 10/04/2016 Replace RecordEndDate/LoadDate with Link Satellite PJ
+--Update 10/25/2016 Adding ProviderOffice PJ
 -- Description:	Gets Suspects details from DV
 -- =============================================
 CREATE PROCEDURE [dbo].[spGetSuspect]
@@ -28,6 +29,7 @@ AS
                 h.Suspect_BK AS CentauriSuspectID ,
                 j.Project_BK AS CentauriProjectID ,
                 p.Provider_BK AS CentauriProviderID ,
+				po.ProviderOffice_BK AS CentauriProviderOfficeID,
                 hm.Member_BK AS CentauriMemberID ,
                 s.[IsScanned] ,
                 s.[IsCNA] ,
@@ -105,12 +107,14 @@ AS
                                             
                                 ) AS QA ON h.H_Suspect_RK = QA.H_Suspect_RK
                 LEFT OUTER JOIN ( SELECT    llsp.H_Suspect_RK ,
-                                            llsp.H_Provider_RK,lspl.LoadDate
+                                            llsp.H_Provider_RK,lspl.H_ProviderOffice_RK,
+											lspl.LoadDate
                                   FROM      dbo.L_SuspectProvider llsp
                                             INNER JOIN dbo.LS_SuspectProvider lspl ON lspl.L_SuspectProvider_RK = llsp.L_SuspectProvider_RK
                                                                                       AND lspl.RecordEndDate IS NULL
                                 ) lsp ON h.H_Suspect_RK = lsp.H_Suspect_RK
                 LEFT OUTER JOIN dbo.H_Provider p ON p.H_Provider_RK = lsp.H_Provider_RK
+				LEFT OUTER JOIN dbo.H_ProviderOffice po ON po.H_ProviderOffice_RK = lsp.H_ProviderOffice_RK
                 LEFT OUTER JOIN ( SELECT    llcm.H_Suspect_RK ,
                                             llcm.H_Member_RK,lcml.LoadDate
                                   FROM      dbo.L_SuspectMember llcm

@@ -307,7 +307,7 @@ AS
                         p.LoadDate ,
                         p.RecordSource
                 FROM    [CHSStaging].[adv].[tblProviderStage] p WITH ( NOLOCK )
-                        INNER JOIN dbo.S_ProviderMasterDemo a WITH ( NOLOCK ) ON p.ProviderMaster_PK = a.ProviderMaster_PK
+                        INNER JOIN dbo.S_ProviderMasterDemo a WITH ( NOLOCK ) ON p.ProviderMaster_PK = a.ProviderMaster_PK AND a.RecordEndDate IS NULL
                         INNER JOIN dbo.H_Provider h ON h.H_Provider_RK = a.H_Provider_RK
                         INNER JOIN CHSDV.dbo.R_ProviderOffice b WITH ( NOLOCK ) ON b.ClientProviderOfficeID = p.ProviderOffice_PK
                                                                                    AND b.ClientID = p.CCI
@@ -411,7 +411,7 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(b.ClientProviderOfficeID, '')))))), 2)) ,
                         p.[RecordSource]
                 FROM    [CHSStaging].[adv].[tblProviderStage] p WITH ( NOLOCK )
-                        INNER JOIN dbo.S_ProviderMasterDemo a WITH ( NOLOCK ) ON p.ProviderMaster_PK = a.ProviderMaster_PK
+                        INNER JOIN dbo.S_ProviderMasterDemo a WITH ( NOLOCK ) ON p.ProviderMaster_PK = a.ProviderMaster_PK AND a.RecordEndDate IS null
                         INNER JOIN dbo.H_Provider h ON h.H_Provider_RK = a.H_Provider_RK
                         INNER JOIN CHSDV.dbo.R_ProviderOffice b WITH ( NOLOCK ) ON b.ClientProviderOfficeID = p.ProviderOffice_PK AND b.ClientID = p.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
