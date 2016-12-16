@@ -10,6 +10,7 @@ GO
 -- Create date: 09/07/2016
 -- Update 09/26/2016 Adding RecordEndDate filter PJ
 --Update 11/08/2016 Adding LS_ProviderMasterOffice PJ
+--Update 12/14/2016 adding l.LoadDate  PJ
 -- Description:	Gets provider office  from DV
 -- =============================================
 CREATE PROCEDURE [dbo].[spGetProviderOffice]
@@ -31,11 +32,11 @@ AS
                 m.LoadDate AS LoadDate ,
                 m.RecordSource AS RecordSource
         FROM    [dbo].[H_Provider] h
-                INNER JOIN (SELECT lm.H_Provider_RK,lm.H_ProviderOffice_RK FROM dbo.L_ProviderMasterOffice lm 
+                INNER JOIN (SELECT lm.H_Provider_RK,lm.H_ProviderOffice_RK,ls.LoadDate FROM dbo.L_ProviderMasterOffice lm 
 				INNER JOIN dbo.LS_ProviderMasterOffice ls ON ls.L_ProviderMasterOffice_RK = lm.L_ProviderMasterOffice_RK AND ls.RecordEndDate IS null) l
 					 ON h.H_Provider_RK = l.H_Provider_RK  -- AND l.RecordEndDate IS NULL
                 INNER JOIN dbo.H_ProviderOffice m ON l.[H_ProviderOffice_RK] = m.[H_ProviderOffice_RK]
-        WHERE   m.LoadDate > @LoadDate;
+        WHERE   m.LoadDate > @LoadDate OR l.LoadDate>@LoadDate;
 
     END;
 
