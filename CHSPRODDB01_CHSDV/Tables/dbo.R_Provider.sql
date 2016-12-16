@@ -14,3 +14,7 @@ CREATE TABLE [dbo].[R_Provider]
 GO
 ALTER TABLE [dbo].[R_Provider] ADD CONSTRAINT [PK_CentauriProvider2] PRIMARY KEY CLUSTERED  ([CentauriProviderID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [idx_ClientProviderID_ClientID] ON [dbo].[R_Provider] ([ClientProviderID], [ClientID]) INCLUDE ([CentauriProviderID]) ON [PRIMARY]
+GO
+CREATE STATISTICS [stat_1501964427_3_4] ON [dbo].[R_Provider] ([ClientID], [ClientProviderID])
+GO

@@ -11,3 +11,7 @@ CREATE TABLE [dbo].[R_Network]
 GO
 ALTER TABLE [dbo].[R_Network] ADD CONSTRAINT [PK_R_Network] PRIMARY KEY CLUSTERED  ([CentauriNetworkID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [idx_ClientID_ClientNetworkID] ON [dbo].[R_Network] ([ClientID], [ClientNetworkID]) INCLUDE ([CentauriNetworkID]) ON [PRIMARY]
+GO
+CREATE STATISTICS [stat_925246351_4_3] ON [dbo].[R_Network] ([ClientNetworkID], [ClientID])
+GO
