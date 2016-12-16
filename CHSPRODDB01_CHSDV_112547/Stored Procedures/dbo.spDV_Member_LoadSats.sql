@@ -4,7 +4,7 @@ SET ANSI_NULLS ON
 GO
 
 
-
+--EXEC [dbo].[spDV_Member_LoadSats] 112559
 
 -- =============================================
 -- Author:		Paul Johnson
@@ -421,7 +421,7 @@ AS
                         SELECT  HashDiff
                         FROM    S_Location
                         WHERE   RecordEndDate IS NULL )
-                        AND rw.CCI = @CCI
+                        --AND rw.CCI = @CCI
                 GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                            UPPER(CONCAT(RTRIM(LTRIM(COALESCE([Address], ''))), ':', RTRIM(LTRIM(COALESCE(ZipCode_PK, '')))))), 2)) ,
                         LoadDate ,
@@ -606,9 +606,9 @@ AS
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Contact_Number, ''))), ':', RTRIM(LTRIM(COALESCE(Cell_Number, ''))),
                                                                        ':', RTRIM(LTRIM(COALESCE(Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
-                        [Contact_Number] ,
-                        [Cell_Number] ,
-                        [Email_Address] ,
+                        LTRIM(RTRIM(ISNULL([Contact_Number],'') )),
+                        LTRIM(RTRIM(ISNULL([Cell_Number],'') )),
+                        LTRIM(RTRIM(ISNULL([Email_Address],'') )),
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Contact_Number, ''))), ':', RTRIM(LTRIM(COALESCE(Cell_Number, ''))),
                                                                        ':', RTRIM(LTRIM(COALESCE(Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
@@ -621,18 +621,18 @@ AS
                         SELECT  HashDiff
                         FROM    S_Contact
                         WHERE   RecordEndDate IS NULL )
-                        AND rw.CCI = @CCI
+                       AND rw.CCI = @CCI
                 GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Contact_Number, ''))), ':', RTRIM(LTRIM(COALESCE(Cell_Number, ''))),
-                                                                        ':', RTRIM(LTRIM(COALESCE(Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Contact_Number, ''))), ':', RTRIM(LTRIM(COALESCE(Cell_Number, ''))),
+                                                                       ':', RTRIM(LTRIM(COALESCE(Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
                         LoadDate ,
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Contact_Number, ''))), ':', RTRIM(LTRIM(COALESCE(Cell_Number, ''))),
                                                                        ':', RTRIM(LTRIM(COALESCE(Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
-                        [Contact_Number] ,
-                        [Cell_Number] ,
-                        [Email_Address] ,
-                        UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                        LTRIM(RTRIM(ISNULL([Contact_Number],'') )),
+                        LTRIM(RTRIM(ISNULL([Cell_Number],'') )),
+                        LTRIM(RTRIM(ISNULL([Email_Address],'') )),
+						UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Contact_Number, ''))), ':', RTRIM(LTRIM(COALESCE(Cell_Number, ''))),
                                                                        ':', RTRIM(LTRIM(COALESCE(Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
                         RecordSource;
@@ -659,8 +659,8 @@ AS
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Home_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(Home_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
-                        [Home_Contact_Number] ,
-                        [Home_Email_Address] ,
+                        LTRIM(RTRIM(ISNULL([Home_Contact_Number],'') )),
+                        LTRIM(RTRIM(ISNULL([Home_Email_Address],'') )),
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Home_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(Home_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
@@ -681,8 +681,8 @@ AS
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Home_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(Home_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
-                        [Home_Contact_Number] ,
-                        [Home_Email_Address] ,
+                        LTRIM(RTRIM(ISNULL([Home_Contact_Number],'') )),
+                        LTRIM(RTRIM(ISNULL([Home_Email_Address],'') )),
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Home_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(Home_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
@@ -709,8 +709,8 @@ AS
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Orig_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(Orig_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
-                        [Orig_Contact_Number] ,
-                        [Orig_Email_Address] ,
+                        LTRIM(RTRIM(ISNULL([Orig_Contact_Number],''))) ,
+                        LTRIM(RTRIM(ISNULL([Orig_Email_Address],''))) ,
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Orig_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(Orig_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
@@ -731,8 +731,8 @@ AS
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Orig_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(Orig_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
-                        [Orig_Contact_Number] ,
-                        [Orig_Email_Address] ,
+                        LTRIM(RTRIM(ISNULL([Orig_Contact_Number],''))) ,
+                        LTRIM(RTRIM(ISNULL([Orig_Email_Address],''))) ,
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Orig_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(Orig_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
@@ -759,8 +759,8 @@ AS
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(POA_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(POA_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
-                        [POA_Contact_Number] ,
-                        [POA_Email_Address] ,
+                        LTRIM(RTRIM(ISNULL([POA_Contact_Number],''))) ,
+                        LTRIM(RTRIM(ISNULL([POA_Email_Address],''))) ,
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(POA_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(POA_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
@@ -781,8 +781,8 @@ AS
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(POA_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(POA_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
-                        [POA_Contact_Number] ,
-                        [POA_Email_Address] ,
+                        LTRIM(RTRIM(ISNULL([POA_Contact_Number],''))) ,
+                        LTRIM(RTRIM(ISNULL([POA_Email_Address],''))) ,
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(POA_Contact_Number, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(POA_Email_Address, ''))), ':', RTRIM(LTRIM(COALESCE(NULL, '')))))), 2)) ,
