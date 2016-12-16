@@ -23,18 +23,20 @@ AS
     -- Insert statements for procedure here
 	--SELECT COUNT(*) FROM S_ProviderOfficeSchedule - 68609
         SELECT  
-		c.[ClientProviderOfficeScheduleID] AS CentauriProviderOfficeScheduleID,
+		c.ProviderOfficeSchedule_BK AS CentauriProviderOfficeScheduleID,
 		m.ProviderOffice_BK AS CentauriProviderOfficeID 		,
 			 p.Project_BK AS  [CentauriProjectID],
       r.User_PK AS [CentauriLastUserID],
       ui.User_PK AS [CentauriScheduledUserID],
       y.ScheduleType_BK [CentauriScheduleTypeID]      ,
 	           s.[Sch_Start],s.[Sch_End],s.[LastUpdated_Date],s.[followup],s.[AddInfo]
-      	    FROM    dbo.H_ProviderOffice m  
-        INNER JOIN [dbo].[L_ProviderOfficeProviderOfficeSchedule] o ON o.H_ProviderOffice_RK = m.H_ProviderOffice_RK AND o.RecordEndDate IS NULL
+       FROM    dbo.H_ProviderOffice m  
+        INNER JOIN (SELECT lo.H_ProviderOffice_RK,lo.H_ProviderOfficeSchedule_RK FROM [dbo].[L_ProviderOfficeProviderOfficeSchedule] lo INNER JOIN LS_ProviderOfficeProviderOfficeSchedule ol ON ol.L_ProviderOfficeProviderOfficeSchedule_RK = lo.L_ProviderOfficeProviderOfficeSchedule_RK AND ol.RecordEndDate IS NULL)  o 
+		ON o.H_ProviderOffice_RK = m.H_ProviderOffice_RK 
 		INNER JOIN dbo.H_ProviderOfficeSchedule c ON o.H_ProviderOfficeSchedule_RK = c.H_ProviderOfficeSchedule_RK 
 		INNER JOIN dbo.S_ProviderOfficeSchedule s ON s.H_ProviderOfficeSchedule_RK = c.H_ProviderOfficeSchedule_RK AND s.RecordEndDate IS NULL
-		LEFT OUTER JOIN (SELECT lt.H_ProviderOfficeSchedule_RK,lt.H_ScheduleType_RK , lst.LoadDate FROM dbo.L_ProviderOfficeScheduleScheduleType lt INNER JOIN dbo.LS_ProviderOfficeScheduleScheduleType lst ON lst.L_ProviderOfficeScheduleScheduleType_RK = lt.L_ProviderOfficeScheduleScheduleType_RK AND lst.RecordEndDate IS NULL )t ON t.H_ProviderOfficeSchedule_RK = o.H_ProviderOfficeSchedule_RK 
+		LEFT OUTER JOIN (SELECT lt.H_ProviderOfficeSchedule_RK,lt.H_ScheduleType_RK , lst.LoadDate FROM dbo.L_ProviderOfficeScheduleScheduleType lt 
+		INNER JOIN dbo.LS_ProviderOfficeScheduleScheduleType lst ON lst.L_ProviderOfficeScheduleScheduleType_RK = lt.L_ProviderOfficeScheduleScheduleType_RK AND lst.RecordEndDate IS NULL )t ON t.H_ProviderOfficeSchedule_RK = o.H_ProviderOfficeSchedule_RK 
 		LEFT OUTER JOIN dbo.H_ScheduleType y ON y.H_ScheduleType_RK = t.H_ScheduleType_RK
 		LEFT OUTER JOIN (SELECT ld.H_ProviderOfficeSchedule_RK,ld.H_Project_RK,lsd.LoadDate FROM dbo.L_ProviderOfficeScheduleProject ld INNER JOIN dbo.LS_ProviderOfficeScheduleProject lsd ON lsd.L_ProviderOfficeScheduleProject_RK = ld.L_ProviderOfficeScheduleProject_RK AND lsd.RecordEndDate IS NULL) d ON d.H_ProviderOfficeSchedule_RK = o.H_ProviderOfficeSchedule_RK 
 		LEFT OUTER JOIN dbo.H_Project p  ON p.H_Project_RK = d.H_Project_RK
