@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[H_Provider]
 (
 [H_Provider_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-[Provider_BK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Provider_BK] [int] NULL,
 [ClientProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [LoadDate] [datetime] NULL CONSTRAINT [DF_H_Provider_LoadDate] DEFAULT (getdate())

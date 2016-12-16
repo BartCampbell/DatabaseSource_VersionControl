@@ -36,13 +36,15 @@ AS
 				    RecordSource,
 				    LoadDate
 			    FROM  CHSStaging.hedis.RawImport AS p
-			    WHERE H_Network_RK IS NOT NULL AND L_ProviderNetwork_RK NOT IN
+			    WHERE p.CentauriNetworkID IS NOT NULL AND p.CentauriProviderID IS NOT NULL AND L_ProviderNetwork_RK NOT IN
 			    (
 				   SELECT
 					   L_ProviderNetwork_RK
 				   FROM  L_ProviderNetwork
 				   WHERE RecordEndDate IS NULL
-			    );
+			    ) 
+
+
 
 		  --LOAD PROVIDER / HEDIS LINKS
 		  INSERT INTO dbo.L_ProviderHEDIS
@@ -60,7 +62,7 @@ AS
 				    LoadDate,
 				    RecordSource
 			    FROM  CHSStaging.hedis.RawImport
-			    WHERE L_ProviderHEDIS_RK NOT IN
+			    WHERE CentauriProviderID IS NOT NULL AND L_ProviderHEDIS_RK NOT IN
 			    (
 				   SELECT
 					   L_ProviderHEDIS_RK
@@ -86,7 +88,7 @@ AS
 				    m.LoadDate,
 				    m.RecordSource
 			    FROM  CHSStaging.hedis.RawImport AS m --257472
-			    WHERE m.CentauriProviderID IS NOT NULL AND L_MemberProvider_RK NOT IN
+			    WHERE m.CentauriProviderID IS NOT NULL AND m.CentauriMemberID IS NOT NULL AND L_MemberProvider_RK NOT IN
 			    (
 				   SELECT
 					   L_MemberProvider_RK
@@ -109,7 +111,7 @@ AS
 				    LoadDate,
 				    RecordSource
 			    FROM  CHSStaging.hedis.RawImport
-			    WHERE L_MemberHEDIS_RK NOT IN
+			    WHERE CentauriMemberID IS NOT NULL AND L_MemberHEDIS_RK NOT IN
 			    (
 				   SELECT
 					   L_MemberHEDIS_RK

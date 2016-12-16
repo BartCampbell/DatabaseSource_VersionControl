@@ -18,6 +18,14 @@ AS
 
         SET NOCOUNT ON;
 
+        UPDATE  CHSStaging.hedis.RawImport
+        SET     [PHO ID] = NULL
+        WHERE   [PHO ID] = 'NULL';
+
+        UPDATE  CHSStaging.hedis.RawImport
+        SET     [PHO Name] = NULL
+        WHERE   [PHO Name] = 'NULL';
+
 
         BEGIN TRY
 
@@ -31,17 +39,26 @@ AS
                       RecordSource
                     )
                     SELECT DISTINCT
-                            c.CentauriClientID ,
+                            c.Client_BK ,
                             i.[PHO ID] AS ClientNetworkID ,
                             i.LoadDate ,
                             i.RecordSource
-                    FROM    CHSStaging.stage.HEDIS_Import i
-                            CROSS JOIN dbo.H_Client cl
-                            INNER JOIN CHSDV.dbo.R_Client AS c ON cl.Client_BK = c.CentauriClientID
+                    FROM    CHSStaging.hedis.RawImport i
+                            CROSS JOIN dbo.H_Client c
                             LEFT JOIN CHSDV.dbo.R_Network r ON i.[PHO ID] = r.ClientNetworkID
-                                                               AND c.CentauriClientID = r.ClientID
-                    WHERE   ISNULL(i.[PHO ID],'') <> ''
+                                                               AND c.Client_BK = r.ClientID
+                    WHERE   ISNULL(i.[PHO ID], '') <> ''
                             AND r.CentauriNetworkID IS NULL;
+
+
+            UPDATE  i
+            SET     i.CentauriNetworkID = r.CentauriNetworkID
+            FROM    CHSStaging.hedis.RawImport i
+                    CROSS JOIN dbo.H_Client c
+                    INNER JOIN CHSDV.dbo.R_Network r ON i.[PHO ID] = r.ClientNetworkID
+                                                       AND c.Client_BK = r.ClientID;
+
+
 
             COMMIT TRANSACTION;
         END TRY

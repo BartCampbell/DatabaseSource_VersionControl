@@ -16,40 +16,58 @@ GO
 
 CREATE PROCEDURE [dbo].[spUpdateHEDISProviderReference]
 AS
-     BEGIN
+    BEGIN
 
-         SET NOCOUNT ON;
+        SET NOCOUNT ON;
+
+        UPDATE  CHSStaging.hedis.RawImport
+        SET     [PCP Name] = NULL
+        WHERE   [PCP Name] = 'NULL';
+
+        UPDATE  CHSStaging.hedis.RawImport
+        SET     [PCP ID] = NULL
+        WHERE   [PCP ID] = 'NULL';
 
 
-         BEGIN TRY
+        BEGIN TRY
 
-             BEGIN TRANSACTION;
+            BEGIN TRANSACTION;
 
              --LOAD NEW PROVIDERS FROM HEDIS STAGING
-             INSERT INTO CHSDV.dbo.R_Provider
-                (
-                  ClientID,
-                  ClientProviderID,
-			   LoadDate,
-			   RecordSource
-                )
-                    SELECT DISTINCT                         
-                         c.CentauriClientID,
-					hp.[PCP ID],
-					hp.LoadDate,
-					hp.RecordSource
-                    FROM  CHSStaging.hedis.RawImport AS hp
-					 CROSS JOIN dbo.H_Client cl 
-                          INNER JOIN CHSDV.dbo.R_Client AS c ON cl.Client_BK = c.CentauriClientID
-					 LEFT JOIN CHSDV.dbo.R_Provider r ON hp.[PCP ID] = r.ClientProviderID AND c.CentauriClientID = r.ClientID
-                    WHERE ISNULL(hp.[PCP ID], '') <> '' AND r.CentauriProviderID IS NULL
+            INSERT  INTO CHSDV.dbo.R_Provider
+                    ( ClientID ,
+                      ClientProviderID ,
+                      LoadDate ,
+                      RecordSource
+                    )
+                    SELECT DISTINCT
+                            c.Client_BK ,
+                            i.[PCP ID] ,
+                            i.LoadDate ,
+                            i.RecordSource
+                    FROM    CHSStaging.hedis.RawImport AS i
+                            CROSS JOIN dbo.H_Client c
+                            LEFT JOIN CHSDV.dbo.R_Provider r ON i.[PCP ID] = r.ClientProviderID
+                                                                AND c.Client_BK = r.ClientID
+                    WHERE   ISNULL(i.[PCP ID], '') <> ''
+                            AND r.CentauriProviderID IS NULL;
 
-             COMMIT TRANSACTION;
-         END TRY
-         BEGIN CATCH
-             IF @@TRANCOUNT > 0
-                 ROLLBACK TRANSACTION;
-             THROW;
-         END CATCH;
-     END;
+
+            UPDATE  i
+            SET     i.CentauriProviderID = r.CentauriProviderID
+            FROM    CHSStaging.hedis.RawImport AS i
+                    CROSS JOIN dbo.H_Client c
+                    LEFT JOIN CHSDV.dbo.R_Provider r ON i.[PCP ID] = r.ClientProviderID
+                                                        AND c.Client_BK = r.ClientID
+            WHERE   ISNULL(i.[PCP ID], '') <> ''; 
+		  
+
+            COMMIT TRANSACTION;
+        END TRY
+        BEGIN CATCH
+            IF @@TRANCOUNT > 0
+                ROLLBACK TRANSACTION;
+            THROW;
+        END CATCH;
+    END;
 GO

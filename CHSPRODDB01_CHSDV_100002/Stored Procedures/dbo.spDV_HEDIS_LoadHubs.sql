@@ -3,8 +3,6 @@ GO
 SET ANSI_NULLS ON
 GO
 
-
-
 -- =============================================
 -- Author:		Travis Parker
 -- Create date:	08/18/2016
@@ -35,7 +33,8 @@ AS
                             RecordSource
                     FROM    CHSStaging.hedis.RawImport
                     WHERE   H_HEDIS_RK NOT IN ( SELECT  H_HEDIS_RK
-                                                FROM    dbo.H_HEDIS );
+                                                FROM    dbo.H_HEDIS )
+                            AND HEDIS_BK IS NOT NULL; 
 
 
 		  --LOAD PROVIDER HUB
@@ -54,7 +53,8 @@ AS
                             p.LoadDate
                     FROM    CHSStaging.hedis.RawImport AS p
                     WHERE   p.H_Provider_RK NOT IN ( SELECT H_Provider_RK
-                                                     FROM   dbo.H_Provider );
+                                                     FROM   dbo.H_Provider )
+                            AND p.CentauriProviderID IS NOT NULL; 
 
 
 		  --LOAD Network Hub
@@ -73,7 +73,9 @@ AS
                             p.LoadDate
                     FROM    CHSStaging.hedis.RawImport AS p
                     WHERE   p.H_Network_RK NOT IN ( SELECT  H_Network_RK
-                                                    FROM    dbo.H_Network );
+                                                    FROM    dbo.H_Network )
+                            AND p.CentauriNetworkID IS NOT NULL; 
+
 
 
 		  --LOAD Member HUB
@@ -92,7 +94,8 @@ AS
                             RecordSource
                     FROM    CHSStaging.hedis.RawImport
                     WHERE   H_Member_RK NOT IN ( SELECT H_Member_RK
-                                                 FROM   dbo.H_Member );
+                                                 FROM   dbo.H_Member )
+                            AND CentauriMemberID IS NOT NULL;
 
         END TRY
         BEGIN CATCH

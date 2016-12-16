@@ -1010,7 +1010,7 @@ AS
                             LEFT JOIN dbo.S_ProviderDemo h ON p.H_Provider_RK = h.H_Provider_RK
                                                               AND h.RecordEndDate IS NULL
                                                               AND p.S_ProviderDemo_HashDiff = h.HashDiff
-                    WHERE   h.S_ProviderDemo_RK IS NULL;
+                    WHERE   p.CentauriProviderID IS NOT NULL  AND h.S_ProviderDemo_RK IS NULL;
 
 		  --RECORD END DATE CLEANUP
             UPDATE  dbo.S_ProviderDemo
@@ -1045,7 +1045,7 @@ AS
                             LEFT JOIN dbo.S_Network s ON i.H_Network_RK = s.H_Network_RK
                                                          AND s.RecordEndDate IS NULL
                                                          AND i.S_Network_HashDiff = s.HashDiff
-                    WHERE   s.S_Network_RK IS NULL; 
+                    WHERE   i.CentauriNetworkID IS NOT NULL AND s.S_Network_RK IS NULL; 
 
 
 		  --RECORD END DATE CLEANUP

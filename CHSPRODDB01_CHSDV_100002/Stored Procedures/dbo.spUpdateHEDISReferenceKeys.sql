@@ -18,18 +18,15 @@ AS
 
 
         UPDATE  i
-        SET     CentauriMemberID = m.CentauriMemberID ,
-                CentauriProviderID = p.CentauriProviderID ,
-                CentauriNetworkID = n.CentauriNetworkID ,
-                HEDIS_BK = CONCAT(RTRIM(LTRIM(COALESCE(i.RecordSource, ''))), ':', RTRIM(LTRIM(COALESCE(i.[PRODUCT_ROLLUP_ID], ''))), ':', RTRIM(LTRIM(COALESCE(i.[MEM_NBR], '')))) ,
+        SET     HEDIS_BK = CONCAT(RTRIM(LTRIM(COALESCE(i.RecordSource, ''))), ':', RTRIM(LTRIM(COALESCE(i.[PRODUCT_ROLLUP_ID], ''))), ':', RTRIM(LTRIM(COALESCE(i.[MEM_NBR], '')))) ,
                 H_HEDIS_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.RecordSource, ''))), ':', RTRIM(LTRIM(COALESCE(i.[PRODUCT_ROLLUP_ID], ''))), ':', RTRIM(LTRIM(COALESCE(i.[MEM_NBR], '')))))), 2)) ,
-                H_Provider_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(RTRIM(LTRIM(COALESCE(p.CentauriProviderID, ''))))), 2)),
-			 H_Network_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(RTRIM(LTRIM(COALESCE(n.CentauriNetworkID, ''))))), 2)),
-			 H_Member_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(RTRIM(LTRIM(COALESCE(m.CentauriMemberID, ''))))), 2)),
-			 L_ProviderNetwork_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(p.CentauriProviderID, ''))), ':', RTRIM(LTRIM(COALESCE(n.CentauriNetworkID, '')))))), 2)),
-			 L_ProviderHEDIS_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(p.CentauriProviderID, ''))), ':', RTRIM(LTRIM(COALESCE(i.RecordSource, ''))), ':', RTRIM(LTRIM(COALESCE(i.[PRODUCT_ROLLUP_ID], ''))), ':', RTRIM(LTRIM(COALESCE(i.[MEM_NBR], '')))))), 2)) ,
-			 L_MemberProvider_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(m.CentauriMemberID, ''))), ':', RTRIM(LTRIM(COALESCE(p.CentauriProviderID, '')))))), 2)),
-			 L_MemberHEDIS_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(m.CentauriMemberID, ''))), ':', RTRIM(LTRIM(COALESCE(i.RecordSource, ''))), ':', RTRIM(LTRIM(COALESCE(i.[PRODUCT_ROLLUP_ID], ''))), ':', RTRIM(LTRIM(COALESCE(i.[MEM_NBR], '')))))), 2)) ,
+                H_Provider_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(RTRIM(LTRIM(COALESCE(i.CentauriProviderID, ''))))), 2)),
+			 H_Network_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(RTRIM(LTRIM(COALESCE(i.CentauriNetworkID, ''))))), 2)),
+			 H_Member_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(RTRIM(LTRIM(COALESCE(i.CentauriMemberID, ''))))), 2)),
+			 L_ProviderNetwork_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.CentauriProviderID, ''))), ':', RTRIM(LTRIM(COALESCE(i.CentauriNetworkID, '')))))), 2)),
+			 L_ProviderHEDIS_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.CentauriProviderID, ''))), ':', RTRIM(LTRIM(COALESCE(i.RecordSource, ''))), ':', RTRIM(LTRIM(COALESCE(i.[PRODUCT_ROLLUP_ID], ''))), ':', RTRIM(LTRIM(COALESCE(i.[MEM_NBR], '')))))), 2)) ,
+			 L_MemberProvider_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.CentauriMemberID, ''))), ':', RTRIM(LTRIM(COALESCE(i.CentauriProviderID, '')))))), 2)),
+			 L_MemberHEDIS_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.CentauriMemberID, ''))), ':', RTRIM(LTRIM(COALESCE(i.RecordSource, ''))), ':', RTRIM(LTRIM(COALESCE(i.[PRODUCT_ROLLUP_ID], ''))), ':', RTRIM(LTRIM(COALESCE(i.[MEM_NBR], '')))))), 2)) ,
 			 S_HEDISDetail_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',UPPER(RTRIM(LTRIM(COALESCE(i.RecordSource,''))) + ':' + 
 				RTRIM(LTRIM(COALESCE(i.LoadDate,''))) + ':' + 
 				RTRIM(LTRIM(COALESCE(i.[PRODUCT_ROLLUP_ID],''))) + ':' + 
@@ -967,18 +964,12 @@ AS
 				RTRIM(LTRIM(COALESCE(i.[PCP Name],''))) + ':' + 
 				RTRIM(LTRIM(COALESCE(i.[PCP ID],'')))
 				)),2)),
-			 S_ProviderDemo_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.RecordSource, ''))), ':', RTRIM(LTRIM(COALESCE(i.LoadDate, ''))), ':', RTRIM(LTRIM(COALESCE(p.CentauriProviderID, ''))), ':', RTRIM(LTRIM(COALESCE(dbo.ufn_parsefind(REPLACE(i.[PCP Name],', ',':'),':',1), ''))), ':', RTRIM(LTRIM(COALESCE(dbo.ufn_parsefind(REPLACE(i.[PCP Name],', ',':'),':',2), '')))))), 2)),
-			 S_ProviderDemo_HashDiff = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(p.CentauriProviderID, ''))), ':', RTRIM(LTRIM(COALESCE(dbo.ufn_parsefind(REPLACE(i.[PCP Name],', ',':'),':',1), ''))), ':', RTRIM(LTRIM(COALESCE(dbo.ufn_parsefind(REPLACE(i.[PCP Name],', ',':'),':',2), '')))))), 2)),
-			 S_Network_HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',UPPER(CONCAT(RTRIM(LTRIM(COALESCE(n.CentauriNetworkID,''))),':',RTRIM(LTRIM(COALESCE(i.[PHO Name],'')))))),2)),
-			 S_Network_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.RecordSource, ''))), ':', RTRIM(LTRIM(COALESCE(i.LoadDate, ''))), ':', RTRIM(LTRIM(COALESCE(n.CentauriNetworkID,''))),':',RTRIM(LTRIM(COALESCE(i.[PHO Name],'')))))),2))
+			 S_ProviderDemo_RK = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.RecordSource, ''))), ':', RTRIM(LTRIM(COALESCE(i.LoadDate, ''))), ':', RTRIM(LTRIM(COALESCE(i.CentauriProviderID, ''))), ':', RTRIM(LTRIM(COALESCE(dbo.ufn_parsefind(REPLACE(i.[PCP Name],', ',':'),':',1), ''))), ':', RTRIM(LTRIM(COALESCE(dbo.ufn_parsefind(REPLACE(i.[PCP Name],', ',':'),':',2), '')))))), 2)),
+			 S_ProviderDemo_HashDiff = UPPER(CONVERT( CHAR(32), HASHBYTES('MD5', UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.CentauriProviderID, ''))), ':', RTRIM(LTRIM(COALESCE(dbo.ufn_parsefind(REPLACE(i.[PCP Name],', ',':'),':',1), ''))), ':', RTRIM(LTRIM(COALESCE(dbo.ufn_parsefind(REPLACE(i.[PCP Name],', ',':'),':',2), '')))))), 2)),
+			 S_Network_HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.CentauriNetworkID,''))),':',RTRIM(LTRIM(COALESCE(i.[PHO Name],'')))))),2)),
+			 S_Network_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.RecordSource, ''))), ':', RTRIM(LTRIM(COALESCE(i.LoadDate, ''))), ':', RTRIM(LTRIM(COALESCE(i.CentauriNetworkID,''))),':',RTRIM(LTRIM(COALESCE(i.[PHO Name],'')))))),2))
         FROM    CHSStaging.hedis.RawImport i
-                CROSS JOIN dbo.H_Client c
-                INNER JOIN CHSDV.dbo.R_Member m ON i.MEM_NBR = m.ClientMemberID
-                                                   AND m.ClientID = c.Client_BK
-                LEFT JOIN CHSDV.dbo.R_Provider p ON i.[PCP ID] = p.ClientProviderID
-                                                     AND p.ClientID = c.Client_BK
-                LEFT JOIN CHSDV.dbo.R_Network n ON i.[PHO ID] = n.ClientNetworkID
-                                                   AND n.ClientID = c.Client_BK;
+                CROSS JOIN dbo.H_Client c;
 
 
         

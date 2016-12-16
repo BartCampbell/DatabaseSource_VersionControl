@@ -10,7 +10,7 @@ CREATE TABLE [dbo].[L_MemberLocation]
 GO
 ALTER TABLE [dbo].[L_MemberLocation] ADD CONSTRAINT [PK_L_MemberLocation] PRIMARY KEY CLUSTERED  ([L_MemberLocation_RK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[L_MemberLocation] ADD CONSTRAINT [FK_L_MemberLocation_H_Location] FOREIGN KEY ([H_Location_RK]) REFERENCES [dbo].[H_Location] ([H_Location_RK])
+ALTER TABLE [dbo].[L_MemberLocation] ADD CONSTRAINT [FK_H_Location_RK] FOREIGN KEY ([H_Location_RK]) REFERENCES [dbo].[H_Location] ([H_Location_RK]) ON DELETE CASCADE ON UPDATE CASCADE
 GO
-ALTER TABLE [dbo].[L_MemberLocation] ADD CONSTRAINT [FK_L_MemberLocation_H_Member] FOREIGN KEY ([H_Member_RK]) REFERENCES [dbo].[H_Member] ([H_Member_RK])
+ALTER TABLE [dbo].[L_MemberLocation] ADD CONSTRAINT [FK_H_Member_RK3] FOREIGN KEY ([H_Member_RK]) REFERENCES [dbo].[H_Member] ([H_Member_RK]) ON DELETE CASCADE ON UPDATE CASCADE
 GO
