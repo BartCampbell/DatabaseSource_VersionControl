@@ -7,7 +7,7 @@ GO
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-Create PROCEDURE [dbo].[prGetRecordsforHCSCIVAPDFExtract]
+Create PROCEDURE [dbo].[prGetRecordsforPDFExtract]
 	-- Add the parameters for the stored procedure here
 	
 AS
