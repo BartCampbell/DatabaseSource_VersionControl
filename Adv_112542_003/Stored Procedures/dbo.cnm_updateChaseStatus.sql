@@ -2,8 +2,8 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
---	cnm_updateChannel '0','0','0',1,'0',1,1
-Create PROCEDURE [dbo].[cnm_updateChannel] 
+--	cnm_updateChaseStatus '0','0','0',1,'0',1,1
+Create PROCEDURE [dbo].[cnm_updateChaseStatus] 
 	@Channel VARCHAR(1000),
 	@Projects varchar(1000),
 	@ProjectGroup varchar(1000),
@@ -12,8 +12,7 @@ Create PROCEDURE [dbo].[cnm_updateChannel]
 	@updateType varchar(1), 
 	@IDs varchar(max),  
 	@User int,
-	@ChannelTo int,
-	@IsAllCharts int
+	@ChaseStatus int
 AS
 BEGIN
 	-- PROJECT/Channel SELECTION
@@ -64,9 +63,9 @@ BEGIN
 		FROM tblProvider P WITH (NOLOCK)
 			INNER JOIN tblSuspect S ON S.Provider_PK = P.Provider_PK
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
-			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK	
-			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK			
-		WHERE S.Channel_PK<>'+CAST(@ChannelTo AS varchar)
+			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
+			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK				
+		WHERE S.Channel_PK<>'+CAST(@ChaseStatus AS varchar)
 		IF (@IDs<>'0')
 			SET @SQL = @SQL + ' AND P.ProviderOffice_PK IN ('+@IDs+')'
 	END
@@ -77,9 +76,9 @@ BEGIN
 		FROM tblProvider P WITH (NOLOCK)
 			INNER JOIN tblSuspect S ON S.Provider_PK = P.Provider_PK
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
-			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK		
-			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK		
-		WHERE P.Provider_PK IN ('+@IDs+') AND S.Channel_PK<>'+CAST(@ChannelTo AS varchar)
+			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK	
+			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK			
+		WHERE P.Provider_PK IN ('+@IDs+') AND S.Channel_PK<>'+CAST(@ChaseStatus AS varchar)
 	END
 	ELSE IF (@updateType='s')
 	BEGIN
@@ -89,24 +88,23 @@ BEGIN
 		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 		INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
-		WHERE S.Suspect_PK IN ('+@IDs+') AND S.Channel_PK<>'+CAST(@ChannelTo AS varchar)
+		WHERE S.Suspect_PK IN ('+@IDs+') AND S.Channel_PK<>'+CAST(@ChaseStatus AS varchar)
 	END
 
 	EXEC (@SQL);
 
 	INSERT INTO tblContactNotesOffice(Project_PK, Office_PK, ContactNote_PK, ContactNoteText, LastUpdated_User_PK, LastUpdated_Date,contact_num)
-	SELECT 0,P.ProviderOffice_PK, 1 ContactNote_PK, CAST(COUNT(DISTINCT CL.Suspect_PK) AS VARCHAR)+' Chases from '+C_From.Channel_Name+' to '+C_To.Channel_Name ContactNoteText, @User LastUpdated_User_PK, GetDate() LastUpdated_Date,0 contac_num 
+	SELECT 0, P.ProviderOffice_PK, 1 ContactNote_PK, CAST(COUNT(DISTINCT CL.Suspect_PK) AS VARCHAR)+' Chases from '+C_From.ChaseStatus+' to '+C_To.ChaseStatus ContactNoteText, @User LastUpdated_User_PK, GetDate() LastUpdated_Date,0 contac_num 
 	FROM tblProvider P WITH (NOLOCK)
 			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK	
 			INNER JOIN #tmpSuspect CL WITH (NOLOCK) ON CL.Suspect_PK = S.Suspect_PK
-			INNER JOIN tblChannel C_To WITH (NOLOCK) ON C_To.Channel_PK = @ChannelTo
-			INNER JOIN tblChannel C_From WITH (NOLOCK) ON C_From.Channel_PK = S.Channel_PK
-	WHERE (@IsAllCharts=1 OR S.IsScanned=0)
-	GROUP BY P.ProviderOffice_PK,C_From.Channel_Name, C_To.Channel_Name
+			INNER JOIN tblChaseStatus C_To WITH (NOLOCK) ON C_To.ChaseStatus_PK = @ChaseStatus
+			INNER JOIN tblChaseStatus C_From WITH (NOLOCK) ON C_From.ChaseStatus_PK = S.ChaseStatus_PK
+	GROUP BY P.ProviderOffice_PK,C_From.ChaseStatus, C_To.ChaseStatus
 
-	INSERT INTO tblChannelLog(Suspect_PK,From_Channel_PK,To_Channel_PK,User_PK,dtUpdate)
-	SELECT S.Suspect_PK,Channel_PK,@ChannelTo,@User,GetDate() FROM #tmpSuspect tS INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Suspect_PK = tS.Suspect_PK WHERE @IsAllCharts=1 OR S.IsScanned=0
+	INSERT INTO tblChaseStatusLog(Suspect_PK,From_ChaseStatus_PK,To_ChaseStatus_PK,User_PK,dtUpdate)
+	SELECT S.Suspect_PK,ChaseStatus_PK,@ChaseStatus,@User,GetDate() FROM #tmpSuspect tS INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Suspect_PK = tS.Suspect_PK
 
-	Update S SET Channel_PK = @ChannelTo FROM #tmpSuspect tS INNER JOIN tblSuspect S ON S.Suspect_PK = tS.Suspect_PK WHERE @IsAllCharts=1 OR S.IsScanned=0
+	Update S SET ChaseStatus_PK = @ChaseStatus FROM #tmpSuspect tS INNER JOIN tblSuspect S ON S.Suspect_PK = tS.Suspect_PK
 END
 GO

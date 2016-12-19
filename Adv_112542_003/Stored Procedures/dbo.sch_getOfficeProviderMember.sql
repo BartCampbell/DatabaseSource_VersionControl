@@ -2,11 +2,31 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
---	sch_getOfficeProviderMember @Office=107
+--	sch_getOfficeProviderMember @User=1,@Office=107
 CREATE PROCEDURE [dbo].[sch_getOfficeProviderMember] 
+	@User int,
 	@Office bigint
 AS
 BEGIN
+	-- PROJECT/Channel SELECTION
+	CREATE TABLE #tmpProject (Project_PK INT)
+	CREATE INDEX idxProjectPK ON #tmpProject (Project_PK)
+
+	CREATE TABLE #tmpChannel (Channel_PK INT)
+	CREATE INDEX idxChannelPK ON #tmpChannel (Channel_PK)
+
+	IF Exists (SELECT * FROM tblUser WHERE IsAdmin=1 AND User_PK=@User)	--For Admins
+	BEGIN
+		INSERT INTO #tmpProject(Project_PK) SELECT DISTINCT Project_PK FROM tblProject P WHERE P.IsRetrospective=1
+		INSERT INTO #tmpChannel(Channel_PK) SELECT DISTINCT Channel_PK FROM tblChannel 
+	END
+	ELSE
+	BEGIN
+		INSERT INTO #tmpProject(Project_PK) SELECT DISTINCT Project_PK FROM tblUserProject WHERE User_PK=@User
+		INSERT INTO #tmpChannel(Channel_PK) SELECT DISTINCT Channel_PK FROM tblUserChannel WHERE User_PK=@User
+	END		 
+	-- PROJECT/Channel SELECTION
+
 	SELECT DISTINCT PO.Address,ZC.ZipCode,ZC.City,ZC.County,ZC.State,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.LocationID
 	FROM tblProviderOffice PO
 		LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK = PO.ZipCode_PK
@@ -34,6 +54,8 @@ BEGIN
 	FROM tblProvider P
 		INNER JOIN tblSuspect S ON P.Provider_PK = S.Provider_PK
 		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
+		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 	WHERE P.ProviderOffice_PK = @Office	AND S.IsScanned=0 AND S.IsCNA=0 --AND S.Project_PK=@Project
 	GROUP BY P.Provider_PK,PM.Provider_ID,PM.Lastname+', '+PM.FirstName
 	ORDER BY Provider
@@ -44,6 +66,8 @@ BEGIN
 		INNER JOIN tblSuspect S ON P.Provider_PK = S.Provider_PK
 		INNER JOIN tblMember M ON M.Member_PK = S.Member_PK
 		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
+		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 	WHERE P.ProviderOffice_PK = @Office	AND S.IsScanned=0 AND S.IsCNA=0 --AND S.Project_PK=@Project
 	ORDER BY P.Provider_PK,Member
 	
@@ -51,5 +75,4 @@ BEGIN
 		WHERE Sch_Start>GetDate()
 		AND ProviderOffice_PK = @Office
 END
-
 GO

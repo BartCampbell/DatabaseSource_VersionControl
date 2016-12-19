@@ -10,7 +10,8 @@ CREATE TABLE [dbo].[tblContactNotesOffice]
 [contact_num] [tinyint] NULL CONSTRAINT [DF__tblContac__conta__46D27B73] DEFAULT ((1)),
 [followup] [date] NULL,
 [IsResponded] [bit] NULL,
-[IsViewedByScheduler] [bit] NULL
+[IsViewedByScheduler] [bit] NULL,
+[MergedProviderOffice_PK] [bigint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblContactNotesOffice] ADD CONSTRAINT [PK_tblContactNotesOffice] PRIMARY KEY CLUSTERED  ([ContactNotesOffice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
