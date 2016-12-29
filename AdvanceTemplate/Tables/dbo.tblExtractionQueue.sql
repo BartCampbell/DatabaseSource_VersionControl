@@ -15,5 +15,9 @@ ALTER TABLE [dbo].[tblExtractionQueue] ADD CONSTRAINT [PK_tblExtractionQueue] PR
 GO
 CREATE NONCLUSTERED INDEX [IX_tblExtractionQueue_User] ON [dbo].[tblExtractionQueue] ([AssignedUser_PK]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_AssignedUser_PK] ON [dbo].[tblExtractionQueue] ([AssignedUser_PK]) INCLUDE ([AssignedDate], [ExtractionQueue_PK], [PDFname]) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IX_tblExtractionQueueUserSource] ON [dbo].[tblExtractionQueue] ([ExtractionQueueSource_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_OfficeExtractUploadDate] ON [dbo].[tblExtractionQueue] ([OfficeFaxOrID], [ExtractionQueueSource_PK], [UploadDate]) ON [PRIMARY]
 GO

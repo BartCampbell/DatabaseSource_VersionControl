@@ -52,7 +52,7 @@ BEGIN
 				END
 				ELSE IF (@User IN (164,163,167,166,165)) --Mail-In
 				BEGIN
-					SET @ExtractionQueueSource_PK = 5
+					SET @ExtractionQueueSource_PK = 99
 					SET @OfficeFaxOrID = 0
 					SET @Records = 25
 				END

@@ -78,7 +78,7 @@ BEGIN
 	END
 
 	SELECT Zone_PK,Zone_Name FROM tblZone ORDER BY Zone_Name
-
+/*
 	-- PROJECT SELECTION
 	CREATE TABLE #tmpProject (Project_PK INT)
 	CREATE INDEX idxProjectPK ON #tmpProject (Project_PK)
@@ -94,5 +94,13 @@ BEGIN
 	SELECT P.Project_PK, Project_Name, ProjectGroup_PK FROM tblProject P  WITH (NOLOCK) INNER JOIN #tmpProject T ON T.Project_PK=P.Project_PK WHERE IsRetrospective=1 ORDER BY PROJECT_NAME
 		
 	SELECT DISTINCT ProjectGroup,ProjectGroup_PK FROM tblProject P  WITH (NOLOCK) INNER JOIN #tmpProject T ON T.Project_PK=P.Project_PK WHERE IsRetrospective=1 ORDER BY ProjectGroup
+*/
+	--List of scheduling supervisors 
+	SELECT DISTINCT U.Lastname+', '+U.Firstname Scheduler,U.User_PK,U.Location_PK 
+	FROM tblSchedulerTeam ST WITH (NOLOCK) 
+		INNER JOIN tblSchedulerTeamDetail STD WITH (NOLOCK) ON STD.SchedulerTeam_PK = ST.SchedulerTeam_PK
+		INNER JOIN tblUser U WITH (NOLOCK) ON U.User_PK = STD.Scheduler_User_PK
+	WHERE IsNull(IsActive,0)=1 AND IsSchedulerSV=1 
+	ORDER BY U.Lastname+', '+U.Firstname;	
 END
 GO

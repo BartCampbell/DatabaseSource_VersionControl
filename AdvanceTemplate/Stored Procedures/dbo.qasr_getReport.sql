@@ -2,7 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
---qasr_getReport 0,1,NULL,NULL,2
+--qasr_getReport 0,0,NULL,'11/01/2016','11/30/2016',2
 CREATE PROCEDURE [dbo].[qasr_getReport] 
 	@Projects varchar(100),
 	@ProjectGroup varchar(10),
@@ -41,8 +41,8 @@ BEGIN
 		INNER JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Scanned_User_PK
 		LEFT JOIN tblScanningQANote_Suspect QA WITH (NOLOCK) ON QA.Suspect_PK = S.Suspect_PK
 	WHERE S.IsScanned=1	
-		AND (@date_range<>1 OR ((@from IS NULL OR QA.dtQA>=@from) AND (@to IS NULL OR QA.dtQA<=@to)))
-		AND (@date_range<>2 OR ((@from IS NULL OR S.Scanned_Date>=@from) AND (@to IS NULL OR S.Scanned_Date<=@to)))
+		AND (@date_range<>1 OR ((@from IS NULL OR QA.dtQA>=@from) AND (@to IS NULL OR QA.dtQA<=DateAdd(day,1,@to))))
+		AND (@date_range<>2 OR ((@from IS NULL OR S.Scanned_Date>=@from) AND (@to IS NULL OR S.Scanned_Date<=DateAdd(day,1,@to))))
 	GROUP BY U.User_PK,U.Lastname+IsNull(', '+U.Firstname,'')
 END
 GO

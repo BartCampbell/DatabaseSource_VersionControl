@@ -19,7 +19,10 @@ CREATE TABLE [dbo].[tblPool]
 [SchedulerTeam_PK] [smallint] NULL,
 [Pool_Priority] [tinyint] NULL,
 [IsAutoRefreshPool] [bit] NULL,
-[PriorityWithinPool] [tinyint] NULL
+[PriorityWithinPool] [tinyint] NULL,
+[IsForcedAllocationAllowed] [bit] NULL,
+[User_PK] [smallint] NULL,
+[Channel_PK] [int] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblPool] ADD CONSTRAINT [PK_tblPool] PRIMARY KEY CLUSTERED  ([Pool_PK]) ON [PRIMARY]

@@ -41,12 +41,17 @@ BEGIN
 		VALUES(@project,@office,3,@ScheduleInfo,@Usr,GetDate())		
 		
 		--Removing Scheduling Info
-		DELETE FROM tblProviderOfficeSchedule WITH (ROWLock) WHERE ProviderOfficeSchedule_PK = @schedule_id
+		DELETE D FROM tblProviderOfficeSchedule D 
+			INNER JOIN tblProviderOfficeSchedule POS WITH (NOLOCK) ON
+				((D.Sch_User_PK IS NULL AND POS.Sch_User_PK IS NULL) OR D.Sch_User_PK = POS.Sch_User_PK) AND 
+				((D.Sch_Start IS NULL AND POS.Sch_Start IS NULL) OR D.Sch_Start = POS.Sch_Start) AND
+				((D.Sch_End IS NULL AND POS.Sch_End IS NULL) OR D.Sch_End = POS.Sch_End)
+		WHERE POS.ProviderOfficeSchedule_PK = @schedule_id
 		
 		--Update Cache
-		UPDATE cPO SET contacted=1,scheduled=0,office_status=4
-		FROM cacheProviderOffice cPO WITH (ROWLock) LEFT JOIN tblProviderOfficeSchedule POS ON POS.Project_PK = cPO.Project_PK AND POS.ProviderOffice_PK = cPO.ProviderOffice_PK
-		WHERE cPO.Project_PK = @project AND cPO.ProviderOffice_PK = @office AND office_status>=3 AND POS.ProviderOfficeSchedule_PK IS NULL		
+		--UPDATE cPO SET contacted=1,scheduled=0,office_status=4
+		--FROM cacheProviderOffice cPO WITH (ROWLock) LEFT JOIN tblProviderOfficeSchedule POS ON POS.Project_PK = cPO.Project_PK AND POS.ProviderOffice_PK = cPO.ProviderOffice_PK
+		--WHERE cPO.Project_PK = @project AND cPO.ProviderOffice_PK = @office AND office_status>=3 AND POS.ProviderOfficeSchedule_PK IS NULL
 		
 		--Return Result for Cancel Email
 		SELECT * FROM #tmp

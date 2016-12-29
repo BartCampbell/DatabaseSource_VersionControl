@@ -2,12 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
--- =============================================
--- Author:		Sajid Ali
--- Create date: Mar-12-2014
--- Description:	RA Coder will use this sp to pull list of providers in a project
--- =============================================
---	sch_getScheduleHours 1,1,32669,2015,2,2
+--	sch_getScheduleHours 0,107,12009,2016,9,30
 CREATE PROCEDURE [dbo].[sch_getScheduleHours] 
 	@project smallint,
 	@office bigint,
@@ -59,14 +54,15 @@ BEGIN
 			AND CAST(CONVERT(VARCHAR,Sch_Start,102) AS SMALLDATETIME)>=D.dt		
 	WHERE ProviderOffice_PK=@office  AND Sch_Type=0 --AND Project_PK=@project
 
-	SELECT TOP 25 Lastname+', '+Firstname ScanTech,Sch_Start,Sch_End,ProviderOfficeSchedule_PK,Sch_Type
+	SELECT DISTINCT TOP 25  IsNull(Lastname+', '+Firstname,'') ScanTech,Sch_Start,Sch_End,MAX(ProviderOfficeSchedule_PK) ProviderOfficeSchedule_PK,Sch_Type
 	FROM tblProviderOfficeSchedule S WITH (NOLOCK) LEFT JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Sch_User_PK
 	WHERE S.ProviderOffice_PK=@office --AND S.Project_PK=@project --AND S.Sch_Type=0
+	GROUP BY Lastname+', '+Firstname,Sch_Start,Sch_End,Sch_Type
+	ORDER BY Sch_Start DESC
+
+	--DELETE FROM tblProviderOfficeSchedule WHERE Sch_Type IS NULL
 
 	SELECT DISTINCT U.User_PK,Lastname,Firstname
 		FROM tblUser U WITH (NOLOCK) INNER JOIN #tmp T ON T.User_PK = U.User_PK	
 END
-
-
-
 GO
