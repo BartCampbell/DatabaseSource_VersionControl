@@ -77,6 +77,7 @@ BEGIN
 				,pm.PIN REN_PIN
 				,m.PID
 				,SUBSTRING(s.ChaseID,2,5) +'_'+s.EDGEMemberID+'_MR_'+replace(substring(s.ChaseID,charindex(SUBSTRING(s.ChaseID,2,5),s.ChaseID),len(s.ChaseID)),'_','')+'_1of1' AS [CHART NAME]
+		--INTO ##MissingChart
 		FROM	tblSuspect s
 				INNER JOIN tblProvider p WITH (NOLOCK)
 					ON s.Provider_PK = p.Provider_PK
@@ -93,9 +94,13 @@ BEGIN
 				AND 
 				s.Suspect_PK IN
 				(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
-					INNER JOIN ChartPull_TX_33602 bc ON bc.enrolleeid = sus.edgememberID) 
-			
+				WHERE sus.EDGEMemberID='11490925'
+				)
+		--	AND SUBSTRING(s.ChaseID,2,5) +'_'+s.EDGEMemberID+'_MR_'+replace(substring(s.ChaseID,charindex(SUBSTRING(s.ChaseID,2,5),s.ChaseID),len(s.ChaseID)),'_','')+'_1of1' = '36096_11490925_MR_360964667_1of1'
+				--(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+				--	INNER JOIN ChartPull_TX_33602 bc ON bc.enrolleeid = sus.edgememberID) 
 
+		
 		--*****************************************************************************
 		TRUNCATE TABLE tmpExportChartStaging	
 		
