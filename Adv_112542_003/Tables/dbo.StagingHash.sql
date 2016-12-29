@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[StagingHash]
 (
 [HashDiff] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
-[TableName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[TableName] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CreateDate] [datetime] NULL CONSTRAINT [DF__StagingHa__Creat__239E4DCF] DEFAULT (getdate())
 ) ON [PRIMARY]
 GO

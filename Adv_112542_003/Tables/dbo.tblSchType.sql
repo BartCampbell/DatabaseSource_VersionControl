@@ -1,6 +1,6 @@
 CREATE TABLE [dbo].[tblSchType]
 (
-[SchType] [varchar] (7) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
+[SchType] [varchar] (7) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SchType_PK] [int] NOT NULL
 ) ON [PRIMARY]
 GO

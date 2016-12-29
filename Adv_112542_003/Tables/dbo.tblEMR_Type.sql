@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[tblEMR_Type]
 (
 [EMR_Type_PK] [smallint] NOT NULL IDENTITY(1, 1),
-[EMR_Type] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
+[EMR_Type] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [User_PK] [smallint] NULL,
 [dtInsert] [smalldatetime] NULL,
 [IsNew] [bit] NULL

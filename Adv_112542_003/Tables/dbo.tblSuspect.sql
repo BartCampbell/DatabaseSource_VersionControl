@@ -30,15 +30,15 @@ CREATE TABLE [dbo].[tblSuspect]
 [ChartRec_InComp_Date] [smalldatetime] NULL,
 [IsHighPriority] [bit] NULL,
 [IsInComp_Replied] [bit] NULL,
-[ChaseID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[ChartPriority] [varchar] (1) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[ChaseID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ChartPriority] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ChartRec_Date] [smalldatetime] NULL,
 [InvoiceExt_Date] [smalldatetime] NULL,
-[ContractCode] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[REN_PROVIDER_SPECIALTY] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[ContractCode] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[REN_PROVIDER_SPECIALTY] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Channel_PK] [int] NULL,
 [ChaseStatus_PK] [int] NULL,
-[PlanLID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
+[PlanLID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
 SET QUOTED_IDENTIFIER ON

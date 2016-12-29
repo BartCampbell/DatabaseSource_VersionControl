@@ -5,7 +5,7 @@ CREATE TABLE [dbo].[tblRAPSData]
 [DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
 [DOS_From] [date] NULL,
 [DOS_Thru] [date] NULL,
-[CPT] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[CPT] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProviderMaster_PK] [bigint] NULL,
 [IsICD10] [bit] NULL,
 [TransactionDate] [date] NULL

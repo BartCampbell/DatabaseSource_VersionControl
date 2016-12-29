@@ -3,7 +3,7 @@ CREATE TABLE [dbo].[tblContactNotesProvider]
 [ContactNotesProvider_PK] [int] NOT NULL IDENTITY(1, 1),
 [ProviderMaster_PK] [bigint] NULL,
 [ContactNote_PK] [smallint] NULL,
-[ContactNoteText] [varchar] (500) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[ContactNoteText] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [LastUpdated_User_PK] [smallint] NULL,
 [LastUpdated_Date] [smalldatetime] NULL
 ) ON [PRIMARY]

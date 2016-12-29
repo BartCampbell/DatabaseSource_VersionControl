@@ -9,7 +9,7 @@ CREATE TABLE [dbo].[tblProviderOfficeSchedule]
 [LastUpdated_User_PK] [smallint] NULL,
 [LastUpdated_Date] [smalldatetime] NULL,
 [followup] [smallint] NULL,
-[AddInfo] [varchar] (200) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[AddInfo] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [sch_type] [smallint] NULL
 ) ON [PRIMARY]
 GO
