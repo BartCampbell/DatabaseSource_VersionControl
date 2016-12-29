@@ -20,7 +20,8 @@ BEGIN
 			DECLARE @IsIssue AS BIT = 0
 			DECLARE @IsCopyCenter AS BIT = 0
 			DECLARE @IsDataIssue AS BIT = 0
-			SELECT @IsCNA = IsCNA, @IsFollowup = IsFollowup, @IsIssue = IsIssue, @IsDataIssue = IsDataIssue, @IsCopyCenter= IsCopyCenter FROM tblContactNote WHERE ContactNote_PK=@note
+			DECLARE @ContactNote_Text AS VARCHAR(150)
+			SELECT @ContactNote_Text = ContactNote_Text, @IsCNA = IsCNA, @IsFollowup = IsFollowup, @IsIssue = IsIssue, @IsDataIssue = IsDataIssue, @IsCopyCenter= IsCopyCenter FROM tblContactNote WHERE ContactNote_PK=@note
 			IF (@Followup<>0)
 			BEGIN
 				IF (@Followup=-1)
@@ -180,28 +181,32 @@ BEGIN
 
 
 -----------Transaction Starts-------------------
-			RETRY4: -- Transaction RETRY
-			BEGIN TRANSACTION
-			BEGIN TRY
-				INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num,followup) 
-				SELECT Project_PK,@office,@note,@aditionaltext,@User_PK,getdate(),@contact_num,@FollowDate FROM cacheProviderOffice WITH (NOLOCK) WHERE ProviderOffice_PK=@office
-				COMMIT TRANSACTION
-			END TRY
-			BEGIN CATCH
-				ROLLBACK TRANSACTION
-				IF ERROR_NUMBER() = 1205 -- Deadlock Error Number
-				BEGIN
-					WAITFOR DELAY '00:00:00.05' -- Wait for 5 ms
-					GOTO RETRY4 -- Go to Label RETRY
-				END
-			END CATCH
+		RETRY4: -- Transaction RETRY
+		BEGIN TRANSACTION
+		BEGIN TRY
+			INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num,followup) 
+			SELECT Project_PK,@office,@note,@aditionaltext,@User_PK,getdate(),@contact_num,@FollowDate FROM cacheProviderOffice WITH (NOLOCK) WHERE ProviderOffice_PK=@office
+			COMMIT TRANSACTION
+		END TRY
+		BEGIN CATCH
+			ROLLBACK TRANSACTION
+			IF ERROR_NUMBER() = 1205 -- Deadlock Error Number
+			BEGIN
+				WAITFOR DELAY '00:00:00.05' -- Wait for 5 ms
+				GOTO RETRY4 -- Go to Label RETRY
+			END
+		END CATCH
 -----------Transaction Starts-------------------
 			
-			If EXISTS(SELECT * FROM tblContactNote WITH (NOLOCK) WHERE ContactNote_PK=@note AND ContactNote_Text='Disable location from being auto-faxed')
-			BEGIN
-				If NOT EXISTS(SELECT * FROM tblExclude_iFax WITH (NOLOCK) WHERE ProviderOffice_PK=@office)
-					INSERT INTO tblExclude_iFax(ProviderOffice_PK) VALUES(@office)
-			END
+		IF @ContactNote_Text='Disable location from being auto-faxed'
+		BEGIN
+			If NOT EXISTS(SELECT * FROM tblExclude_iFax WITH (NOLOCK) WHERE ProviderOffice_PK=@office)
+				INSERT INTO tblExclude_iFax(ProviderOffice_PK) VALUES(@office)
+		END
+		ELSE IF @ContactNote_Text='Internal Issue (Onsite Extraction)'
+		BEGIN
+			Update tblProviderOffice WITH (ROWLOCK) SET ProviderOfficeBucket_PK=4 WHERE ProviderOffice_PK=@office
+		END
 
 		IF (@priority_supervisor>0)
 		BEGIN
