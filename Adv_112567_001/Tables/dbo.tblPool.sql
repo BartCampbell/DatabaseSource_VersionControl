@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[tblPool]
 (
 [Pool_PK] [smallint] NOT NULL IDENTITY(1, 1),
-[Pool_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[Pool_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [IsBucketRule] [bit] NULL,
 [IsFollowupRule] [bit] NULL,
 [IsRemainingRule] [bit] NULL,
@@ -14,8 +14,8 @@ CREATE TABLE [dbo].[tblPool]
 [IsZoneRule] [bit] NULL,
 [Zone_PK] [tinyint] NULL,
 [IsProjectRule] [bit] NULL,
-[Projects] [varchar] (500) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[ProjectGroups] [varchar] (500) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[Projects] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProjectGroups] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SchedulerTeam_PK] [smallint] NULL,
 [Pool_Priority] [tinyint] NULL,
 [IsAutoRefreshPool] [bit] NULL,

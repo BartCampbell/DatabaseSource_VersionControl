@@ -6,11 +6,11 @@ CREATE TABLE [dbo].[tmpExportChartStaging]
 [Member_PK] [int] NULL,
 [Suspect_PK] [bigint] NOT NULL,
 [CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[ChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[ChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [InDummy] [int] NULL,
 [InNormal] [int] NULL,
-[DOB] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[ProviderName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[ProviderContact] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
+[DOB] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderName] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderContact] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO

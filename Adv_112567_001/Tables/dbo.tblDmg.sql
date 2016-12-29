@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[tblDmg]
 (
 [Dmg_PK] [tinyint] NOT NULL IDENTITY(1, 1),
-[Dmg_Desc] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[Dmg_Desc] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [IsMale] [bit] NULL,
 [Age_Low] [tinyint] NULL,
 [Age_High] [tinyint] NULL

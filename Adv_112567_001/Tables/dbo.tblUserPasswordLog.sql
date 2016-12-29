@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[tblUserPasswordLog]
 (
 [User_PK] [smallint] NULL,
-[Password] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[Password] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [dtPassword] [date] NULL
 ) ON [PRIMARY]
 GO

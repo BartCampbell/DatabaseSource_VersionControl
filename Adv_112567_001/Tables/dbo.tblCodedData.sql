@@ -5,7 +5,7 @@ CREATE TABLE [dbo].[tblCodedData]
 [DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
 [DOS_From] [smalldatetime] NULL,
 [DOS_Thru] [smalldatetime] NULL,
-[CPT] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[CPT] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Provider_PK] [bigint] NULL,
 [CodedSource_PK] [smallint] NULL,
 [IsICD10] [bit] NULL,

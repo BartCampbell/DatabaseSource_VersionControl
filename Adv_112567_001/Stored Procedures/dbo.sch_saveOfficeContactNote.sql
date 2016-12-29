@@ -10,7 +10,8 @@ CREATE PROCEDURE [dbo].[sch_saveOfficeContactNote]
 	@aditionaltext varchar(max),
 	@User_PK int,
 	@contact_num int,
-	@Followup int
+	@Followup int,
+	@priority_supervisor int
 AS
 BEGIN   
 			DECLARE @IsCNA AS BIT = 0
@@ -19,31 +20,34 @@ BEGIN
 			DECLARE @IsIssue AS BIT = 0
 			DECLARE @IsCopyCenter AS BIT = 0
 			DECLARE @IsDataIssue AS BIT = 0
-			SELECT @IsCNA = IsCNA, @IsFollowup = IsFollowup, @IsIssue = IsIssue, @IsDataIssue = IsDataIssue, @IsCopyCenter= IsCopyCenter FROM tblContactNote WHERE ContactNote_PK=@note
+			DECLARE @ContactNote_Text AS VARCHAR(150)
+			SELECT @ContactNote_Text = ContactNote_Text, @IsCNA = IsCNA, @IsFollowup = IsFollowup, @IsIssue = IsIssue, @IsDataIssue = IsDataIssue, @IsCopyCenter= IsCopyCenter FROM tblContactNote WHERE ContactNote_PK=@note
 			IF (@Followup<>0)
 			BEGIN
 				IF (@Followup=-1)
 					SET @FollowDate = NULL
+				ELSE IF (@Followup=-2)
+					SET @FollowDate = GETDATE()
 				ELSE
 					SET @FollowDate = DATEADD(day,@Followup,GETDATE())
------------Transaction Starts-------------------
-			RETRY1: -- Transaction RETRY
-			BEGIN TRANSACTION
-			BEGIN TRY
-				UPDATE cacheProviderOffice WITH (ROWLOCK) SET follow_up = @FollowDate WHERE ProviderOffice_PK=@office --Project_PK=@project AND 
-				UPDATE tblContactNotesOffice WITH (ROWLOCK) SET followup = @FollowDate WHERE Office_PK=@office --Project_PK=@project AND 
-				Update tblProviderOfficeStatus WITH (ROWLOCK) SET OfficeIssueStatus=5 WHERE ProviderOffice_PK=@office AND OfficeIssueStatus=2
-				COMMIT TRANSACTION
-			END TRY
-			BEGIN CATCH
-				ROLLBACK TRANSACTION
-				IF ERROR_NUMBER() = 1205 -- Deadlock Error Number
-				BEGIN
-					WAITFOR DELAY '00:00:00.05' -- Wait for 5 ms
-					GOTO RETRY1 -- Go to Label RETRY
-				END
-			END CATCH
------------Transaction Starts-------------------
+	-----------Transaction Starts-------------------
+				RETRY1: -- Transaction RETRY
+				BEGIN TRANSACTION
+				BEGIN TRY
+					UPDATE cacheProviderOffice WITH (ROWLOCK) SET follow_up = @FollowDate WHERE ProviderOffice_PK=@office --Project_PK=@project AND 
+					UPDATE tblContactNotesOffice WITH (ROWLOCK) SET followup = @FollowDate WHERE Office_PK=@office --Project_PK=@project AND 
+					Update tblProviderOfficeStatus WITH (ROWLOCK) SET OfficeIssueStatus=5 WHERE ProviderOffice_PK=@office AND OfficeIssueStatus=2
+					COMMIT TRANSACTION
+				END TRY
+				BEGIN CATCH
+					ROLLBACK TRANSACTION
+					IF ERROR_NUMBER() = 1205 -- Deadlock Error Number
+					BEGIN
+						WAITFOR DELAY '00:00:00.05' -- Wait for 5 ms
+						GOTO RETRY1 -- Go to Label RETRY
+					END
+				END CATCH
+	-----------Transaction Starts-------------------
 			END
 
 			IF (@IsIssue=1 OR @IsDataIssue=1 OR @IsCopyCenter=1)
@@ -177,11 +181,40 @@ BEGIN
 
 
 -----------Transaction Starts-------------------
-			RETRY4: -- Transaction RETRY
+		RETRY4: -- Transaction RETRY
+		BEGIN TRANSACTION
+		BEGIN TRY
+			INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num,followup) 
+			SELECT Project_PK,@office,@note,@aditionaltext,@User_PK,getdate(),@contact_num,@FollowDate FROM cacheProviderOffice WITH (NOLOCK) WHERE ProviderOffice_PK=@office
+			COMMIT TRANSACTION
+		END TRY
+		BEGIN CATCH
+			ROLLBACK TRANSACTION
+			IF ERROR_NUMBER() = 1205 -- Deadlock Error Number
+			BEGIN
+				WAITFOR DELAY '00:00:00.05' -- Wait for 5 ms
+				GOTO RETRY4 -- Go to Label RETRY
+			END
+		END CATCH
+-----------Transaction Starts-------------------
+			
+		IF @ContactNote_Text='Disable location from being auto-faxed'
+		BEGIN
+			If NOT EXISTS(SELECT * FROM tblExclude_iFax WITH (NOLOCK) WHERE ProviderOffice_PK=@office)
+				INSERT INTO tblExclude_iFax(ProviderOffice_PK) VALUES(@office)
+		END
+		ELSE IF @ContactNote_Text='Internal Issue (Onsite Extraction)'
+		BEGIN
+			Update tblProviderOffice WITH (ROWLOCK) SET ProviderOfficeBucket_PK=4 WHERE ProviderOffice_PK=@office
+		END
+
+		IF (@priority_supervisor>0)
+		BEGIN
+-----------Transaction Starts-------------------
+			RETRY_UpdateOffice: -- Transaction RETRY
 			BEGIN TRANSACTION
 			BEGIN TRY
-				INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num,followup) 
-				SELECT Project_PK,@office,@note,@aditionaltext,@User_PK,getdate(),@contact_num,@FollowDate FROM cacheProviderOffice WITH (NOLOCK) WHERE ProviderOffice_PK=@office
+				UPDATE tblProviderOffice SET AssignedUser_PK=@priority_supervisor, AssignedDate = GETDATE(), ProviderOfficeBucket_PK=12 WHERE ProviderOffice_PK=@office
 				COMMIT TRANSACTION
 			END TRY
 			BEGIN CATCH
@@ -189,16 +222,10 @@ BEGIN
 				IF ERROR_NUMBER() = 1205 -- Deadlock Error Number
 				BEGIN
 					WAITFOR DELAY '00:00:00.05' -- Wait for 5 ms
-					GOTO RETRY4 -- Go to Label RETRY
+					GOTO RETRY_UpdateOffice -- Go to Label RETRY
 				END
 			END CATCH
 -----------Transaction Starts-------------------
-			
-			If EXISTS(SELECT * FROM tblContactNote WITH (NOLOCK) WHERE ContactNote_PK=@note AND ContactNote_Text='Disable location from being auto-faxed')
-			BEGIN
-				If NOT EXISTS(SELECT * FROM tblExclude_iFax WITH (NOLOCK) WHERE ProviderOffice_PK=@office)
-					INSERT INTO tblExclude_iFax(ProviderOffice_PK) VALUES(@office)
-			END
+		END
 END
-
 GO

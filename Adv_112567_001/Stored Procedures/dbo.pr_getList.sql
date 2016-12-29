@@ -9,7 +9,7 @@ GO
 -- Description:	To get Finance Report Summary for Dashboad
 -- =============================================
 /* Sample Executions
-pr_getList '0','0',1,0,2,5,'1/1/2014','1/1/2017',0
+pr_getList '0','0',1,0,2,5,'11/1/2016','11/30/2016',0
 */
 CREATE PROCEDURE [dbo].[pr_getList]
 	@Projects varchar(100),
@@ -245,5 +245,4 @@ BEGIN
 	
 	EXEC (@SQL);
 END 
-
 GO

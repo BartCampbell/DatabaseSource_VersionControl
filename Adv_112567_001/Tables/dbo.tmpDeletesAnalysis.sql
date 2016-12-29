@@ -13,14 +13,14 @@ CREATE TABLE [dbo].[tmpDeletesAnalysis]
 [ICD CODE DISPOSITION REASON] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
 [Page From] [float] NULL,
 [Page To] [float] NULL,
-[REN_TIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[REN_PIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[PID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[REN_TIN] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[REN_PIN] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PID] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CHART NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
 [Visionary Comments] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[Login] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[Column1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[Column12] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[Login] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Column1] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Column12] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Visionary Final Comments] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
 ) ON [PRIMARY]
 GO

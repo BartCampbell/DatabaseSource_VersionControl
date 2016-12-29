@@ -13,9 +13,9 @@ CREATE TABLE [dbo].[tmpExportAtena_bak_Prod]
 [ICD CODE DISPOSITION REASON] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
 [Page From] [smallint] NULL,
 [Page To] [smallint] NULL,
-[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
 ) ON [PRIMARY]
 GO

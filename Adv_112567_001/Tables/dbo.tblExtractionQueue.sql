@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[tblExtractionQueue]
 (
 [ExtractionQueue_PK] [int] NOT NULL IDENTITY(1, 1),
-[PDFname] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[PDFname] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ExtractionQueueSource_PK] [tinyint] NULL,
 [FileSize] [bigint] NULL,
 [AssignedUser_PK] [smallint] NULL,
