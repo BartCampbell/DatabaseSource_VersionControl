@@ -95,5 +95,12 @@ BEGIN
 		
 	SELECT DISTINCT ProjectGroup,ProjectGroup_PK FROM tblProject P  WITH (NOLOCK) INNER JOIN #tmpProject T ON T.Project_PK=P.Project_PK WHERE IsRetrospective=1 ORDER BY ProjectGroup
 */
+	--List of scheduling supervisors 
+	SELECT DISTINCT U.Lastname+', '+U.Firstname Scheduler,U.User_PK,U.Location_PK 
+	FROM tblSchedulerTeam ST WITH (NOLOCK) 
+		INNER JOIN tblSchedulerTeamDetail STD WITH (NOLOCK) ON STD.SchedulerTeam_PK = ST.SchedulerTeam_PK
+		INNER JOIN tblUser U WITH (NOLOCK) ON U.User_PK = STD.Scheduler_User_PK
+	WHERE IsNull(IsActive,0)=1 AND IsSchedulerSV=1 
+	ORDER BY U.Lastname+', '+U.Firstname;	
 END
 GO

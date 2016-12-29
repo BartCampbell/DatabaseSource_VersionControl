@@ -28,7 +28,12 @@ BEGIN
 			Outer Apply (SELECT count(1) Offices FROM tblProviderOffice PO with (nolock) WHERE PO.Pool_PK = P.Pool_PK AND ProviderOfficeBucket_PK<>0) X
 		ORDER BY P.Pool_Priority
 
-	SELECT count(1) Offices FROM tblProviderOffice PO with (nolock) WHERE PO.Pool_PK IS NULL AND ProviderOfficeBucket_PK<>0
+	SELECT count(DISTINCT PO.ProviderOffice_PK) Offices 
+		FROM tblProviderOffice PO with (nolock) 
+			INNER JOIN tblProvider P with (nolock) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
+			INNER JOIN tblSuspect S with (nolock) ON P.Provider_PK = S.Provider_PK
+		WHERE PO.Pool_PK IS NULL AND PO.ProviderOfficeBucket_PK<>0 
+		AND S.IsCNA=0 AND S.IsScanned=0
 
 		IF (@type=1)
 			return ;
