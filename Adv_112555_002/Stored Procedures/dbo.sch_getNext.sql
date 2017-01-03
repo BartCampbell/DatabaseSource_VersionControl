@@ -25,7 +25,12 @@ BEGIN
 	--Setting Remaining Offices for Each Pool
 	Update P SET UnassignedOffices = Offices
 		FROM #tmpPool P
-			Outer Apply (SELECT COUNT(1) Offices FROM tblProviderOffice PO WITH (NOLOCK) WHERE PO.Pool_PK=P.Pool_PK AND AssignedUser_PK IS NULL) X
+			Outer Apply (SELECT COUNT(DISTINCT PO.ProviderOffice_PK) Offices FROM tblProviderOffice PO WITH (NOLOCK) 
+					INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON cPO.ProviderOffice_PK = PO.ProviderOffice_PK
+				WHERE PO.Pool_PK=P.Pool_PK AND AssignedUser_PK IS NULL
+					AND cPO.charts-cPO.extracted_count-cPO.cna_count>0 AND PO.ProviderOfficeBucket_PK NOT IN (0,7,8,10)
+					AND IsNull(follow_up,'2014-1-1')<=GetDate() 			
+			) X
 
 	DELETE FROM #tmpPool WHERE UnassignedOffices=0
 
