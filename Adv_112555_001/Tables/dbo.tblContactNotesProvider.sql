@@ -8,5 +8,5 @@ CREATE TABLE [dbo].[tblContactNotesProvider]
 [LastUpdated_Date] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblContactNotesProvider] ADD CONSTRAINT [PK_tblContactNotesProvider] PRIMARY KEY CLUSTERED  ([ContactNotesProvider_PK]) WITH (FILLFACTOR=90) ON [PRIMARY]
+ALTER TABLE [dbo].[tblContactNotesProvider] ADD CONSTRAINT [PK_tblContactNotesProvider] PRIMARY KEY CLUSTERED  ([ContactNotesProvider_PK]) ON [PRIMARY]
 GO

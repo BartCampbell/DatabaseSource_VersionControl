@@ -9,9 +9,9 @@ GO
 --	
 --	sch_getOffice_map 1,0,0,4,0,1,0,0
 CREATE PROCEDURE [dbo].[sch_getOffice_map] 
-	@Channel int,
-	@Projects varchar(100),
-	@ProjectGroup varchar(10),
+	@Channel VARCHAR(1000),
+	@Projects varchar(1000),
+	@ProjectGroup varchar(1000),
 	@Provider BigInt,
 	@bucket int,
 	@followup_bucket int,
@@ -45,10 +45,10 @@ BEGIN
 		EXEC ('DELETE FROM #tmpProject WHERE Project_PK NOT IN ('+@Projects+')')
 		
 	IF (@ProjectGroup<>'0')
-		DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK<>@ProjectGroup
+		EXEC ('DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK NOT IN ('+@ProjectGroup+')')
 		
-	IF (@Channel<>0)
-		DELETE T FROM #tmpChannel T WHERE Channel_PK<>@Channel				 
+	IF (@Channel<>'0')
+		EXEC ('DELETE T FROM #tmpChannel T WHERE Channel_PK NOT IN ('+@Channel+')')			 
 	-- PROJECT/Channel SELECTION
 
 	DECLARE @OFFICE AS BIGINT = 0

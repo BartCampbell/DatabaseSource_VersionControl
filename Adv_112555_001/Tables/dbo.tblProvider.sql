@@ -15,3 +15,5 @@ CREATE NONCLUSTERED INDEX [IX_tblProvider_1] ON [dbo].[tblProvider] ([ProviderMa
 GO
 CREATE NONCLUSTERED INDEX [IDX_ProviderOffice_PK] ON [dbo].[tblProvider] ([ProviderOffice_PK]) INCLUDE ([Provider_PK]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_ProviderOffice_PK_provpk] ON [dbo].[tblProvider] ([ProviderOffice_PK]) INCLUDE ([Provider_PK]) ON [PRIMARY]
+GO
