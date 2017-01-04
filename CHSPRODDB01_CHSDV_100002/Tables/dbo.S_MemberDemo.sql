@@ -7,7 +7,7 @@ CREATE TABLE [dbo].[S_MemberDemo]
 [LastName] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [MiddleInitial] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Gender] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[DOB] [datetime] NULL,
+[DOB] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [HashDiff] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordEndDate] [datetime] NULL

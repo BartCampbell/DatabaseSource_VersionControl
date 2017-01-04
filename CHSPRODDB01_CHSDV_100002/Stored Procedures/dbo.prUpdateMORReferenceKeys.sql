@@ -48,7 +48,7 @@ AS
                                                                      UPPER(CONCAT(RTRIM(LTRIM(COALESCE(RecordTypeCode, ''))), ':',
                                                                                   RTRIM(LTRIM(COALESCE(ContractNumber, ''))), ':',
                                                                                   RTRIM(LTRIM(COALESCE(TotalRecordCount, ''))), ':',
-                                                                                  RTRIM(LTRIM(COALESCE(LoadDate, ''))), ':',
+                                                                                  RTRIM(LTRIM(COALESCE(@CurrentDate, ''))), ':',
                                                                                   RTRIM(LTRIM(COALESCE(RecordSource, '')))))), 2)) ,
                 H_MOR_Header_RK = @RK ,
                 LoadDate = @CurrentDate ,
@@ -121,7 +121,8 @@ AS
                                                                             + LTRIM(RTRIM(COALESCE(DD_HCC52, ''))) + LTRIM(RTRIM(COALESCE(DD_HCC107, '')))
                                                                             + LTRIM(RTRIM(COALESCE(INT1, ''))) + LTRIM(RTRIM(COALESCE(INT2, '')))
                                                                             + LTRIM(RTRIM(COALESCE(INT3, ''))) + LTRIM(RTRIM(COALESCE(INT4, '')))
-                                                                            + LTRIM(RTRIM(COALESCE(INT5, ''))) + LTRIM(RTRIM(COALESCE(INT6, ''))))), 2)) ,
+                                                                            + LTRIM(RTRIM(COALESCE(INT5, ''))) + LTRIM(RTRIM(COALESCE(INT6, '')))
+															 + LTRIM(RTRIM(COALESCE(@CurrentDate, ''))) + LTRIM(RTRIM(COALESCE(RecordSource, ''))))), 2)) ,
                 HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                              UPPER(LTRIM(RTRIM(COALESCE(@RecordTypeCode, ''))) + LTRIM(RTRIM(COALESCE(@ContractNumber, '')))
 													  + LTRIM(RTRIM(COALESCE(@RunDate, ''))) + LTRIM(RTRIM(COALESCE(@PaymentYearAndMonth, '')))
@@ -186,8 +187,7 @@ AS
                                                                    + LTRIM(RTRIM(COALESCE(DD_HCC52, ''))) + LTRIM(RTRIM(COALESCE(DD_HCC107, '')))
                                                                    + LTRIM(RTRIM(COALESCE(INT1, ''))) + LTRIM(RTRIM(COALESCE(INT2, '')))
                                                                    + LTRIM(RTRIM(COALESCE(INT3, ''))) + LTRIM(RTRIM(COALESCE(INT4, '')))
-                                                                   + LTRIM(RTRIM(COALESCE(INT5, ''))) + LTRIM(RTRIM(COALESCE(INT6, '')))
-                                                                   + LTRIM(RTRIM(COALESCE(LoadDate, ''))) + LTRIM(RTRIM(COALESCE(RecordSource, ''))))), 2)) ,
+                                                                   + LTRIM(RTRIM(COALESCE(INT5, ''))) + LTRIM(RTRIM(COALESCE(INT6, ''))))), 2)) ,
                 RecordSource = @RecordSource ,
                 LoadDate = @CurrentDate ,
 			 S_MemberDemo_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
@@ -197,7 +197,7 @@ AS
                                                                                  RTRIM(LTRIM(COALESCE(MI, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(Gender, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(DOB, ''))), ':',
-                                                                                 RTRIM(LTRIM(COALESCE(LoadDate, ''))), ':',
+                                                                                 RTRIM(LTRIM(COALESCE(@CurrentDate, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(RecordSource, '')))))), 2)),
 			 S_MemberDemo_HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                                     UPPER(CONCAT(RTRIM(LTRIM(COALESCE(CentauriMemberID, ''))), ':',
@@ -209,7 +209,7 @@ AS
 			 S_MemberHICN_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                                     UPPER(CONCAT(RTRIM(LTRIM(COALESCE(CentauriMemberID, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(HICN, ''))), ':',
-                                                                                 RTRIM(LTRIM(COALESCE(LoadDate, ''))), ':',
+                                                                                 RTRIM(LTRIM(COALESCE(@CurrentDate, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(RecordSource, '')))))), 2)),
 			 S_MemberHICN_HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                                     UPPER(CONCAT(RTRIM(LTRIM(COALESCE(CentauriMemberID, ''))), ':',
@@ -312,7 +312,8 @@ AS
                                                                          + LTRIM(RTRIM(COALESCE(SCHIZOPHRENIA_SEIZURES, '')))
                                                                          + LTRIM(RTRIM(COALESCE(SEPSIS_ARTIF_OPENINGS, '')))
                                                                          + LTRIM(RTRIM(COALESCE(SEPSIS_ASP_SPEC_BACT_PNEUM, '')))
-                                                                         + LTRIM(RTRIM(COALESCE(SEPSIS_PRESSURE_ULCER, ''))))), 2)) ,
+                                                                         + LTRIM(RTRIM(COALESCE(SEPSIS_PRESSURE_ULCER, ''))) + LTRIM(RTRIM(COALESCE(@CurrentDate, '')))
+														   + LTRIM(RTRIM(COALESCE(RecordSource, ''))))), 2)) ,
                 HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                              UPPER(LTRIM(RTRIM(COALESCE(@RecordTypeCode, ''))) + LTRIM(RTRIM(COALESCE(@ContractNumber, '')))
 													  + LTRIM(RTRIM(COALESCE(@RunDate, ''))) + LTRIM(RTRIM(COALESCE(@PaymentYearAndMonth, '')))
@@ -399,8 +400,7 @@ AS
                                                                    + LTRIM(RTRIM(COALESCE(SCHIZOPHRENIA_SEIZURES, '')))
                                                                    + LTRIM(RTRIM(COALESCE(SEPSIS_ARTIF_OPENINGS, '')))
                                                                    + LTRIM(RTRIM(COALESCE(SEPSIS_ASP_SPEC_BACT_PNEUM, '')))
-                                                                   + LTRIM(RTRIM(COALESCE(SEPSIS_PRESSURE_ULCER, ''))) + LTRIM(RTRIM(COALESCE(LoadDate, '')))
-                                                                   + LTRIM(RTRIM(COALESCE(RecordSource, ''))))), 2)) ,
+                                                                   + LTRIM(RTRIM(COALESCE(SEPSIS_PRESSURE_ULCER, ''))))), 2)) ,
                 RecordSource = @RecordSource ,
                 LoadDate = @CurrentDate ,
                 S_MemberDemo_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
@@ -410,7 +410,7 @@ AS
                                                                                  RTRIM(LTRIM(COALESCE(MI, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(Gender, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(DOB, ''))), ':',
-                                                                                 RTRIM(LTRIM(COALESCE(LoadDate, ''))), ':',
+                                                                                 RTRIM(LTRIM(COALESCE(@CurrentDate, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(RecordSource, '')))))), 2)),
 			 S_MemberDemo_HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                                     UPPER(CONCAT(RTRIM(LTRIM(COALESCE(CentauriMemberID, ''))), ':',
@@ -422,7 +422,7 @@ AS
                 S_MemberHICN_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                                     UPPER(CONCAT(RTRIM(LTRIM(COALESCE(CentauriMemberID, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(HICN, ''))), ':',
-                                                                                 RTRIM(LTRIM(COALESCE(LoadDate, ''))), ':',
+                                                                                 RTRIM(LTRIM(COALESCE(@CurrentDate, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(RecordSource, '')))))), 2)),
 			 S_MemberHICN_HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                                     UPPER(CONCAT(RTRIM(LTRIM(COALESCE(CentauriMemberID, ''))), ':',
@@ -520,7 +520,8 @@ AS
                                                                          + LTRIM(RTRIM(COALESCE(SCHIZOPHRENIA_SEIZURES, '')))
                                                                          + LTRIM(RTRIM(COALESCE(SEPSIS_ARTIF_OPENINGS, '')))
                                                                          + LTRIM(RTRIM(COALESCE(SEPSIS_ASP_SPEC_BACT_PNEUM, '')))
-                                                                         + LTRIM(RTRIM(COALESCE(SEPSIS_PRESSURE_ULCER, ''))))), 2)) ,
+                                                                         + LTRIM(RTRIM(COALESCE(SEPSIS_PRESSURE_ULCER, ''))) + LTRIM(RTRIM(COALESCE(@CurrentDate, '')))
+														   + LTRIM(RTRIM(COALESCE(RecordSource, ''))))), 2)) ,
                 HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                              UPPER(LTRIM(RTRIM(COALESCE(@RecordTypeCode, ''))) + LTRIM(RTRIM(COALESCE(@ContractNumber, '')))
 													  + LTRIM(RTRIM(COALESCE(@RunDate, ''))) + LTRIM(RTRIM(COALESCE(@PaymentYearAndMonth, '')))
@@ -603,8 +604,7 @@ AS
                                                                    + LTRIM(RTRIM(COALESCE(SCHIZOPHRENIA_SEIZURES, '')))
                                                                    + LTRIM(RTRIM(COALESCE(SEPSIS_ARTIF_OPENINGS, '')))
                                                                    + LTRIM(RTRIM(COALESCE(SEPSIS_ASP_SPEC_BACT_PNEUM, '')))
-                                                                   + LTRIM(RTRIM(COALESCE(SEPSIS_PRESSURE_ULCER, ''))) + LTRIM(RTRIM(COALESCE(LoadDate, '')))
-                                                                   + LTRIM(RTRIM(COALESCE(RecordSource, ''))))), 2)) ,
+                                                                   + LTRIM(RTRIM(COALESCE(SEPSIS_PRESSURE_ULCER, ''))))), 2)) ,
                 RecordSource = @RecordSource ,
                 LoadDate = @CurrentDate ,
                 S_MemberDemo_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
@@ -614,7 +614,7 @@ AS
                                                                                  RTRIM(LTRIM(COALESCE(MI, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(Gender, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(DOB, ''))), ':',
-                                                                                 RTRIM(LTRIM(COALESCE(LoadDate, ''))), ':',
+                                                                                 RTRIM(LTRIM(COALESCE(@CurrentDate, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(RecordSource, '')))))), 2)),
 			 S_MemberDemo_HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                                     UPPER(CONCAT(RTRIM(LTRIM(COALESCE(CentauriMemberID, ''))), ':',
@@ -626,7 +626,7 @@ AS
                 S_MemberHICN_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                                     UPPER(CONCAT(RTRIM(LTRIM(COALESCE(CentauriMemberID, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(HICN, ''))), ':',
-                                                                                 RTRIM(LTRIM(COALESCE(LoadDate, ''))), ':',
+                                                                                 RTRIM(LTRIM(COALESCE(@CurrentDate, ''))), ':',
                                                                                  RTRIM(LTRIM(COALESCE(RecordSource, '')))))), 2)),
 			 S_MemberHICN_HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                                     UPPER(CONCAT(RTRIM(LTRIM(COALESCE(CentauriMemberID, ''))), ':',
@@ -640,4 +640,5 @@ AS
 
 
     END;
+
 GO

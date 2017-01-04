@@ -36,7 +36,7 @@ AS
                             GETDATE() ,
                             @RecordSource
                     FROM    CHSStaging.dbo.X12_834_RawImport i
-                            INNER JOIN ETLConfig.dbo.TradingPartnerFile AS t ON i.FileLevelDetail_SenderID_GS02 = t.SenderID
+                            INNER JOIN CHSStaging.dbo.TradingPartnerFile AS t ON i.FileLevelDetail_SenderID_GS02 = t.SenderID
                                                                                  AND i.FileLevelDetail_ReceiverID_GS03 = t.ReceiverID
                             INNER JOIN CHSDV.dbo.R_Client AS c ON t.TradingPartner = c.ClientName
                             LEFT JOIN CHSDV.dbo.R_Member AS r ON i.MemberLevelDetail_RefID1_REF02 = r.ClientMemberID

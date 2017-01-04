@@ -35,7 +35,7 @@ AS
                     dbo.ufn_parsefind(REPLACE(i.ProviderInfo_IdentificationCode_NM109, ' ', ':'), ':', 1) AS ClientProviderID
             INTO    #NewProviders
             FROM    CHSStaging.dbo.X12_834_RawImport i
-                    INNER JOIN ETLConfig.dbo.TradingPartnerFile AS t ON i.FileLevelDetail_SenderID_GS02 = t.SenderID
+                    INNER JOIN CHSStaging.dbo.TradingPartnerFile AS t ON i.FileLevelDetail_SenderID_GS02 = t.SenderID
                                                                          AND i.FileLevelDetail_ReceiverID_GS03 = t.ReceiverID
                     INNER JOIN CHSDV.dbo.R_Client AS c ON t.TradingPartner = c.ClientName
             WHERE   ISNULL(dbo.ufn_parsefind(REPLACE(i.ProviderInfo_IdentificationCode_NM109, ' ', ':'), ':', 1), '') NOT IN ( '', 'NULL' );

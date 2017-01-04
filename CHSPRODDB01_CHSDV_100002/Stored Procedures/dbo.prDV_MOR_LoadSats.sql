@@ -41,6 +41,16 @@ AS
                                                          AND t.HashDiff = s.HashDiff
                 WHERE   t.S_MOR_Trailer_RK IS NULL; 
 
+	   --RECORD END DATE CLEANUP
+	   UPDATE  dbo.S_MOR_Trailer
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.S_MOR_Trailer AS z
+                                    WHERE     z.H_MOR_Header_RK = a.H_MOR_Header_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.S_MOR_Trailer a
+        WHERE   a.RecordEndDate IS NULL;
+
 
 	   --LOAD MemberHICN A RECORDS
         INSERT  INTO dbo.S_MemberHICN
@@ -64,6 +74,17 @@ AS
                                                         AND s.HashDiff = a.S_MemberHICN_HashDiff
                 WHERE   s.S_MemberHICN_RK IS NULL;
 	   
+	   --RECORD END DATE CLEANUP
+        UPDATE  dbo.S_MemberHICN
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.S_MemberHICN AS z
+                                    WHERE     z.H_Member_RK = a.H_Member_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.S_MemberHICN a
+        WHERE   a.RecordEndDate IS NULL;
+
+	   
 	   --LOAD MemberHICN B RECORDS
         INSERT  INTO dbo.S_MemberHICN
                 ( S_MemberHICN_RK ,
@@ -85,6 +106,16 @@ AS
                                                         AND s.RecordEndDate IS NULL
                                                         AND s.HashDiff = b.S_MemberHICN_HashDiff
                 WHERE   s.S_MemberHICN_RK IS NULL;
+	   
+	   --RECORD END DATE CLEANUP
+        UPDATE  dbo.S_MemberHICN
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.S_MemberHICN AS z
+                                    WHERE     z.H_Member_RK = a.H_Member_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.S_MemberHICN a
+        WHERE   a.RecordEndDate IS NULL;
 	   
 	   --LOAD MemberHICN C RECORDS
         INSERT  INTO dbo.S_MemberHICN
@@ -108,7 +139,16 @@ AS
                                                         AND s.HashDiff = c.S_MemberHICN_HashDiff
                 WHERE   s.S_MemberHICN_RK IS NULL;
 	   
-
+	   --RECORD END DATE CLEANUP
+        UPDATE  dbo.S_MemberHICN
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.S_MemberHICN AS z
+                                    WHERE     z.H_Member_RK = a.H_Member_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.S_MemberHICN a
+        WHERE   a.RecordEndDate IS NULL;
+	   
 	   --LOAD MemberDemo A RECORDS
         INSERT  INTO dbo.S_MemberDemo
                 ( S_MemberDemo_RK ,
@@ -138,6 +178,16 @@ AS
                                                         AND s.RecordEndDate IS NULL
                                                         AND a.S_MemberDemo_HashDiff = s.HashDiff
                 WHERE   s.S_MemberDemo_RK IS NULL; 
+	   
+	   --RECORD END DATE CLEANUP
+        UPDATE  dbo.S_MemberDemo
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.S_MemberDemo AS z
+                                    WHERE     z.H_Member_RK = a.H_Member_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.S_MemberDemo a
+        WHERE   a.RecordEndDate IS NULL;
 	   
 	   --LOAD MemberDemo B RECORDS
         INSERT  INTO dbo.S_MemberDemo
@@ -169,6 +219,16 @@ AS
                                                         AND b.S_MemberDemo_HashDiff = s.HashDiff
                 WHERE   s.S_MemberDemo_RK IS NULL; 
 	   
+	   --RECORD END DATE CLEANUP
+        UPDATE  dbo.S_MemberDemo
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.S_MemberDemo AS z
+                                    WHERE     z.H_Member_RK = a.H_Member_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.S_MemberDemo a
+        WHERE   a.RecordEndDate IS NULL;
+	   
 	   --LOAD MemberDemo C RECORDS
         INSERT  INTO dbo.S_MemberDemo
                 ( S_MemberDemo_RK ,
@@ -199,6 +259,16 @@ AS
                                                         AND c.S_MemberDemo_HashDiff = s.HashDiff
                 WHERE   s.S_MemberDemo_RK IS NULL; 
 
+	   --RECORD END DATE CLEANUP
+        UPDATE  dbo.S_MemberDemo
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.S_MemberDemo AS z
+                                    WHERE     z.H_Member_RK = a.H_Member_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.S_MemberDemo a
+        WHERE   a.RecordEndDate IS NULL;
+	   
 	   -- LOAD MOR A RECORDS
         INSERT  INTO dbo.LS_MOR_ARecord
                 ( LS_MOR_ARecord_RK ,
@@ -452,12 +522,22 @@ AS
                         s.LoadDate ,
                         s.HashDiff
                 FROM    CHSStaging.mor.MOR_ARecord_Stage s
-                        LEFT JOIN dbo.LS_MOR_ARecord a ON s.LS_MOR_ARecord_RK = a.LS_MOR_ARecord_RK
+                        LEFT JOIN dbo.LS_MOR_ARecord a ON s.L_Member_MOR_RK = a.L_Member_MOR_RK
                                                           AND a.RecordEndDate IS NULL
                                                           AND s.HashDiff = a.HashDiff
                 WHERE   a.LS_MOR_ARecord_RK IS NULL; 
 
 
+	   --RECORD END DATE CLEANUP
+        UPDATE  dbo.LS_MOR_ARecord
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.LS_MOR_ARecord AS z
+                                    WHERE     z.L_Member_MOR_RK = a.L_Member_MOR_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.LS_MOR_ARecord a
+        WHERE   a.RecordEndDate IS NULL;
+	   
 	   -- LOAD MOR B RECORDS
         INSERT  INTO dbo.LS_MOR_BRecord
                 ( LS_MOR_BRecord_RK ,
@@ -788,6 +868,16 @@ AS
                                                           AND s.HashDiff = b.HashDiff
                 WHERE   b.LS_MOR_BRecord_RK IS NULL; 
 
+	   --RECORD END DATE CLEANUP
+        UPDATE  dbo.LS_MOR_BRecord
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.LS_MOR_BRecord AS z
+                                    WHERE     z.L_Member_MOR_RK = a.L_Member_MOR_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.LS_MOR_BRecord a
+        WHERE   a.RecordEndDate IS NULL;
+	   
 	   -- LOAD MOR C RECORDS
         INSERT  INTO dbo.LS_MOR_CRecord
                 ( LS_MOR_CRecord_RK ,
@@ -1100,7 +1190,15 @@ AS
                                                           AND s.HashDiff = c.HashDiff
                 WHERE   c.LS_MOR_CRecord_RK IS NULL; 
 	
-
+	   --RECORD END DATE CLEANUP
+        UPDATE  dbo.LS_MOR_CRecord
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.LS_MOR_CRecord AS z
+                                    WHERE     z.L_Member_MOR_RK = a.L_Member_MOR_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.LS_MOR_CRecord a
+        WHERE   a.RecordEndDate IS NULL;
 	
     END;
 GO

@@ -60,7 +60,7 @@ AS
 				S_Location_HashDiff = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',UPPER(CONCAT(RTRIM(LTRIM(COALESCE(i.Member_Address_N301,''))),':',RTRIM(LTRIM(COALESCE(i.Member_CityName_N401,''))),':',RTRIM(LTRIM(COALESCE(i.Member_StateProvinceCode_N402,''))),':',RTRIM(LTRIM(COALESCE(i.Member_PostalCode_N403,''))) ))),2)) ,
 				L_ProviderNetwork_RK = UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',UPPER(CONCAT(RTRIM(LTRIM(COALESCE(p.CentauriProviderID,''))),':',RTRIM(LTRIM(COALESCE(n.CentauriNetworkID,''))) ))),2))
             FROM    CHSStaging.dbo.X12_834_RawImport i--4459
-                    INNER JOIN ETLConfig.dbo.TradingPartnerFile AS t ON i.FileLevelDetail_SenderID_GS02 = t.SenderID
+                    INNER JOIN CHSStaging.dbo.TradingPartnerFile AS t ON i.FileLevelDetail_SenderID_GS02 = t.SenderID
                                                                          AND i.FileLevelDetail_ReceiverID_GS03 = t.ReceiverID
                     INNER JOIN CHSDV.dbo.R_Client c ON t.TradingPartner = c.ClientName
                     INNER JOIN CHSDV.dbo.R_Member m ON m.ClientID = c.CentauriClientID
