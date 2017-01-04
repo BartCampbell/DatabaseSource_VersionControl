@@ -9,6 +9,7 @@ GO
 -- Create date: 09/19/2016
 --Update 09/27/2016 Adding LoadDate to Primary Key PJ
 --Update 09/29/2018 Adding Channel_PK and EDGEMemberID  PJ
+--Update 12/27/2016 Add Provider_PK to S_SuspectDetail PJ
 -- Description:	Data Vault Suspect Load Satelites
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_Suspect_LoadSats]
@@ -61,10 +62,13 @@ AS
 				  [Channel_PK] ,
 				  [EDGEMemberID],
                   [HashDiff] ,
-                  [RecordSource]
+                  [RecordSource],
+				  Provider_PK
                 )
                 SELECT  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.CSI,
+                                                              ''))), ':',
+															  RTRIM(LTRIM(COALESCE(rw.[Provider_PK],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsScanned],
                                                               ''))), ':',
@@ -175,6 +179,8 @@ AS
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[IsScanned],
                                                               ''))), ':',
+															   RTRIM(LTRIM(COALESCE(rw.[Provider_PK],
+                                                              ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsCNA],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsCoded],
@@ -241,10 +247,13 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[EDGEMemberID],
                                                               '')))))), 2)) ,
-                        RecordSource
+                        RecordSource,
+						rw.Provider_PK
                 FROM    CHSStaging.adv.tblSuspectWCStage rw WITH ( NOLOCK )
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[IsScanned],
+                                                              ''))), ':',
+															   RTRIM(LTRIM(COALESCE(rw.[Provider_PK],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsCNA],
                                                               ''))), ':',
@@ -318,7 +327,9 @@ AS
                                 AND RecordEndDate IS NULL )
                         AND rw.CCI = @CCI
                 GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.CSI,
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.CSI,
+                                                              ''))), ':',
+															  RTRIM(LTRIM(COALESCE(rw.[Provider_PK],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsScanned],
                                                               ''))), ':',
@@ -429,6 +440,8 @@ AS
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[IsScanned],
                                                               ''))), ':',
+															   RTRIM(LTRIM(COALESCE(rw.[Provider_PK],
+                                                              ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsCNA],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsCoded],
@@ -495,7 +508,8 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[EDGEMemberID],
                                                               '')))))), 2)) ,
-                        RecordSource;
+                        RecordSource,
+						rw.Provider_PK;
 
 	--RECORD END DATE CLEANUP
         UPDATE  dbo.S_SuspectDetail
@@ -686,6 +700,7 @@ AS
 
 
     END;
+
 
 
 
