@@ -34,7 +34,7 @@ AS
         ON t.ProviderOfficeID = s.ProviderOfficeID
             AND ISNULL(t.Phone,'') = ISNULL(s.Phone,'')
             AND ISNULL(t.Fax,'') = ISNULL(s.Fax,'')
-			AND ISNULL(t.EmailAddress,'') = ISNULL( t.EmailAddress,'')
+			AND ISNULL(t.EmailAddress,'') = ISNULL( s.EmailAddress,'')
         WHEN NOT MATCHED BY TARGET THEN
             INSERT ( ProviderOfficeID, Phone, Fax, EmailAddress )
             VALUES ( ProviderOfficeID, Phone, Fax, EmailAddress );

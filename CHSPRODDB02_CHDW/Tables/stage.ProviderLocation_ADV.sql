@@ -6,6 +6,7 @@ CREATE TABLE [stage].[ProviderLocation_ADV]
 [City] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [State] [char] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Zip] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[County] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[County] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[OfficeLocationID] [int] NULL
 ) ON [PRIMARY]
 GO

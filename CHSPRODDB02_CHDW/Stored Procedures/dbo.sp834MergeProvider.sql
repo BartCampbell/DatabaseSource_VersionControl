@@ -23,9 +23,10 @@ AS
         MERGE INTO dim.Provider AS t
         USING
             ( SELECT    CentauriProviderID ,
-                        LastName ,
-                        FirstName 
+                        MAX(LastName) AS LastName ,
+                        MAX(FirstName) AS FirstName 
               FROM      stage.Provider
+		    GROUP BY CentauriProviderID
             ) AS s
         ON t.CentauriProviderID = s.CentauriProviderID
         WHEN MATCHED AND ( t.LastName <> s.LastName OR t.FirstName <> s.FirstName
