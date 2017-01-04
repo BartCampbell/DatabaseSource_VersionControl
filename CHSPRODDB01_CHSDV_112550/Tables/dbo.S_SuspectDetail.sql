@@ -39,7 +39,8 @@ CREATE TABLE [dbo].[S_SuspectDetail]
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordEndDate] [datetime] NULL,
 [Channel_PK] [int] NULL,
-[EDGEMemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[EDGEMemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Provider_PK] [int] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[S_SuspectDetail] ADD CONSTRAINT [PK_S_SuspectDetail] PRIMARY KEY CLUSTERED  ([S_SuspectDetail_RK]) ON [PRIMARY]
