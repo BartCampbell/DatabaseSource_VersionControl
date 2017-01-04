@@ -16,17 +16,19 @@ AS
 
 
     SELECT TOP 1
-            t.ClientID,
-		  'CHSDV_' + CONVERT(VARCHAR(10),t.ClientID ) AS ClientDB
+            t.ClientID ,
+            'CHSDV_' + CONVERT(VARCHAR(10), t.ClientID) AS ClientDB
     FROM    ( SELECT TOP 1
                         m.ClientID ,
                         0 AS rownum
               FROM      mmr.MMR_Stage s
-                        INNER JOIN ETLConfig.dbo.ClientPlanMap m ON m.PlanNo = s.MCO_Contract_Nbr AND m.Process = 'MMR'
+                        INNER JOIN dbo.ClientPlanMap m ON m.PlanNo = s.MCO_Contract_Nbr
+                                                                    AND m.Process = 'MMR'
               UNION
               SELECT    0 AS ClientID ,
                         1 AS rownum
             ) t
     ORDER BY t.rownum;
+
 
 GO

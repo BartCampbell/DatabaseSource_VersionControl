@@ -24,7 +24,7 @@ AS
                         m.ClientID ,
                         0 AS rownum
               FROM      mor.MOR_Header_Stage s
-                        INNER JOIN ETLConfig.dbo.ClientPlanMap m ON m.PlanNo = s.ContractNumber AND m.Process = 'MOR'
+                        INNER JOIN dbo.ClientPlanMap m ON m.PlanNo = s.ContractNumber AND m.Process = 'MOR'
               UNION
               SELECT    0 AS ClientID ,
                         1 AS rownum
