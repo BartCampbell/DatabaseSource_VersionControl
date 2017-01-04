@@ -16,6 +16,7 @@ GO
  --Update 09/27/2016 Adding LoadDate to Primary Key PJ
  --Update 10/04/2016 Replace RecordEndDate/LoadDate with Link Satellite PJ
  --Update 10/25/2016 Adding provideroffice to LS_SuspectProvider PJ
+ --Update 12/27/2016 Add Provider_PK to S_SuspectDetail PJ
 -- Description:	Load all Link Tables from the tblSuspectWCStage table
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_Suspect_LoadLinks]
@@ -138,6 +139,8 @@ AS --DECLARE  @CCI VARCHAR(50)
 		
 	 
 --** Load L_SuspectProvider
+--When tblSuspect has changed
+
         INSERT  INTO L_SuspectProvider
                 SELECT  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, '')))))), 2)) ,
@@ -146,13 +149,10 @@ AS --DECLARE  @CCI VARCHAR(50)
                         a.LoadDate ,
                         a.RecordSource ,
                         NULL
-                   FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
+               FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
 				        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK FROM dbo.L_ProviderMasterOffice l INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK AND d.RecordEndDate IS NULL ) b
 									ON CAST(a.Provider_PK AS VARCHAR) = b.Provider_PK
-                        --INNER JOIN CHSDV.dbo.R_Provider b WITH ( NOLOCK ) ON CAST(a.Provider_PK AS VARCHAR)= b.ClientProviderID
-                        --                                      AND b.ClientID = a.CCI
-                        --                                      AND b.ClientProviderID IS NOT NULL
-                        --INNER JOIN CHSStaging.adv.tblProviderStage b WITH ( NOLOCK ) ON a.Provider_PK = b.Provider_PK
+                        
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, '')))))), 2)) NOT IN (
                         SELECT  L_SuspectProvider_RK
@@ -166,8 +166,40 @@ AS --DECLARE  @CCI VARCHAR(50)
                         a.LoadDate ,
                         a.RecordSource;
 
---** Load LS_SuspectProvider
+-- When tblProvider has changed
 
+DECLARE @LoadDate DATE
+SET @LoadDate=GETDATE()
+
+        INSERT  INTO L_SuspectProvider
+                SELECT  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, '')))))), 2)) ,
+                        h.H_Suspect_RK ,
+                        b.H_Provider_RK ,
+                       @LoadDate ,
+                        b.RecordSource ,
+                        NULL
+                   FROM    dbo.H_Suspect h
+				   INNER JOIN dbo.S_SuspectDetail s
+				   ON s.H_Suspect_RK = h.H_Suspect_RK AND s.RecordEndDate IS NULL
+				        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK,l.LoadDate,d.LoadDate AS LoadDate2,d.RecordSource FROM dbo.L_ProviderMasterOffice l INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK AND d.RecordEndDate IS NULL ) b
+									ON s.Provider_PK = b.Provider_PK 
+                  WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, '')))))), 2))  NOT IN (
+                        SELECT  L_SuspectProvider_RK
+                        FROM    L_SuspectProvider
+                        WHERE   RecordEndDate IS NULL )
+                   GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, '')))))), 2)) ,
+                        h.H_Suspect_RK ,
+                        b.H_Provider_RK ,
+                        b.RecordSource;
+
+				
+
+
+	--** Load LS_SuspectProvider
+	--Where tblSuspect changes
 
         INSERT  INTO [dbo].[LS_SuspectProvider]
                 ( [LS_SuspectProvider_RK] ,
@@ -233,6 +265,71 @@ AS --DECLARE  @CCI VARCHAR(50)
         WHERE   a.RecordEndDate IS NULL; 
 		
 	 
+	 --WHERE tblProviderChanges
+
+	   INSERT  INTO [dbo].[LS_SuspectProvider]
+                ( [LS_SuspectProvider_RK] ,
+                  [LoadDate] ,
+                  [L_SuspectProvider_RK] ,
+                  [H_Suspect_RK] ,
+                  [H_Provider_RK] ,
+				  [H_ProviderOffice_RK],
+                  [Active] ,
+                  [HashDiff] ,
+                  [RecordSource]
+                )
+                SELECT  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
+														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':',
+														   RTRIM(LTRIM(COALESCE(@LoadDate, '')))))), 2)) ,
+                        @LoadDate ,
+                        UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, '')))))), 2)) ,
+                        h.H_Suspect_RK ,
+                        b.H_Provider_RK ,
+						b.[H_ProviderOffice_RK],
+                        'Y' ,
+                        UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
+														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':Y'))), 2)) ,
+                        b.RecordSource
+					FROM    dbo.H_Suspect h
+						INNER JOIN dbo.S_SuspectDetail s ON s.H_Suspect_RK = h.H_Suspect_RK AND s.RecordEndDate IS NULL
+				        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK,l.H_ProviderOffice_RK ,l.LoadDate,d.LoadDate AS LoadDate2,d.RecordSource 
+										FROM dbo.L_ProviderMasterOffice l INNER JOIN dbo.LS_ProviderMasterOffice d 
+											ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK AND d.RecordEndDate IS NULL ) b
+									ON s.Provider_PK = b.Provider_PK 
+                WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
+														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':Y'))), 2)) NOT IN (
+                        SELECT  HashDiff
+                        FROM    LS_SuspectProvider
+                        WHERE   RecordEndDate IS NULL )
+                GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
+														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':',
+														   RTRIM(LTRIM(COALESCE(@LoadDate, '')))))), 2)) ,
+                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, '')))))), 2)) ,
+                        h.H_Suspect_RK ,
+                        b.H_Provider_RK ,
+						b.[H_ProviderOffice_RK],
+                        UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
+														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':Y'))), 2)) ,
+                        b.RecordSource; 
+
+		--RECORD END DATE CLEANUP
+        UPDATE  dbo.LS_SuspectProvider
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                  FROM      dbo.LS_SuspectProvider z
+                                  WHERE     z.[H_Suspect_RK] = a.[H_Suspect_RK]
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.LS_SuspectProvider a
+        WHERE   a.RecordEndDate IS NULL; 
+
+
 --** Load L_SuspectMember
         INSERT  INTO L_SuspectMember
                 SELECT  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
@@ -1163,5 +1260,5 @@ AS --DECLARE  @CCI VARCHAR(50)
     END;
 
 
-
+	
 GO
