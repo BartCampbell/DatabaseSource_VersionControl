@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[tblZipCode]
 (
 [ZipCode_PK] [int] NOT NULL,
-[ZipCode] [varchar] (5) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
+[ZipCode] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [City] [varchar] (40) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [State] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [County] [varchar] (40) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,

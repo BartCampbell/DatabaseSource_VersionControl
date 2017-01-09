@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[tblNoteText]
 (
 [NoteText_PK] [smallint] NOT NULL IDENTITY(1, 1),
-[NoteText] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[NoteText] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [IsDiagnosisNote] [bit] NULL,
 [IsChartNote] [bit] NULL,
 [Client_PK] [smallint] NULL,

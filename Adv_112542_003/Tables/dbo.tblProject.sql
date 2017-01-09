@@ -1,15 +1,15 @@
 CREATE TABLE [dbo].[tblProject]
 (
 [Project_PK] [int] NOT NULL IDENTITY(1, 1),
-[Project_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[Project_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [IsScan] [bit] NULL,
 [IsCode] [bit] NULL,
 [Client_PK] [smallint] NULL,
 [dtInsert] [datetime] NULL,
-[IsProspective] [bit] NULL CONSTRAINT [DF__tblProjec__IsPro__236943A5] DEFAULT ((0)),
+[IsProspective] [bit] NULL CONSTRAINT [DF__tblProjec__IsPro__5006DFF2] DEFAULT ((0)),
 [IsRetrospective] [bit] NULL,
 [IsHEDIS] [bit] NULL,
-[ProjectGroup] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[ProjectGroup] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProjectGroup_PK] [int] NULL
 ) ON [PRIMARY]
 GO

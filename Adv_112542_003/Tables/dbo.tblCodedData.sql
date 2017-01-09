@@ -2,7 +2,7 @@ CREATE TABLE [dbo].[tblCodedData]
 (
 [CodedData_PK] [bigint] NOT NULL IDENTITY(1, 1),
 [Suspect_PK] [bigint] NOT NULL,
-[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DOS_From] [smalldatetime] NULL,
 [DOS_Thru] [smalldatetime] NULL,
 [CPT] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
