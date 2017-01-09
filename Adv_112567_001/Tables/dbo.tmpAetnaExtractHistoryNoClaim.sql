@@ -8,7 +8,7 @@ CREATE TABLE [dbo].[tmpAetnaExtractHistoryNoClaim]
 [ServiceToDt] [date] NULL,
 [RenProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ICDCode] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[DXCodeCategory] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DXCodeCategory] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [ICDCodeDisposition] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ICDCodeDispositionReason] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [PageFrom] [smallint] NULL,
@@ -21,5 +21,5 @@ CREATE TABLE [dbo].[tmpAetnaExtractHistoryNoClaim]
 [tmpAetnaExtractHistoryNoClaimPK] [int] NOT NULL IDENTITY(1, 1)
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tmpAetnaExtractHistoryNoClaim] ADD CONSTRAINT [PK_tmpAetnaExtractHistoryNoClaimPK] PRIMARY KEY CLUSTERED  ([tmpAetnaExtractHistoryNoClaimPK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tmpAetnaExtractHistoryNoClaim] ADD CONSTRAINT [PK_tmpAetnaExtractHistoryNoClaimPK] PRIMARY KEY CLUSTERED  ([tmpAetnaExtractHistoryNoClaimPK]) ON [PRIMARY]
 GO

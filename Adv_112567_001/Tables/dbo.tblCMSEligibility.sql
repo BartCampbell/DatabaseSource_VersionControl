@@ -11,5 +11,5 @@ CREATE TABLE [dbo].[tblCMSEligibility]
 [Payment] [float] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblCMSEligibility] ADD CONSTRAINT [PK__tblCMSEligibility] PRIMARY KEY CLUSTERED  ([Member_PK], [EligibleMonth]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblCMSEligibility] ADD CONSTRAINT [PK__tblCMSEligibility] PRIMARY KEY CLUSTERED  ([Member_PK], [EligibleMonth]) ON [PRIMARY]
 GO

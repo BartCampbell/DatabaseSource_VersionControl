@@ -8,5 +8,5 @@ CREATE TABLE [dbo].[tblInteractionRate]
 [ESRD] [float] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblInteractionRate] ADD CONSTRAINT [PK__tblInteractionRate] PRIMARY KEY CLUSTERED  ([Interaction_PK], [PaymentModel], [RateYear]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblInteractionRate] ADD CONSTRAINT [PK__tblInteractionRate] PRIMARY KEY CLUSTERED  ([Interaction_PK], [PaymentModel], [RateYear]) ON [PRIMARY]
 GO

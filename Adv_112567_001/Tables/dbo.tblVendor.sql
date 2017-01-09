@@ -15,7 +15,7 @@ CREATE TABLE [dbo].[tblVendor]
 [Email_Address] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblVendor] ADD CONSTRAINT [PK_tblVendor] PRIMARY KEY CLUSTERED  ([Vendor_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblVendor] ADD CONSTRAINT [PK_tblVendor] PRIMARY KEY CLUSTERED  ([Vendor_PK]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_tblVendorClient] ON [dbo].[tblVendor] ([Client_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tblVendorClient] ON [dbo].[tblVendor] ([Client_PK]) ON [PRIMARY]
 GO

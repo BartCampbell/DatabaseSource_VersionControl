@@ -5,5 +5,5 @@ CREATE TABLE [dbo].[tblMORDetailInteraction]
 [PaymentModel] [tinyint] NOT NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblMORDetailInteraction] ADD CONSTRAINT [PK_MORDetailInteraction] PRIMARY KEY CLUSTERED  ([MORHeader_PK], [Interaction_PK], [PaymentModel]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblMORDetailInteraction] ADD CONSTRAINT [PK_MORDetailInteraction] PRIMARY KEY CLUSTERED  ([MORHeader_PK], [Interaction_PK], [PaymentModel]) ON [PRIMARY]
 GO

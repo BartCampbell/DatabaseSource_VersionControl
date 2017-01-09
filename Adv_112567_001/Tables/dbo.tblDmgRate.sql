@@ -8,5 +8,5 @@ CREATE TABLE [dbo].[tblDmgRate]
 [ESRD] [float] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblDmgRate] ADD CONSTRAINT [PK__tblDmgRate] PRIMARY KEY CLUSTERED  ([Dmg_PK], [PaymentModel], [RateYear]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblDmgRate] ADD CONSTRAINT [PK__tblDmgRate] PRIMARY KEY CLUSTERED  ([Dmg_PK], [PaymentModel], [RateYear]) ON [PRIMARY]
 GO

@@ -6,5 +6,5 @@ CREATE TABLE [dbo].[tblSuspectAssignment]
 [LastUpdated_Date] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblSuspectAssignment] ADD CONSTRAINT [PK_tblSuspectAssignment] PRIMARY KEY CLUSTERED  ([Suspect_PK], [User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblSuspectAssignment] ADD CONSTRAINT [PK_tblSuspectAssignment] PRIMARY KEY CLUSTERED  ([Suspect_PK], [User_PK]) ON [PRIMARY]
 GO

@@ -6,5 +6,5 @@ CREATE TABLE [dbo].[tblProviderOfficeAssignment]
 [LastUpdated_Date] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblProviderOfficeAssignment] ADD CONSTRAINT [PK_tblProviderOfficeAssignment] PRIMARY KEY CLUSTERED  ([ProviderOffice_PK], [User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblProviderOfficeAssignment] ADD CONSTRAINT [PK_tblProviderOfficeAssignment] PRIMARY KEY CLUSTERED  ([ProviderOffice_PK], [User_PK]) ON [PRIMARY]
 GO

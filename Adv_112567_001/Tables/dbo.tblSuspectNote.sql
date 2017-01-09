@@ -6,5 +6,5 @@ CREATE TABLE [dbo].[tblSuspectNote]
 [Coded_Date] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblSuspectNote] ADD CONSTRAINT [PK_tblSuspectNote] PRIMARY KEY CLUSTERED  ([Suspect_PK], [NoteText_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblSuspectNote] ADD CONSTRAINT [PK_tblSuspectNote] PRIMARY KEY CLUSTERED  ([Suspect_PK], [NoteText_PK]) ON [PRIMARY]
 GO

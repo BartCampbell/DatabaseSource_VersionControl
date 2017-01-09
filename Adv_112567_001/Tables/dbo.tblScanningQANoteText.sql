@@ -7,5 +7,5 @@ CREATE TABLE [dbo].[tblScanningQANoteText]
 [IsRemove] [bit] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblScanningQANoteText] ADD CONSTRAINT [PK_tblScanningQANoteText] PRIMARY KEY CLUSTERED  ([ScanningQANoteText_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblScanningQANoteText] ADD CONSTRAINT [PK_tblScanningQANoteText] PRIMARY KEY CLUSTERED  ([ScanningQANoteText_PK]) ON [PRIMARY]
 GO

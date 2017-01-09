@@ -8,5 +8,5 @@ CREATE TABLE [dbo].[tblHCCRate]
 [ESRD] [float] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblHCCRate] ADD CONSTRAINT [PK__tblHCCRate] PRIMARY KEY CLUSTERED  ([HCC], [PaymentModel], [RateYear]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblHCCRate] ADD CONSTRAINT [PK__tblHCCRate] PRIMARY KEY CLUSTERED  ([HCC], [PaymentModel], [RateYear]) ON [PRIMARY]
 GO

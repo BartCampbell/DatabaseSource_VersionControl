@@ -19,21 +19,11 @@ CREATE TABLE [dbo].[cacheProviderOffice]
 [dtLastContact] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[cacheProviderOffice] ADD CONSTRAINT [PK_cacheProviderOffice] PRIMARY KEY CLUSTERED  ([Project_PK], [ProviderOffice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[cacheProviderOffice] ADD CONSTRAINT [PK_cacheProviderOffice] PRIMARY KEY CLUSTERED  ([Project_PK], [ProviderOffice_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_FollowUp] ON [dbo].[cacheProviderOffice] ([follow_up]) INCLUDE ([ProviderOffice_PK]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_ProviderPKProviderOfficePK] ON [dbo].[cacheProviderOffice] ([Project_PK], [ProviderOffice_PK]) ON [PRIMARY]
 GO
-GRANT ALTER ON  [dbo].[cacheProviderOffice] TO [INTERNAL\Paul.Johnson]
-GO
-GRANT CONTROL ON  [dbo].[cacheProviderOffice] TO [INTERNAL\Paul.Johnson]
-GO
-GRANT VIEW DEFINITION ON  [dbo].[cacheProviderOffice] TO [INTERNAL\Paul.Johnson]
-GO
-GRANT SELECT ON  [dbo].[cacheProviderOffice] TO [INTERNAL\Paul.Johnson]
-GO
-GRANT INSERT ON  [dbo].[cacheProviderOffice] TO [INTERNAL\Paul.Johnson]
-GO
-GRANT DELETE ON  [dbo].[cacheProviderOffice] TO [INTERNAL\Paul.Johnson]
-GO
-GRANT UPDATE ON  [dbo].[cacheProviderOffice] TO [INTERNAL\Paul.Johnson]
+CREATE NONCLUSTERED INDEX [IDX_ProviderOfficePK] ON [dbo].[cacheProviderOffice] ([ProviderOffice_PK]) INCLUDE ([dtLastContact], [follow_up]) ON [PRIMARY]
 GO

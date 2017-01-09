@@ -4,5 +4,5 @@ CREATE TABLE [dbo].[tblHEDIS_suspect]
 [measure_pk] [smallint] NOT NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblHEDIS_suspect] ADD CONSTRAINT [PK_tblHEDIS_suspect] PRIMARY KEY CLUSTERED  ([suspect_pk], [measure_pk]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblHEDIS_suspect] ADD CONSTRAINT [PK_tblHEDIS_suspect] PRIMARY KEY CLUSTERED  ([suspect_pk], [measure_pk]) ON [PRIMARY]
 GO

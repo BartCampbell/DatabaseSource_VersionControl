@@ -4,5 +4,5 @@ CREATE TABLE [dbo].[tblSegment]
 [Segment] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblSegment] ADD CONSTRAINT [PK_tblSegment] PRIMARY KEY CLUSTERED  ([Segment_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblSegment] ADD CONSTRAINT [PK_tblSegment] PRIMARY KEY CLUSTERED  ([Segment_PK]) ON [PRIMARY]
 GO

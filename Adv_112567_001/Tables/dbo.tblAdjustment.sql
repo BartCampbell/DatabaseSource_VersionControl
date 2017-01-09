@@ -8,5 +8,5 @@ CREATE TABLE [dbo].[tblAdjustment]
 [Coding_Intensity] [float] NOT NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblAdjustment] ADD CONSTRAINT [PK_tblAdjustment] PRIMARY KEY CLUSTERED  ([RateYear]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblAdjustment] ADD CONSTRAINT [PK_tblAdjustment] PRIMARY KEY CLUSTERED  ([RateYear]) ON [PRIMARY]
 GO

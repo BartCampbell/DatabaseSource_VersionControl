@@ -8,5 +8,5 @@ CREATE TABLE [dbo].[tblUserWorkingHour]
 [ToMin] [tinyint] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblUserWorkingHour] ADD CONSTRAINT [PK_tblUserWorkingHour] PRIMARY KEY CLUSTERED  ([User_PK], [Day_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblUserWorkingHour] ADD CONSTRAINT [PK_tblUserWorkingHour] PRIMARY KEY CLUSTERED  ([User_PK], [Day_PK]) ON [PRIMARY]
 GO

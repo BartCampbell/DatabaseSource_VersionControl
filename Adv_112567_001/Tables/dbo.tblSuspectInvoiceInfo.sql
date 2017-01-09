@@ -19,7 +19,7 @@ CREATE TABLE [dbo].[tblSuspectInvoiceInfo]
 [IsPaid] [bit] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblSuspectInvoiceInfo] ADD CONSTRAINT [PK_tblSuspectInvoiceInfo] PRIMARY KEY CLUSTERED  ([Invoice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblSuspectInvoiceInfo] ADD CONSTRAINT [PK_tblSuspectInvoiceInfo] PRIMARY KEY CLUSTERED  ([Invoice_PK]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_tblSuspectInvoiceInfo_Suspect] ON [dbo].[tblSuspectInvoiceInfo] ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tblSuspectInvoiceInfo_Suspect] ON [dbo].[tblSuspectInvoiceInfo] ([Suspect_PK]) ON [PRIMARY]
 GO

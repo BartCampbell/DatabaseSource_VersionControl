@@ -20,5 +20,5 @@ CREATE TABLE [dbo].[tblUserRemoved]
 [deactivate_after] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblUserRemoved] ADD CONSTRAINT [PK_tblUserRemoved] PRIMARY KEY CLUSTERED  ([User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblUserRemoved] ADD CONSTRAINT [PK_tblUserRemoved] PRIMARY KEY CLUSTERED  ([User_PK]) ON [PRIMARY]
 GO

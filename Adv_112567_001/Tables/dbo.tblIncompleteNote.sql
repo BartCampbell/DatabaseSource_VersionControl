@@ -6,5 +6,5 @@ CREATE TABLE [dbo].[tblIncompleteNote]
 [IsSchedulerNote] [bit] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblIncompleteNote] ADD CONSTRAINT [PK_tblIncompleteNote] PRIMARY KEY CLUSTERED  ([IncompleteNote_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblIncompleteNote] ADD CONSTRAINT [PK_tblIncompleteNote] PRIMARY KEY CLUSTERED  ([IncompleteNote_PK]) ON [PRIMARY]
 GO

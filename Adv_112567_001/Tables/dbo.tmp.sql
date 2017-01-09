@@ -9,10 +9,10 @@ CREATE TABLE [dbo].[tmp]
 [Member_ID] [varchar] (22) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Member] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DOB] [date] NULL,
-[DOSs] [varchar] (4000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DOSs] [varchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Inovice_Rec] [smalldatetime] NULL,
 [RecFaxIn] [smalldatetime] NULL,
 [RecMailIn] [smalldatetime] NULL,
 [Extracted] [smalldatetime] NULL
-) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO

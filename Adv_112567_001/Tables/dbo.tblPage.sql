@@ -11,5 +11,5 @@ CREATE TABLE [dbo].[tblPage]
 [isActive] [bit] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblPage] ADD CONSTRAINT [PK_tblPage] PRIMARY KEY CLUSTERED  ([page_pk]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblPage] ADD CONSTRAINT [PK_tblPage] PRIMARY KEY CLUSTERED  ([page_pk]) ON [PRIMARY]
 GO

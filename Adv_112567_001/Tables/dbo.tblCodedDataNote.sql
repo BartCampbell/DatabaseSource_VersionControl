@@ -4,5 +4,5 @@ CREATE TABLE [dbo].[tblCodedDataNote]
 [NoteText_PK] [smallint] NOT NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblCodedDataNote] ADD CONSTRAINT [PK_tblCodedDataNote] PRIMARY KEY CLUSTERED  ([CodedData_PK], [NoteText_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblCodedDataNote] ADD CONSTRAINT [PK_tblCodedDataNote] PRIMARY KEY CLUSTERED  ([CodedData_PK], [NoteText_PK]) ON [PRIMARY]
 GO

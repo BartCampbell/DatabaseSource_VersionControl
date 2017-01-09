@@ -5,5 +5,5 @@ CREATE TABLE [dbo].[tblMilestoneDetail]
 [Goal] [int] NULL
 ) ON [PRIMARY]
 GO
-CREATE CLUSTERED INDEX [IDX_Milestone_PK] ON [dbo].[tblMilestoneDetail] ([Milestone_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE CLUSTERED INDEX [IDX_Milestone_PK] ON [dbo].[tblMilestoneDetail] ([Milestone_PK]) ON [PRIMARY]
 GO

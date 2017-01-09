@@ -11,5 +11,5 @@ CREATE TABLE [dbo].[tblMemberSchedule]
 [LastUpdated_Date] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblMemberSchedule] ADD CONSTRAINT [PK_tblCAMS_Schedule] PRIMARY KEY CLUSTERED  ([Schedule_PK]) WITH (FILLFACTOR=90) ON [PRIMARY]
+ALTER TABLE [dbo].[tblMemberSchedule] ADD CONSTRAINT [PK_tblCAMS_Schedule] PRIMARY KEY CLUSTERED  ([Schedule_PK]) ON [PRIMARY]
 GO

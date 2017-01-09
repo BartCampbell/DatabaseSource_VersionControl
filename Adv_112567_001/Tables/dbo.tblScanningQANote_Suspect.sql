@@ -6,9 +6,9 @@ CREATE TABLE [dbo].[tblScanningQANote_Suspect]
 [QA_User_PK] [smallint] NOT NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblScanningQANote_Suspect] ADD CONSTRAINT [PK_tblScanningQANote_Suspect] PRIMARY KEY CLUSTERED  ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblScanningQANote_Suspect] ADD CONSTRAINT [PK_tblScanningQANote_Suspect] PRIMARY KEY CLUSTERED  ([Suspect_PK]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_tblScanningQANote_Suspect_QAUser] ON [dbo].[tblScanningQANote_Suspect] ([QA_User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tblScanningQANote_Suspect_QAUser] ON [dbo].[tblScanningQANote_Suspect] ([QA_User_PK]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_tblScanningQANote_Suspect_Note] ON [dbo].[tblScanningQANote_Suspect] ([ScanningQANote_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tblScanningQANote_Suspect_Note] ON [dbo].[tblScanningQANote_Suspect] ([ScanningQANote_PK]) ON [PRIMARY]
 GO

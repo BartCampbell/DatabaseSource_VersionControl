@@ -7,5 +7,5 @@ CREATE TABLE [dbo].[tblIssueResponseOffice]
 [dtInsert] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblIssueResponseOffice] ADD CONSTRAINT [PK_tblIssueResponseOffice] PRIMARY KEY CLUSTERED  ([IssueResponse_PK], [ContactNotesOffice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblIssueResponseOffice] ADD CONSTRAINT [PK_tblIssueResponseOffice] PRIMARY KEY CLUSTERED  ([IssueResponse_PK], [ContactNotesOffice_PK]) ON [PRIMARY]
 GO

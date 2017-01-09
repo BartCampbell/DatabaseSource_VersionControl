@@ -5,5 +5,5 @@ CREATE TABLE [dbo].[tblCodedSource]
 [sortOrder] [smallint] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblCodedSource] ADD CONSTRAINT [PK_tblCodedSource] PRIMARY KEY CLUSTERED  ([CodedSource_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblCodedSource] ADD CONSTRAINT [PK_tblCodedSource] PRIMARY KEY CLUSTERED  ([CodedSource_PK]) ON [PRIMARY]
 GO

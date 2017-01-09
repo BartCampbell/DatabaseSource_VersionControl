@@ -5,7 +5,7 @@ CREATE TABLE [dbo].[tblMarket]
 [Market_Name] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblMarket] ADD CONSTRAINT [PK_tblMarket] PRIMARY KEY CLUSTERED  ([Market_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblMarket] ADD CONSTRAINT [PK_tblMarket] PRIMARY KEY CLUSTERED  ([Market_PK]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_tblMarketClient] ON [dbo].[tblMarket] ([Client_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tblMarketClient] ON [dbo].[tblMarket] ([Client_PK]) ON [PRIMARY]
 GO

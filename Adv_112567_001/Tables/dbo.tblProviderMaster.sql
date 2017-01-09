@@ -11,5 +11,5 @@ CREATE TABLE [dbo].[tblProviderMaster]
 [ProviderGroup] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblProviderMaster] ADD CONSTRAINT [PK_tblProviderMaster] PRIMARY KEY CLUSTERED  ([ProviderMaster_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblProviderMaster] ADD CONSTRAINT [PK_tblProviderMaster] PRIMARY KEY CLUSTERED  ([ProviderMaster_PK]) ON [PRIMARY]
 GO

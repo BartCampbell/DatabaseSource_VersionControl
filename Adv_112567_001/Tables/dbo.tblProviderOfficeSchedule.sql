@@ -13,13 +13,13 @@ CREATE TABLE [dbo].[tblProviderOfficeSchedule]
 [sch_type] [smallint] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblProviderOfficeSchedule] ADD CONSTRAINT [PK_tblProviderOfficeSchedule] PRIMARY KEY CLUSTERED  ([ProviderOfficeSchedule_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblProviderOfficeSchedule] ADD CONSTRAINT [PK_tblProviderOfficeSchedule] PRIMARY KEY CLUSTERED  ([ProviderOfficeSchedule_PK]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule_1] ON [dbo].[tblProviderOfficeSchedule] ([LastUpdated_User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule_1] ON [dbo].[tblProviderOfficeSchedule] ([LastUpdated_User_PK]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule_Prj] ON [dbo].[tblProviderOfficeSchedule] ([Project_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule_Prj] ON [dbo].[tblProviderOfficeSchedule] ([Project_PK]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule_Office] ON [dbo].[tblProviderOfficeSchedule] ([ProviderOffice_PK], [Project_PK]) INCLUDE ([LastUpdated_Date]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule_Office] ON [dbo].[tblProviderOfficeSchedule] ([ProviderOffice_PK], [Project_PK]) INCLUDE ([LastUpdated_Date]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule] ON [dbo].[tblProviderOfficeSchedule] ([Sch_User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule] ON [dbo].[tblProviderOfficeSchedule] ([Sch_User_PK]) ON [PRIMARY]
 GO

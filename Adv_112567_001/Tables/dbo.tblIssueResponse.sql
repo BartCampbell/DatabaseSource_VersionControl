@@ -5,5 +5,5 @@ CREATE TABLE [dbo].[tblIssueResponse]
 [sortOrder] [bigint] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblIssueResponse] ADD CONSTRAINT [PK_tblIssueResponse] PRIMARY KEY CLUSTERED  ([IssueResponse_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblIssueResponse] ADD CONSTRAINT [PK_tblIssueResponse] PRIMARY KEY CLUSTERED  ([IssueResponse_PK]) ON [PRIMARY]
 GO

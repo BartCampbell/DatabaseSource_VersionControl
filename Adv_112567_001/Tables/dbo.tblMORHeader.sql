@@ -7,7 +7,7 @@ CREATE TABLE [dbo].[tblMORHeader]
 [RunDate] [date] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblMORHeader] ADD CONSTRAINT [PK_MORHeader] PRIMARY KEY CLUSTERED  ([MORHeader_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblMORHeader] ADD CONSTRAINT [PK_MORHeader] PRIMARY KEY CLUSTERED  ([MORHeader_PK]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_MORHeader] ON [dbo].[tblMORHeader] ([Member_PK], [PaymentYear], [PaymentMonth]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_MORHeader] ON [dbo].[tblMORHeader] ([Member_PK], [PaymentYear], [PaymentMonth]) ON [PRIMARY]
 GO

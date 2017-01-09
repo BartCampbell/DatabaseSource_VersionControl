@@ -6,5 +6,5 @@ CREATE TABLE [dbo].[tblScanningNotes]
 [LastUpdated] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblScanningNotes] ADD CONSTRAINT [PK_tblScanningNotes] PRIMARY KEY CLUSTERED  ([ScanningNote_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblScanningNotes] ADD CONSTRAINT [PK_tblScanningNotes] PRIMARY KEY CLUSTERED  ([ScanningNote_PK]) ON [PRIMARY]
 GO

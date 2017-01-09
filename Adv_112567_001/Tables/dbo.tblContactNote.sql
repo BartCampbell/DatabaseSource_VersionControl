@@ -16,5 +16,5 @@ CREATE TABLE [dbo].[tblContactNote]
 [AllowedAttempts] [tinyint] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblContactNote] ADD CONSTRAINT [PK_tblContactNote] PRIMARY KEY CLUSTERED  ([ContactNote_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblContactNote] ADD CONSTRAINT [PK_tblContactNote] PRIMARY KEY CLUSTERED  ([ContactNote_PK]) ON [PRIMARY]
 GO

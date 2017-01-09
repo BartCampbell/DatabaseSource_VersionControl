@@ -5,5 +5,5 @@ CREATE TABLE [dbo].[tblInvoiceVendor]
 [LastUpdated] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblInvoiceVendor] ADD CONSTRAINT [PK_tblInvoiceVendor] PRIMARY KEY CLUSTERED  ([InvoiceVendor_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblInvoiceVendor] ADD CONSTRAINT [PK_tblInvoiceVendor] PRIMARY KEY CLUSTERED  ([InvoiceVendor_PK]) ON [PRIMARY]
 GO

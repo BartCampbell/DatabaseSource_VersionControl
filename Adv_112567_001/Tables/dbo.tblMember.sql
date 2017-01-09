@@ -2,9 +2,9 @@ CREATE TABLE [dbo].[tblMember]
 (
 [Member_PK] [bigint] NOT NULL IDENTITY(1, 1),
 [HICNumber] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Member_ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[Lastname] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[Firstname] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[Member_ID] [varchar] (22) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Lastname] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Firstname] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DOB] [date] NULL,
 [Gender] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Address] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -47,7 +47,7 @@ CREATE TABLE [dbo].[tblMember]
 [Exp_Date] [date] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblMember] ADD CONSTRAINT [PK_tblMember] PRIMARY KEY CLUSTERED  ([Member_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblMember] ADD CONSTRAINT [PK_tblMember] PRIMARY KEY CLUSTERED  ([Member_PK]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IDX_MemberPK] ON [dbo].[tblMember] ([Member_PK]) INCLUDE ([DOB], [Firstname], [Lastname], [Member_ID]) ON [PRIMARY]
 GO

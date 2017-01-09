@@ -6,5 +6,5 @@ CREATE TABLE [dbo].[tblUserSession]
 [SessionEnd] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblUserSession] ADD CONSTRAINT [PK_tblUserSession] PRIMARY KEY CLUSTERED  ([Session_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblUserSession] ADD CONSTRAINT [PK_tblUserSession] PRIMARY KEY CLUSTERED  ([Session_PK]) ON [PRIMARY]
 GO

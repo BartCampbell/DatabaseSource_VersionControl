@@ -5,7 +5,7 @@ CREATE TABLE [dbo].[tblSubClient]
 [SubClient_Name] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblSubClient] ADD CONSTRAINT [PK_tblSubClient] PRIMARY KEY CLUSTERED  ([SubClient_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblSubClient] ADD CONSTRAINT [PK_tblSubClient] PRIMARY KEY CLUSTERED  ([SubClient_PK]) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IX_tblSubClient] ON [dbo].[tblSubClient] ([Client_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_tblSubClient] ON [dbo].[tblSubClient] ([Client_PK]) ON [PRIMARY]
 GO

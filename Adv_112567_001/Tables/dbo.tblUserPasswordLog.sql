@@ -5,5 +5,5 @@ CREATE TABLE [dbo].[tblUserPasswordLog]
 [dtPassword] [date] NULL
 ) ON [PRIMARY]
 GO
-CREATE CLUSTERED INDEX [IX_tblUserPasswordLog] ON [dbo].[tblUserPasswordLog] ([User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE CLUSTERED INDEX [IX_tblUserPasswordLog] ON [dbo].[tblUserPasswordLog] ([User_PK]) ON [PRIMARY]
 GO

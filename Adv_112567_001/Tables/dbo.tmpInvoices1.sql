@@ -12,8 +12,8 @@ CREATE TABLE [dbo].[tmpInvoices1]
 [Date] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Payee] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [TotalAmount] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Confirmation #] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
-[Payment Type] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[Confirmation #] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Payment Type] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Source] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Notes] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Invoice_PK] [int] NULL

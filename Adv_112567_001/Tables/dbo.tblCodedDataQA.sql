@@ -11,5 +11,5 @@ CREATE TABLE [dbo].[tblCodedDataQA]
 [IsChanged] [bit] NULL
 ) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IDX_CodeData_PK] ON [dbo].[tblCodedDataQA] ([CodedData_PK]) INCLUDE ([IsAdded], [IsChanged], [IsConfirmed], [IsRemoved]) WITH (FILLFACTOR=80) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IDX_CodeData_PK] ON [dbo].[tblCodedDataQA] ([CodedData_PK]) INCLUDE ([IsAdded], [IsChanged], [IsConfirmed], [IsRemoved]) ON [PRIMARY]
 GO

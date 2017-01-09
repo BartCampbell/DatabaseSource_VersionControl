@@ -4,5 +4,5 @@ CREATE TABLE [dbo].[tblUserProject]
 [Project_PK] [smallint] NOT NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblUserProject] ADD CONSTRAINT [PK_tblUserProject] PRIMARY KEY CLUSTERED  ([User_PK], [Project_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblUserProject] ADD CONSTRAINT [PK_tblUserProject] PRIMARY KEY CLUSTERED  ([User_PK], [Project_PK]) ON [PRIMARY]
 GO

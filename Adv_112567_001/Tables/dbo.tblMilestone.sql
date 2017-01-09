@@ -9,5 +9,5 @@ CREATE TABLE [dbo].[tblMilestone]
 [Project_PK] [int] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblMilestone] ADD CONSTRAINT [PK_tblMilestone] PRIMARY KEY CLUSTERED  ([Milestone_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblMilestone] ADD CONSTRAINT [PK_tblMilestone] PRIMARY KEY CLUSTERED  ([Milestone_PK]) ON [PRIMARY]
 GO

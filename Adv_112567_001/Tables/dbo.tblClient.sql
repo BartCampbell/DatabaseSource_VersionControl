@@ -4,5 +4,5 @@ CREATE TABLE [dbo].[tblClient]
 [Client_Name] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblClient] ADD CONSTRAINT [PK_tblClient] PRIMARY KEY CLUSTERED  ([Client_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+ALTER TABLE [dbo].[tblClient] ADD CONSTRAINT [PK_tblClient] PRIMARY KEY CLUSTERED  ([Client_PK]) ON [PRIMARY]
 GO
