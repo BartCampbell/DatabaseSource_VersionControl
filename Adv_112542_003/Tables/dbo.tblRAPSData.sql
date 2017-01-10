@@ -2,7 +2,7 @@ CREATE TABLE [dbo].[tblRAPSData]
 (
 [RAPSData_PK] [bigint] NOT NULL IDENTITY(1, 1),
 [Member_PK] [bigint] NOT NULL,
-[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
 [DOS_From] [date] NULL,
 [DOS_Thru] [date] NULL,
 [CPT] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,

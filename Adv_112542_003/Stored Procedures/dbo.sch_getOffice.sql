@@ -7,7 +7,7 @@ GO
 -- Create date: Mar-12-2014
 -- Description:	RA Coder will use this sp to pull list of providers in a project
 -- =============================================
---	sch_getOffice @Projects='0', @ProjectGroup='0', @Page=1, @PageSize=100, @Alpha='', @Sort='', @Order='', @Provider=9, @bucket=0, @followup_bucket=0, @user=1, @scheduler=0, @PoolPK=0, @ZonePK=0, @OFFICE=0
+--	sch_getOffice @Channel='0',@Projects='0', @ProjectGroup='0', @Page=1, @PageSize=100, @Alpha='', @Sort='', @Order='', @bucket=0, @followup_bucket=0, @user=1, @scheduler=0, @PoolPK=0, @ZonePK=0, @OFFICE=0,@search_type =0,@search_value=''
 CREATE PROCEDURE [dbo].[sch_getOffice] 
 	@Channel VARCHAR(1000),
 	@Projects varchar(1000),
@@ -94,7 +94,7 @@ BEGIN
 
 	CREATE TABLE #tmpOffices (ProviderOffice_PK BIGINT,Providers INT, Charts Int, LastContact SmallDateTime, FollowUpDate SmallDateTime,Offices smallint)
 	CREATE INDEX idxProviderOffice_PK ON #tmpOffices (ProviderOffice_PK)
-
+		
 	INSERT INTO #tmpOffices(ProviderOffice_PK,Providers, Charts, LastContact, FollowUpDate,Offices)
 	SELECT PO.ProviderOffice_PK,COUNT(DISTINCT S.Provider_PK) Providers, COUNT(DISTINCT CASE WHEN IsScanned=0 AND IsCNA=0 THEN S.Suspect_PK ELSE NULL END) Charts,MAX(dtLastContact) LastContact,MAX(follow_up) FollowUpDate,Count(DISTINCT S.Project_PK) Offices 
 		FROM tblProviderOffice PO WITH (NOLOCK)
@@ -155,8 +155,8 @@ BEGIN
 			WHERE IsNull(PO.Address,0) Like @Alpha+'%'
 		)
 	
-		SELECT * FROM tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
-		
+		SELECT * FROM tbl --WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
+
 		IF @OFFICE=0
 			SELECT UPPER(LEFT(PO.Address,1)) alpha1, UPPER(RIGHT(LEFT(PO.Address,2),1)) alpha2,Count(DISTINCT cPO.ProviderOffice_PK) records
 			FROM #tmpOffices cPO WITH (NOLOCK)

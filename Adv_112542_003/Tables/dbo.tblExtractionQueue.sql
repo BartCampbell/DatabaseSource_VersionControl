@@ -8,7 +8,7 @@ CREATE TABLE [dbo].[tblExtractionQueue]
 [IsDuplicate] [bit] NULL,
 [UploadDate] [smalldatetime] NULL,
 [AssignedDate] [smalldatetime] NULL,
-[OfficeFaxOrID] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[OfficeFaxOrID] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblExtractionQueue] ADD CONSTRAINT [PK_tblExtractionQueue] PRIMARY KEY CLUSTERED  ([ExtractionQueue_PK]) ON [PRIMARY]

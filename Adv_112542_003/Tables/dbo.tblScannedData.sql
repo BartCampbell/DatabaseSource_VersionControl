@@ -6,7 +6,7 @@ CREATE TABLE [dbo].[tblScannedData]
 [FileName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [User_PK] [smallint] NULL,
 [dtInsert] [smalldatetime] NULL,
-[is_deleted] [bit] NULL CONSTRAINT [DF__tblScanne__is_de__50FB042B] DEFAULT ((0)),
+[is_deleted] [bit] NULL CONSTRAINT [DF__tblScanne__is_de__3F115E1A] DEFAULT ((0)),
 [CodedStatus] [tinyint] NULL
 ) ON [PRIMARY]
 GO

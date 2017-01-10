@@ -1,7 +1,7 @@
 CREATE TABLE [dbo].[tblDocumentType]
 (
 [DocumentType_PK] [tinyint] NOT NULL,
-[DocumentType] [nvarchar] (1020) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DocumentType] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [LastUpdated] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO

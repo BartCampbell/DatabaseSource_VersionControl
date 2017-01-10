@@ -18,7 +18,7 @@ CREATE TABLE [dbo].[tblUser]
 [deactivate_after] [smalldatetime] NULL,
 [linked_provider_id] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [linked_provider_pk] [bigint] NULL,
-[IsClient] [bit] NULL CONSTRAINT [DF__tblUser__IsClien__6AEFE058] DEFAULT ((0)),
+[IsClient] [bit] NULL CONSTRAINT [DF__tblUser__IsClien__6DCC4D03] DEFAULT ((0)),
 [sch_Name] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [sch_Tel] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [sch_Fax] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
