@@ -92,13 +92,22 @@ BEGIN
 				--AND
 				s.IsScanned = 1
 				AND 
-				s.Suspect_PK IN
-				(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
-				WHERE sus.EDGEMemberID='11490925'
-				)
-		--	AND SUBSTRING(s.ChaseID,2,5) +'_'+s.EDGEMemberID+'_MR_'+replace(substring(s.ChaseID,charindex(SUBSTRING(s.ChaseID,2,5),s.ChaseID),len(s.ChaseID)),'_','')+'_1of1' = '36096_11490925_MR_360964667_1of1'
-				--(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
-				--	INNER JOIN ChartPull_TX_33602 bc ON bc.enrolleeid = sus.edgememberID) 
+			--SUBSTRING(s.ChaseID,2,5) +'_'+s.EDGEMemberID+'_MR_'+replace(substring(s.ChaseID,charindex(SUBSTRING(s.ChaseID,2,5),s.ChaseID),len(s.ChaseID)),'_','')+'_1of1' = '36096_11490925_MR_360964667_1of1'
+			s.suspect_pk NOT IN 
+			(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+			INNER JOIN ChartPull_TX_33602 bc ON bc.enrolleeid = sus.edgememberID)
+			AND s.suspect_pk NOT IN 
+			(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+			INNER JOIN dbo.ChartPull_IL_36096 il ON il.enrolleeid = sus.edgememberID)
+			AND s.suspect_pk NOT IN 
+			(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+			INNER JOIN dbo.ChartPull_MT_30751 mt ON mt.enrolleeid = sus.edgememberID)
+			AND s.suspect_pk NOT IN 
+			(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+			INNER JOIN dbo.ChartPull_NM_75605 nm ON nm.enrolleeid = sus.edgememberID)
+			AND s.suspect_pk NOT IN 
+			(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+			INNER JOIN dbo.ChartPull_OK_87571 ok ON ok.enrolleeid = sus.edgememberID) 
 
 		
 		--*****************************************************************************
