@@ -1,4 +1,6 @@
 
+EXEC sp_addrolemember N'db_ddladmin', N'INTERNAL\dawn.carter'
+
 EXEC sp_addrolemember N'db_ddladmin', N'Internal\Dustin.Resch'
 EXEC sp_addrolemember N'db_ddladmin', N'INTERNAL\brandon.rodman'
 GO

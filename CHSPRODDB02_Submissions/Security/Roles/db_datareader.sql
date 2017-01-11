@@ -1,4 +1,6 @@
 
+EXEC sp_addrolemember N'db_datareader', N'INTERNAL\dawn.carter'
+
 EXEC sp_addrolemember N'db_datareader', N'Internal\Dustin.Resch'
 
 EXEC sp_addrolemember N'db_datareader', N'INTERNAL\CHS_ReportingUsers'

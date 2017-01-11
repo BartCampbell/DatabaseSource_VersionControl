@@ -1,7 +1,10 @@
 CREATE ROLE [db_executer]
 AUTHORIZATION [dbo]
-EXEC sp_addrolemember N'db_executer', N'Internal\Dustin.Resch'
+EXEC sp_addrolemember N'db_executer', N'INTERNAL\dawn.carter'
 GRANT EXECUTE TO [db_executer]
+
+EXEC sp_addrolemember N'db_executer', N'Internal\Dustin.Resch'
+
 
 GO
 EXEC sp_addrolemember N'db_executer', N'INTERNAL\brandon.rodman'
