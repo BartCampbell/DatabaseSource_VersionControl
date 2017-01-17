@@ -14,3 +14,5 @@ ALTER TABLE [dbo].[tblScannedData] ADD CONSTRAINT [PK_tblScannedData] PRIMARY KE
 GO
 CREATE NONCLUSTERED INDEX [IX_tblScannedData_Suspect] ON [dbo].[tblScannedData] ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [NonClusteredIndex-20170116-100711] ON [dbo].[tblScannedData] ([Suspect_PK], [dtInsert]) ON [PRIMARY]
+GO
