@@ -2,10 +2,10 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
---qar_getCodedData 0,0,1,'','',0
+--qar_getCoderList 0,0,1,'','',0
 CREATE PROCEDURE [dbo].[qar_getCoderList] 
-	@Projects varchar(100),
-	@ProjectGroup varchar(10),
+	@Projects varchar(1000),
+	@ProjectGroup varchar(1000),
 	@User int,
 	@txt_FROM smalldatetime,
 	@txt_to smalldatetime,
@@ -40,7 +40,8 @@ BEGIN
 		COUNT(DISTINCT CASE WHEN CDQ.IsChanged=1 THEN CDQ.CodedData_PK ELSE NULL END) [Total Dx Changed],
 		COUNT(DISTINCT CASE WHEN CDQ.IsAdded=1 THEN CDQ.CodedData_PK ELSE NULL END) [Total Dx Added],
 		COUNT(DISTINCT CASE WHEN CDQ.IsRemoved=1 THEN CDQ.CodedData_PK ELSE NULL END) [Total Dx Removed],
-		CAST(ROUND(CAST(COUNT(DISTINCT CASE WHEN CDQ.IsConfirmed=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)/CAST(COUNT(DISTINCT CD.CodedData_PK)+COUNT(DISTINCT CASE WHEN CDQ.IsRemoved=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)*100,2) AS varchar) + ' %' [QA Accuracy Rate]
+		CASE WHEN COUNT(DISTINCT CASE WHEN CDQ.IsConfirmed=1 THEN CDQ.CodedData_PK ELSE NULL END)=0 THEN '' ELSE
+			CAST(ROUND(CAST(COUNT(DISTINCT CASE WHEN CDQ.IsConfirmed=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)/CAST(COUNT(DISTINCT CD.CodedData_PK)+COUNT(DISTINCT CASE WHEN CDQ.IsRemoved=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)*100,2) AS varchar) + ' %' END [QA Accuracy Rate]
 	FROM tblSuspect S WITH (NOLOCK) 
 		INNER JOIN #tmpProject P ON P.Project_PK = S.Project_PK
 		INNER JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Coded_User_PK

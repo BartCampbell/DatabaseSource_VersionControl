@@ -14,6 +14,8 @@ ALTER TABLE [dbo].[tblScannedData] ADD CONSTRAINT [PK_tblScannedData] PRIMARY KE
 GO
 CREATE NONCLUSTERED INDEX [IDX_DocTypePK] ON [dbo].[tblScannedData] ([DocumentType_PK]) INCLUDE ([is_deleted], [Suspect_PK]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [<Name of Missing Index, sysname,>] ON [dbo].[tblScannedData] ([dtInsert]) INCLUDE ([Suspect_PK]) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IDX_FileName] ON [dbo].[tblScannedData] ([FileName]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_tblScannedData_Suspect] ON [dbo].[tblScannedData] ([Suspect_PK]) ON [PRIMARY]

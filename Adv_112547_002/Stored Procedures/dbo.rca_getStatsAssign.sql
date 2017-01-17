@@ -2,8 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
--- exec rca_getStatsAssign @level=1,@only_incomplete=0,@pages=1,@less_more='g',@priority='',@project=0,@group=0,@charts2Assign=5,@coders='47,40,53,55,39'
--- exec rca_getStatsAssign @level=1,@only_incomplete=0,@pages=1,@less_more='',@priority='',@project=0,@group=0,@charts2Assign=100,@coders=''
+-- exec rca_getStatsAssign @level=1,@only_incomplete=0,@pages=1,@less_more='',@priority='',@projects=0,@ProjectGroup=0,@charts2Assign=0,@coders='',@IsBlindCoding=1,@IsHCCOnly=0
 CREATE PROCEDURE [dbo].[rca_getStatsAssign]
 	@level int,
 	@only_incomplete int,
@@ -13,7 +12,7 @@ CREATE PROCEDURE [dbo].[rca_getStatsAssign]
 	@Projects varchar(1000),
 	@ProjectGroup int,
 	@charts2Assign int,
-	@coders varchar(1000),
+	@coders varchar(max),
 	@IsBlindCoding tinyint,
 	@IsHCCOnly tinyint
 AS
