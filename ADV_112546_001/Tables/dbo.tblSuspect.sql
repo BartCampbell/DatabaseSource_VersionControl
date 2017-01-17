@@ -83,6 +83,8 @@ END
 GO
 ALTER TABLE [dbo].[tblSuspect] ADD CONSTRAINT [PK_tblSuspect] PRIMARY KEY CLUSTERED  ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_ChartPriority] ON [dbo].[tblSuspect] ([ChartPriority]) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IX_tblSuspectChaseStatus] ON [dbo].[tblSuspect] ([ChaseStatus_PK]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IDX_IsCoded] ON [dbo].[tblSuspect] ([IsCoded]) INCLUDE ([Coded_Date], [Coded_User_PK], [Member_PK], [Project_PK], [Provider_PK], [QA_Date], [QA_User_PK], [Scanned_User_PK], [Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
