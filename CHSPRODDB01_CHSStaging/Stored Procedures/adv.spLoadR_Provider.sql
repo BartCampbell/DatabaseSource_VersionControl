@@ -12,6 +12,7 @@ GO
 -- 09/21/2016 changed to NOT IN (112551) PJ
 -- 10/11/2016 Changed the R_Provider load to come from master PJ
 -- 11/03/2016 Changed 11248 to be based on NPI (Not PIN) PJ
+--01/17/2017 Added GuildNet 112567 PJ
 -- Description:	Load the R_Provider reference table and pull back the hashmemberkey
 -- =============================================
 CREATE PROCEDURE [adv].[spLoadR_Provider] 
@@ -139,7 +140,7 @@ AS
         --        INNER JOIN CHSDV.dbo.R_ProviderMaster b ON a.ProviderMaster_PK = b.ClientProviderMasterID
         --                                                   AND a.CCI = b.ClientID;
 
-        IF @CCI IN ( 112542, 112547 )
+        IF @CCI IN ( 112542, 112547 ,112567)
             BEGIN							
 				DELETE FROM CHSStaging.adv.tblProviderMasterStage  WHERE Provider_ID LIKE 'SA%'
 
@@ -224,6 +225,9 @@ AS
         
 
             END; 
+
+
+			
 
         IF @CCI IN ( 112549, 112550, 112546 )
             BEGIN
