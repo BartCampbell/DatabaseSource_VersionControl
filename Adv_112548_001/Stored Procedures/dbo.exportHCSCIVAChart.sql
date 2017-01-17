@@ -15,7 +15,7 @@ SELECT *,GetDate() QuickRAPSDate FROM tmpExportAtenaProvMemb
 SELECT COUNT(*) Charts,QuickRAPSDate FROM tmpExportChases GROUP BY QuickRAPSDate ORDER BY QuickRAPSDate DESC 
 */
 --	exportAtenaData
-Create PROCEDURE [dbo].[exportHCSCIVAChart]
+CREATE PROCEDURE [dbo].[exportHCSCIVAChart]
 AS
 BEGIN
 	RETRY: -- Label RETRY
@@ -85,14 +85,31 @@ BEGIN
 					ON p.ProviderMaster_PK = pm.ProviderMaster_PK
 				INNER JOIN tblMember m  WITH (NOLOCK)
 					ON s.Member_PK = m.Member_PK
-				INNER JOIN WellcareExtract_20161118 wc
-				ON wc.ChartID = s.ChaseID 
+				INNER JOIN dbo.tblScannedData sd ON sd.Suspect_PK = s.Suspect_PK
+				--INNER JOIN WellcareExtract_20161118 wc
+				--ON wc.ChartID = s.ChaseID 
 				--LEFT JOIN tmpExportChases t 
 				--	ON s.Suspect_PK = t.Suspect_PK
 		WHERE	--t.Suspect_PK IS NULL
 				--AND
 				s.IsScanned = 1
-
+				AND sd.is_deleted=0
+				AND 
+					s.suspect_pk NOT IN 
+			(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+			INNER JOIN ChartPull_TX_33602 bc ON bc.enrolleeid = sus.edgememberID)
+			AND s.suspect_pk NOT IN 
+			(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+			INNER JOIN dbo.ChartPull_IL_36096 il ON il.enrolleeid = sus.edgememberID)
+			AND s.suspect_pk NOT IN 
+			(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+			INNER JOIN dbo.ChartPull_MT_30751 mt ON mt.enrolleeid = sus.edgememberID)
+			AND s.suspect_pk NOT IN 
+			(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+			INNER JOIN dbo.ChartPull_NM_75605 nm ON nm.enrolleeid = sus.edgememberID)
+			AND s.suspect_pk NOT IN 
+			(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+			INNER JOIN dbo.ChartPull_OK_87571 ok ON ok.enrolleeid = sus.edgememberID) 
 
 		--*****************************************************************************
 		TRUNCATE TABLE tmpExportChartStaging	
