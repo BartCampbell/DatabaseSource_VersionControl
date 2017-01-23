@@ -290,7 +290,7 @@ BEGIN
 			GROUP BY User_PK
 		
 		SELECT ROW_NUMBER() OVER(ORDER BY L.Location) AS RowNumber, L.Location
-			,MAX(Assigned) Assigned, MAX(Coded) Coded, 0 User_PK
+			,SUM(Assigned) Assigned, SUM(Coded) Coded, 0 User_PK
 		FROM #tmp T INNER JOIN tblUser U ON U.User_PK = T.User_PK
 			INNER JOIN tblLocation L ON L.Location_PK = U.Location_PK 
 		'

@@ -9,6 +9,8 @@ CREATE TABLE [dbo].[tblCoderAssignment]
 GO
 CREATE NONCLUSTERED INDEX [IX_tblCoderAssignmentLevel] ON [dbo].[tblCoderAssignment] ([CoderLevel]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_SuspectPK] ON [dbo].[tblCoderAssignment] ([Suspect_PK]) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IX_tblCoderAssignmentSuspect] ON [dbo].[tblCoderAssignment] ([Suspect_PK]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_tblCoderAssignmentUser] ON [dbo].[tblCoderAssignment] ([User_PK]) ON [PRIMARY]

@@ -9,7 +9,8 @@ CREATE PROCEDURE [dbo].[qar_getCoderList]
 	@User int,
 	@txt_FROM smalldatetime,
 	@txt_to smalldatetime,
-	@date_range int
+	@date_range int,
+	@location int
 AS
 BEGIN
 	-- PROJECT SELECTION
@@ -50,6 +51,7 @@ BEGIN
 	WHERE S.IsCoded=1 AND IsNull(CD.Is_Deleted,0)=0
 		AND (@date_range<>1 OR (CAST(S.QA_Date AS DATE)>=@txt_FROM AND CAST(S.QA_Date AS DATE)<=@txt_to))
 		AND (@date_range<>2 OR (CAST(S.Coded_Date AS DATE)>=@txt_FROM AND CAST(S.Coded_Date AS DATE)<=@txt_to))
+		AND (@location=0 OR U.Location_PK=@location)
 	GROUP BY S.Coded_User_PK,U.Lastname,U.Firstname,U.Username
 END
 GO
