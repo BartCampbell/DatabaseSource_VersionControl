@@ -5,7 +5,7 @@ CREATE TABLE [dbo].[tblModelCode]
 [V12HCC] [tinyint] NULL,
 [V21HCC] [tinyint] NULL,
 [V22HCC] [tinyint] NULL,
-[RxHCC] [tinyint] NULL,
+[RxHCC] [int] NULL,
 [start_date] [datetime] NULL,
 [end_date] [datetime] NULL,
 [IsICD10] [bit] NOT NULL
