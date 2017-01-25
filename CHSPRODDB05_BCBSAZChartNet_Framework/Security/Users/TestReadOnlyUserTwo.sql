@@ -1,0 +1,2 @@
+CREATE USER [TestReadOnlyUserTwo] WITHOUT LOGIN WITH DEFAULT_SCHEMA=[TestReadOnlyUserTwo]
+GO
