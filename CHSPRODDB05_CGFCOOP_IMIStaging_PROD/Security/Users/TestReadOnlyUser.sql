@@ -1,0 +1,2 @@
+CREATE USER [TestReadOnlyUser] WITHOUT LOGIN
+GO

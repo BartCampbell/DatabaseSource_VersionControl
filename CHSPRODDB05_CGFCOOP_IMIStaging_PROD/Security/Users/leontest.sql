@@ -1,0 +1,2 @@
+CREATE USER [leontest] WITHOUT LOGIN
+GO

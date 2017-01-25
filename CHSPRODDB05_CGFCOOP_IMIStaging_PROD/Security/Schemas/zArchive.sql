@@ -1,0 +1,3 @@
+CREATE SCHEMA [zArchive]
+AUTHORIZATION [dbo]
+GO

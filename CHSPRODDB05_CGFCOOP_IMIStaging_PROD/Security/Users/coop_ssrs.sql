@@ -1,0 +1,2 @@
+CREATE USER [coop_ssrs] WITHOUT LOGIN
+GO
