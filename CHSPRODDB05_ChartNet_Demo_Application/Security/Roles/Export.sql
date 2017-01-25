@@ -1,0 +1,3 @@
+CREATE ROLE [Export]
+AUTHORIZATION [dbo]
+GO

@@ -1,0 +1,14 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+CREATE FUNCTION [dbo].[GetMeasure] 
+(
+	@MeasureID int
+)
+RETURNS varchar(50)
+AS
+BEGIN
+	RETURN (SELECT TOP 1 HedisMeasure FROM dbo.Measure WHERE MeasureID = @MeasureID);
+END
+GO
