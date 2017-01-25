@@ -1,0 +1,2 @@
+CREATE USER [ChartNet_AppUser_Custom] WITHOUT LOGIN
+GO
