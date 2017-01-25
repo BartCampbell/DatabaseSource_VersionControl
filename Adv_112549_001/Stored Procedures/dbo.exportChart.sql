@@ -84,16 +84,23 @@ BEGIN
 					ON p.ProviderMaster_PK = pm.ProviderMaster_PK
 				INNER JOIN tblMember m  WITH (NOLOCK)
 					ON s.Member_PK = m.Member_PK
+				INNER JOIN dbo.tblScannedData sd 
+				ON sd.Suspect_PK = s.Suspect_PK
 				--LEFT JOIN tmpExportChases t 
 				--	ON s.Suspect_PK = t.Suspect_PK
 		WHERE	
 				--t.Suspect_PK IS NULL
 				--AND
-				s.IsScanned = 1
+				s.IsScanned = 1 AND sd.is_deleted=0
 				AND 
-				s.Suspect_PK IN
+				s.Suspect_PK not IN
 				(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
-					INNER JOIN attac_49532 bc ON bc.enrolleeid = sus.edgememberID) --49532 Sample
+					INNER JOIN attac_49532 bc ON bc.enrolleeid = sus.edgememberID
+					UNION                    
+					SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+					INNER JOIN dbo.Attac_BCBSSample bc ON bc.enrolleeid = sus.edgememberID
+					
+					) --49532 Sample
 			
 
 		--*****************************************************************************
