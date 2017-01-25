@@ -1,0 +1,12 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+
+CREATE VIEW [Result].[MeasureDetail_PPV_PUCV] AS
+SELECT * FROM Result.MeasureDetail_EDU
+UNION
+SELECT * FROM Result.MeasureDetail_HPC
+UNION
+SELECT * FROM Result.MeasureDetail_IHU
+GO

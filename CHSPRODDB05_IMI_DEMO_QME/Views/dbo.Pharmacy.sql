@@ -1,0 +1,6 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+CREATE VIEW [dbo].[Pharmacy] AS SELECT * FROM [CCA_QINet_Staging].[dbo].[Pharmacy];
+GO

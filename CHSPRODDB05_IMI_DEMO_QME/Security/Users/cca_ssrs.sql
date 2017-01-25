@@ -1,0 +1,2 @@
+CREATE USER [cca_ssrs] WITHOUT LOGIN
+GO
