@@ -5,3 +5,5 @@ CREATE TABLE [dbo].[ChartsToCode_withImages]
 GO
 CREATE NONCLUSTERED INDEX [IDX_ChartID] ON [dbo].[ChartsToCode_withImages] ([CHART_ID]) ON [PRIMARY]
 GO
+CREATE UNIQUE CLUSTERED INDEX [IDX_ClusteredChartID] ON [dbo].[ChartsToCode_withImages] ([CHART_ID]) ON [PRIMARY]
+GO

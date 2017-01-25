@@ -49,15 +49,15 @@ BEGIN
 			LEFT JOIN tblModelCode MC WITH (NOLOCK) ON MC.DiagnosisCode = CD.DiagnosisCode AND MC.V12HCC IS NOT NULL
 		WHERE IsScanned=1 --
 			AND SLC_This.Suspect_PK IS NULL --Replaced 'AND IsCoded=0' to this to Show only not coded charts by this level. 
-			AND IsNull(SD.is_deleted,0)=0 AND CA.Suspect_PK IS NULL
+			AND (SD.is_deleted IS NULL OR SD.is_deleted=0) AND CA.Suspect_PK IS NULL
 			AND (@priority='' OR S.ChartPriority=@priority)
 			AND (@IsBlindCoding=1 OR @level=1 OR SLC.Suspect_PK IS NOT NULL)
 			AND (@IsHCCOnly=0 OR MC.DiagnosisCode IS NOT NULL)
 		GROUP BY S.Suspect_PK,S.Member_PK
 		HAVING 
 			@less_more='' 
-			OR (@less_more='l' AND count(DISTINCT SD.Suspect_PK)<=@pages)
-			OR (@less_more='g' AND count(DISTINCT SD.Suspect_PK)>=@pages)
+			OR (@less_more='l' AND count(DISTINCT SD.ScannedData_PK)<=@pages)
+			OR (@less_more='g' AND count(DISTINCT SD.ScannedData_PK)>=@pages)
 		ORDER BY S.Member_PK
 	END	
 
