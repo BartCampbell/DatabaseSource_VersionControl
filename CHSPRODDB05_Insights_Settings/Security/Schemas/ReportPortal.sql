@@ -1,0 +1,3 @@
+CREATE SCHEMA [ReportPortal]
+AUTHORIZATION [dbo]
+GO
