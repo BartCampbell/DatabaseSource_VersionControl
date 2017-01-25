@@ -331,3 +331,5 @@ CREATE TABLE [dbo].[NPI_MASTER_WklyStage]
 [Healthcare Provider Taxonomy Group_15] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
+ALTER TABLE [dbo].[NPI_MASTER_WklyStage] ADD CONSTRAINT [PK_NPI_MASTER_WklyStage] PRIMARY KEY CLUSTERED  ([NPI]) ON [PRIMARY]
+GO
