@@ -1,0 +1,15 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+
+
+
+CREATE VIEW [dbo].[MedicalRecordIMAExcl] AS
+SELECT	*
+FROM	dbo.MedicalRecordIMA
+WHERE	IMAEvidenceID = 5
+
+
+
+GO
