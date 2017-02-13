@@ -2,8 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
--- exec rca_getStatsAssign @level=1,@only_incomplete=0,@pages=1,@less_more='g',@priority='',@project=0,@group=0,@charts2Assign=5,@coders='47,40,53,55,39'
--- exec rca_getStatsAssign @level=1,@only_incomplete=0,@pages=1,@less_more='',@priority='',@project=0,@group=0,@charts2Assign=100,@coders=''
+-- exec rca_getStatsAssign @level=1,@only_incomplete=0,@pages=1,@less_more='',@priority='',@projects=0,@ProjectGroup=0,@charts2Assign=0,@coders='',@IsBlindCoding=1,@IsHCCOnly=0
 CREATE PROCEDURE [dbo].[rca_getStatsAssign]
 	@level int,
 	@only_incomplete int,
@@ -13,7 +12,7 @@ CREATE PROCEDURE [dbo].[rca_getStatsAssign]
 	@Projects varchar(1000),
 	@ProjectGroup int,
 	@charts2Assign int,
-	@coders varchar(1000),
+	@coders varchar(max),
 	@IsBlindCoding tinyint,
 	@IsHCCOnly tinyint
 AS
@@ -50,15 +49,15 @@ BEGIN
 			LEFT JOIN tblModelCode MC WITH (NOLOCK) ON MC.DiagnosisCode = CD.DiagnosisCode AND MC.V12HCC IS NOT NULL
 		WHERE IsScanned=1 --
 			AND SLC_This.Suspect_PK IS NULL --Replaced 'AND IsCoded=0' to this to Show only not coded charts by this level. 
-			AND IsNull(SD.is_deleted,0)=0 AND CA.Suspect_PK IS NULL
+			AND (SD.is_deleted IS NULL OR SD.is_deleted=0) AND CA.Suspect_PK IS NULL
 			AND (@priority='' OR S.ChartPriority=@priority)
 			AND (@IsBlindCoding=1 OR @level=1 OR SLC.Suspect_PK IS NOT NULL)
 			AND (@IsHCCOnly=0 OR MC.DiagnosisCode IS NOT NULL)
 		GROUP BY S.Suspect_PK,S.Member_PK
 		HAVING 
 			@less_more='' 
-			OR (@less_more='l' AND count(DISTINCT SD.Suspect_PK)<=@pages)
-			OR (@less_more='g' AND count(DISTINCT SD.Suspect_PK)>=@pages)
+			OR (@less_more='l' AND count(DISTINCT SD.ScannedData_PK)<=@pages)
+			OR (@less_more='g' AND count(DISTINCT SD.ScannedData_PK)>=@pages)
 		ORDER BY S.Member_PK
 	END	
 
@@ -99,5 +98,4 @@ BEGIN
 			exec rca_getLists @level,1,@IsBlindCoding;
 		END	
 END
-
 GO
