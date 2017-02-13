@@ -20,7 +20,7 @@ CREATE PROCEDURE [dbo].[im_updateInvoice]
 	@invAcc varchar(20),
 	@addInfo varchar(200),
 	@inv_file varchar(50),
-	@suspects varchar(1000),
+	@suspects varchar(MAX),
 	@office int
 AS
 BEGIN

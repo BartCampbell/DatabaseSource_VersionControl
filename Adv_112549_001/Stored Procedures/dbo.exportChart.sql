@@ -92,15 +92,15 @@ BEGIN
 				--t.Suspect_PK IS NULL
 				--AND
 				s.IsScanned = 1 AND sd.is_deleted=0
-				AND 
-				s.Suspect_PK not IN
-				(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
-					INNER JOIN attac_49532 bc ON bc.enrolleeid = sus.edgememberID
-					UNION                    
-					SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
-					INNER JOIN dbo.Attac_BCBSSample bc ON bc.enrolleeid = sus.edgememberID
+				--AND 
+				--s.Suspect_PK not IN
+				--(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+				--	INNER JOIN attac_49532 bc ON bc.enrolleeid = sus.edgememberID
+				--	UNION                    
+				--	SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
+				--	INNER JOIN dbo.Attac_BCBSSample bc ON bc.enrolleeid = sus.edgememberID
 					
-					) --49532 Sample
+				--	) --49532 Sample
 			
 
 		--*****************************************************************************
