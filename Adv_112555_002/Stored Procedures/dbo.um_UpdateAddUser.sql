@@ -102,7 +102,7 @@ BEGIN
 			,isScanTechSV = @isScanTechSV, isSchedulerSV = @isSchedulerSV, IsSchedulerManager=@IsSchedulerManager
 			,IsChangePasswordOnFirstLogin=@IsChangePasswordOnFirstLogin
 			,location_pk = @location, isAllowDownload = @isAllowDownload
-			,IsInvoiceAccountant=@IsInvoiceAccountant, IsBillingAccountant=@IsBillingAccountant, IsManagementUser=@IsManagementUser
+			,IsInvoiceAccountant=@IsInvoiceAccountant, IsBillingAccountant=@IsBillingAccountant, IsManagementUser=@IsBillingAccountant
 		WHERE User_PK=@id
 		
 		IF (@pwd<>'')

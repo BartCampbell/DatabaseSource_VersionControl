@@ -6,9 +6,11 @@ CREATE TABLE [dbo].[tmpExportChases]
 [Member_PK] [int] NULL,
 [Suspect_PK] [bigint] NOT NULL,
 [CHART NAME] [varchar] (75) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[ChaseID] [bigint] NULL,
+[ChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [InDummy] [int] NULL,
 [InNormal] [int] NULL,
 [QuickRAPSDate] [datetime] NOT NULL
 ) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_ChaseID] ON [dbo].[tmpExportChases] ([ChaseID]) ON [PRIMARY]
 GO

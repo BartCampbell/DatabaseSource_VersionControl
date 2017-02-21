@@ -9,7 +9,6 @@ CREATE TABLE [stage].[tblSuspect]
 [ChasePriority] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [MedicalRecordID] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ClientProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[ConsolidatedProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[DNC] [bit] NULL
+[ConsolidatedProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO

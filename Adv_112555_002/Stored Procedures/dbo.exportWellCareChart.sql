@@ -15,7 +15,7 @@ SELECT *,GetDate() QuickRAPSDate FROM tmpExportAtenaProvMemb
 SELECT COUNT(*) Charts,QuickRAPSDate FROM tmpExportChases GROUP BY QuickRAPSDate ORDER BY QuickRAPSDate DESC 
 */
 --	exportAtenaData
-Create PROCEDURE [dbo].[exportHCSCIVAChart]
+CREATE PROCEDURE [dbo].[exportWellCareChart]
 AS
 BEGIN
 	RETRY: -- Label RETRY
@@ -85,14 +85,14 @@ BEGIN
 					ON p.ProviderMaster_PK = pm.ProviderMaster_PK
 				INNER JOIN tblMember m  WITH (NOLOCK)
 					ON s.Member_PK = m.Member_PK
-				INNER JOIN WellcareExtract_20161118 wc
-				ON wc.ChartID = s.ChaseID 
-				--LEFT JOIN tmpExportChases t 
-				--	ON s.Suspect_PK = t.Suspect_PK
-		WHERE	--t.Suspect_PK IS NULL
-				--AND
-				s.IsScanned = 1
+				INNER JOIN dbo.tblScannedData SD 
+					ON SD.Suspect_PK = s.Suspect_PK
+				LEFT JOIN tmpExportChases t 
+					ON s.Suspect_PK = t.Suspect_PK
 
+		WHERE	t.Suspect_PK IS NULL
+				AND
+				IsNull(SD.is_deleted,0)=0 AND SD.DocumentType_PK<>99 AND S.IsScanned=1 AND S.Channel_PK=10
 
 		--*****************************************************************************
 		TRUNCATE TABLE tmpExportChartStaging	
