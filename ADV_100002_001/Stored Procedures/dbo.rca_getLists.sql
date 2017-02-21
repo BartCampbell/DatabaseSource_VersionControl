@@ -9,13 +9,15 @@ CREATE PROCEDURE [dbo].[rca_getLists]
 	@IsBlindCoding tinyint
 AS
 BEGIN
-	SELECT U.User_PK,U.Lastname+', '+U.Firstname Fullname,Count(DISTINCT CA.Suspect_PK)-COUNT(DISTINCT SLC.Suspect_PK) Assignments 
+	SELECT U.User_PK,U.Lastname+', '+U.Firstname Fullname,Count(DISTINCT CA.Suspect_PK)-COUNT(DISTINCT SLC.Suspect_PK) Assignments, Location_PK 
 	FROM tblUser U WITH (NOLOCK) 
 		LEFT JOIN tblCoderAssignment CA WITH (NOLOCK) ON U.User_PK = CA.User_PK AND CA.CoderLevel=@level
 		LEFT JOIN tblSuspectLevelCoded SLC WITH (NOLOCK) ON SLC.Suspect_PK=CA.Suspect_PK AND SLC.CoderLevel=@level AND SLC.IsCompleted=1
 	WHERE U.IsReviewer=1 AND U.CoderLevel=@level 
-	GROUP BY U.User_PK,U.Lastname,U.Firstname
+	GROUP BY U.User_PK,U.Lastname,U.Firstname, Location_PK
 	ORDER BY Fullname
+
+	SELECT DISTINCT L.Location_PK,L.Location FROM tblLocation L WITH (NOLOCK) INNER JOIN tblUser U WITH (NOLOCK) ON U.Location_PK = L.Location_PK WHERE U.IsReviewer=1 AND U.CoderLevel=@level
 
 	if (@only_coders=1)
 		return;
@@ -28,5 +30,4 @@ BEGIN
 
 	exec rca_getStatsAssign @level=1,@only_incomplete=0,@pages=1,@less_more='',@priority='',@Projects='0',@ProjectGroup='0',@charts2Assign=0,@coders='',@IsBlindCoding=@IsBlindCoding,@IsHCCOnly=0
 END
-
 GO

@@ -86,6 +86,13 @@ BEGIN
 	END
 	ELSE
 	BEGIN
+		IF (@ChartStatus>-1)
+		BEGIN
+			Truncate Table #tmpChaseStatus
+			INSERT INTO #tmpChaseStatus(ChaseStatus_PK,ChaseStatusGroup_PK) 
+				SELECT DISTINCT T.ChaseStatus_PK,T.ChaseStatusGroup_PK FROM tblChaseStatus X INNER JOIN tblChaseStatus T ON T.ChaseStatus = X.ChaseStatus WHERE IsNull(X.ChaseStatus_PK,0)=@ChartStatus
+		END
+		
 		SELECT S.Suspect_PK,
 				ROW_NUMBER() OVER(
 				ORDER BY 
@@ -114,8 +121,8 @@ BEGIN
 		WHERE (
 			(@office>0 AND PO.ProviderOffice_PK = @office) OR 
 			(@provider>0 AND P.Provider_PK = @provider) 
-			) AND
-			(@ChartStatus=-1 OR IsNull(S.ChaseStatus_PK,0)=@ChartStatus)
+			) --AND
+			--(@ChartStatus=-1 OR IsNull(S.ChaseStatus_PK,0)=@ChartStatus)
 	END
 END
 GO
