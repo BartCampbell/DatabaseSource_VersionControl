@@ -57,6 +57,7 @@ BEGIN
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN tblProviderOffice PO2 WITH (NOLOCK) ON 
 				(RTRIM(PO.ContactNumber)<>'' AND (Replace(Replace(Replace(Replace(PO2.ContactNumber,' ',''),'-',''),')',''),'(','') LIKE Replace(Replace(Replace(Replace(PO.ContactNumber,' ',''),'-',''),')',''),'(',''))
+				OR RTRIM(PO.FaxNumber)<>'' AND (Replace(Replace(Replace(Replace(PO2.FaxNumber,' ',''),'-',''),')',''),'(','') LIKE Replace(Replace(Replace(Replace(PO.FaxNumber,' ',''),'-',''),')',''),'(',''))
 				OR (RTRIM(PO2.Address)=RTRIM(PO.Address))
 				OR (PO2.GroupName = PO.GroupName AND IsNull(PO2.GroupName,'') NOT LIKE ''))
 				AND PO2.ProviderOffice_PK = @OFFICE AND PO.ProviderOffice_PK <> @OFFICE
