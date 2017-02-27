@@ -1,8 +1,8 @@
 CREATE TABLE [dbo].[S_GNClaimRptDetails]
 (
 [S_GNClaimRptDetails_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-[LoadDate] [datetime] NULL,
-[H_GNClaimRpt_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[LoadDate] [datetime] NOT NULL,
+[H_PharmacyClaim_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RECORD IND] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CLAIM NO] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CLAIM TYPE] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -13,8 +13,6 @@ CREATE TABLE [dbo].[S_GNClaimRptDetails]
 [RETRO LICS CODE] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ORIG DISP DATE] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [COMPOUND FLAG] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MBR ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MBR DOB] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [EMPL GRP ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [BEN PLAN ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CATEGORY CODE] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -60,11 +58,9 @@ CREATE TABLE [dbo].[S_GNClaimRptDetails]
 [STEP THER IND] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [GRP DRUG NAME] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [GENERIC NAME] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PHARM NPI ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ORIGIN CODE] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [EXP GRP NO] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [GL BATCHID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PHARM NABP] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [WAC AMT] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [MAC AMT] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AWP AMT] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -77,15 +73,8 @@ CREATE TABLE [dbo].[S_GNClaimRptDetails]
 [SALES TAX AMT] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [GPI IND] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [BILL DATE] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MBR LAST NAME] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MBR FIRST NAME] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MBR MIDDLE NAME] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[GENDER] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[AGE] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RELATIONSHIP CODE] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DEPENDENT CODE] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MBR PCP] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MBR PRGM] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DOB DEFAULT IND] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [PATIENT LOC] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SUBMITTED DOB] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -191,12 +180,12 @@ CREATE TABLE [dbo].[S_GNClaimRptDetails]
 [MI CMPD MEDD PAID AMT] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [MI CMPD MEDD EL PLN AMT] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [MI CMPD MEDD EL COST AMT] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[HashDiff] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[HashDiff] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordEndDate] [datetime] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[S_GNClaimRptDetails] ADD CONSTRAINT [PK_S_GNClaimRptDetails] PRIMARY KEY CLUSTERED  ([S_GNClaimRptDetails_RK]) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[S_GNClaimRptDetails] ADD CONSTRAINT [FK_H_GNClaimRpt_RK1] FOREIGN KEY ([H_GNClaimRpt_RK]) REFERENCES [dbo].[H_GNClaimRpt] ([H_GNClaimRpt_RK]) ON DELETE CASCADE ON UPDATE CASCADE
+ALTER TABLE [dbo].[S_GNClaimRptDetails] ADD CONSTRAINT [FK_S_GNClaimRptDetails_H_PharmacyClaim] FOREIGN KEY ([H_PharmacyClaim_RK]) REFERENCES [dbo].[H_PharmacyClaim] ([H_PharmacyClaim_RK])
 GO

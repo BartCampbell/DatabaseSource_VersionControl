@@ -2,7 +2,7 @@ CREATE TABLE [dbo].[S_MKM301Details]
 (
 [S_MKM301Details_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [LoadDate] [datetime] NULL,
-[H_MKM301_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[H_Claims_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CLAIM NO  ] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CLM LN NO  ] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [NO-UNITS  ] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -19,7 +19,6 @@ CREATE TABLE [dbo].[S_MKM301Details]
 [GROUP     ] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CAT   ] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [EVAL ] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PROVIDER ] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [TOP ] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [PAR ] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CERTIFICA ] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -42,7 +41,6 @@ CREATE TABLE [dbo].[S_MKM301Details]
 [CPT4-M1] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CPT4-M2] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [NOPYFLD] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PROVIDER-NPI] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [HashDiff] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordEndDate] [datetime] NULL
@@ -50,5 +48,5 @@ CREATE TABLE [dbo].[S_MKM301Details]
 GO
 ALTER TABLE [dbo].[S_MKM301Details] ADD CONSTRAINT [PK_S_MKM301Details] PRIMARY KEY CLUSTERED  ([S_MKM301Details_RK]) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[S_MKM301Details] ADD CONSTRAINT [FK_H_MKM301_RK1] FOREIGN KEY ([H_MKM301_RK]) REFERENCES [dbo].[H_MKM301] ([H_MKM301_RK]) ON DELETE CASCADE ON UPDATE CASCADE
+ALTER TABLE [dbo].[S_MKM301Details] ADD CONSTRAINT [FK_H_Claims_RK] FOREIGN KEY ([H_Claims_RK]) REFERENCES [dbo].[H_Claims] ([H_Claims_RK]) ON DELETE CASCADE ON UPDATE CASCADE
 GO

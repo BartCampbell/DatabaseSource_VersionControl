@@ -1,14 +1,13 @@
-CREATE TABLE [dbo].[S_esi1900Details]
+CREATE TABLE [dbo].[S_PharmacyClaimesi1900]
 (
-[S_esi1900Details_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
-[LoadDate] [datetime] NULL,
-[H_esi1900_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[S_PharmacyClaimesi1900_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[LoadDate] [datetime] NOT NULL,
+[H_PharmacyClaim_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProductIdentifier] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordIdentifier] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProcessorNumber] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [BatchNumber] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DateBilled] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PharmacyNABPNumber] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [PrescriptionNumber] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DateFilled] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [UandCFlag] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -25,13 +24,6 @@ CREATE TABLE [dbo].[S_esi1900Details]
 [AmountBilled] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AmountClaimed] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AmountDisallowed] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MemberLastName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MemberFirstName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MemberMiddleInitial] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MemberDateofBirth] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MemberGender] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CardHolderID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MemberNumber] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [PlanType] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [GroupNumber] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [PrescriberDEANumber] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -122,8 +114,6 @@ CREATE TABLE [dbo].[S_esi1900Details]
 [PatientLocation] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [PrescriberQualifier] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [PrescriberIdentifier] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PharmacyQualifier] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PharmacyIdentifier] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [HRAAppliedAmount] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [HRAESIFund] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [MedicareDCoveredDrug] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -193,12 +183,12 @@ CREATE TABLE [dbo].[S_esi1900Details]
 [AdjustReasonTypeCode] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [BatchID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [PaymentRefrenceNumber] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[HashDiff] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[HashDiff] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordEndDate] [datetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[S_esi1900Details] ADD CONSTRAINT [PK_S_esi1900Details] PRIMARY KEY CLUSTERED  ([S_esi1900Details_RK]) ON [PRIMARY]
+ALTER TABLE [dbo].[S_PharmacyClaimesi1900] ADD CONSTRAINT [PK_S_PharmacyClaimesi1900] PRIMARY KEY CLUSTERED  ([S_PharmacyClaimesi1900_RK]) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[S_esi1900Details] ADD CONSTRAINT [FK_H_esi1900_RK1] FOREIGN KEY ([H_esi1900_RK]) REFERENCES [dbo].[H_esi1900] ([H_esi1900_RK]) ON DELETE CASCADE ON UPDATE CASCADE
+ALTER TABLE [dbo].[S_PharmacyClaimesi1900] ADD CONSTRAINT [FK_S_PharmacyClaimesi1900_H_PharmacyClaim] FOREIGN KEY ([H_PharmacyClaim_RK]) REFERENCES [dbo].[H_PharmacyClaim] ([H_PharmacyClaim_RK])
 GO
