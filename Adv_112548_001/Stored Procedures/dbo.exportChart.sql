@@ -77,7 +77,7 @@ BEGIN
 				,pm.PIN REN_PIN
 				,m.PID
 				,SUBSTRING(s.ChaseID,2,5) +'_'+s.EDGEMemberID+'_MR_'+replace(substring(s.ChaseID,charindex(SUBSTRING(s.ChaseID,2,5),s.ChaseID),len(s.ChaseID)),'_','')+'_1of1' AS [CHART NAME]
-		--INTO ##MissingChart
+		
 		FROM	tblSuspect s
 				INNER JOIN tblProvider p WITH (NOLOCK)
 					ON s.Provider_PK = p.Provider_PK
@@ -86,29 +86,11 @@ BEGIN
 				INNER JOIN tblMember m  WITH (NOLOCK)
 					ON s.Member_PK = m.Member_PK
 				JOIN dbo.tblScannedData sd ON sd.Suspect_PK = s.Suspect_PK
-				--LEFT JOIN tmpExportChases t 
-				--	ON s.Suspect_PK = t.Suspect_PK
+			
 		WHERE	
-				--t.Suspect_PK IS NULL
-				--AND
+				
 				s.IsScanned = 1 AND sd.is_deleted = 0
 				
-			--SUBSTRING(s.ChaseID,2,5) +'_'+s.EDGEMemberID+'_MR_'+replace(substring(s.ChaseID,charindex(SUBSTRING(s.ChaseID,2,5),s.ChaseID),len(s.ChaseID)),'_','')+'_1of1' = '36096_11490925_MR_360964667_1of1'
-			--s.suspect_pk NOT IN 
-			--(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
-			--INNER JOIN ChartPull_TX_33602 bc ON bc.enrolleeid = sus.edgememberID)
-			--AND s.suspect_pk NOT IN 
-			--(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
-			--INNER JOIN dbo.ChartPull_IL_36096 il ON il.enrolleeid = sus.edgememberID)
-			--AND s.suspect_pk NOT IN 
-			--(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
-			--INNER JOIN dbo.ChartPull_MT_30751 mt ON mt.enrolleeid = sus.edgememberID)
-			--AND s.suspect_pk NOT IN 
-			--(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
-			--INNER JOIN dbo.ChartPull_NM_75605 nm ON nm.enrolleeid = sus.edgememberID)
-			--AND s.suspect_pk NOT IN 
-			--(SELECT DISTINCT sus.Suspect_PK FROM dbo.tblsuspect sus
-			--INNER JOIN dbo.ChartPull_OK_87571 ok ON ok.enrolleeid = sus.edgememberID) 
 
 		
 		--*****************************************************************************
@@ -140,8 +122,7 @@ BEGIN
 		FROM	#Chart tf
 	
 	
-	--SELECT * FROM tmpExportChartStaging
---SELECT 'tmpExportChartStaging', COUNT(1) FROM tmpExportChartStaging
+
 
 		DROP TABLE #Chart
 
