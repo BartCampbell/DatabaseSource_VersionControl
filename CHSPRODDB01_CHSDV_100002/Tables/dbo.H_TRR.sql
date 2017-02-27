@@ -1,0 +1,10 @@
+CREATE TABLE [dbo].[H_TRR]
+(
+[H_TRR_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[TRR_BK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[LoadDate] [datetime] NOT NULL,
+[RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[H_TRR] ADD CONSTRAINT [PK_H_TRR] PRIMARY KEY CLUSTERED  ([H_TRR_RK]) ON [PRIMARY]
+GO

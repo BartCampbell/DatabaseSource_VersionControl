@@ -21,15 +21,15 @@ AS
             s.Last_Name ,
             CONVERT(VARCHAR(10),s.Gender) AS Gender ,
             CONVERT(INT,CONVERT(VARCHAR(10),s.Birth_Date,112)) AS DOB ,
-		  s.RecordSource ,
+		  MAX(s.RecordSource) AS RecordSource ,
 		  c.Client_BK AS CentauriClientID ,
-		  s.LoadDate
+		  MAX(s.LoadDate) AS LoadDate
     FROM    dbo.H_Member h
             INNER JOIN dbo.L_Member_MMR l ON l.H_Member_RK = h.H_Member_RK
 		  INNER JOIN dbo.S_MMRDetail s ON s.H_MMR_RK = l.H_MMR_RK
 		  CROSS JOIN dbo.H_Client c
-    WHERE   s.RecordEndDate IS NULL AND s.LoadDate > @LastLoadTime;
-
+    WHERE   s.RecordEndDate IS NULL AND s.LoadDate > @LastLoadTime
+    GROUP BY h.Member_BK, s.First_Initial, s.Last_Name, CONVERT(VARCHAR(10),s.Gender), CONVERT(INT,CONVERT(VARCHAR(10),s.Birth_Date,112)), c.Client_BK
 
 
 
