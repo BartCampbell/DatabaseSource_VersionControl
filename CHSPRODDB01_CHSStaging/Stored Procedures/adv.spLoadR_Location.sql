@@ -29,14 +29,14 @@ AS
                         a.LoadDate ,
                         a.[RecordSource]
                 FROM    CHSStaging.adv.tblLocationStage a
-                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceLocation] b ON a.Location_PK = b.ClientLocationID AND a.CCI = b.ClientID
+                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceLocation] b ON a.Location_PK = b.ClientLocationID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                 WHERE   a.CCI = @CCI
                         AND b.ClientLocationID IS NULL;
 
         UPDATE  CHSStaging.adv.tblLocationStage
         SET     LocationHashKey = b.LocationHashKey
         FROM    CHSStaging.adv.tblLocationStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceLocation b ON a.Location_PK = b.ClientLocationID
+                INNER JOIN CHSDV.dbo.R_AdvanceLocation b ON a.Location_PK = b.ClientLocationID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 
@@ -52,7 +52,7 @@ AS
         UPDATE  CHSStaging.adv.tblLocationStage
         SET     CLI = b.CentauriLocationID
         FROM    CHSStaging.adv.tblLocationStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceLocation b ON a.Location_PK = b.ClientLocationID
+                INNER JOIN CHSDV.dbo.R_AdvanceLocation b ON a.Location_PK = b.ClientLocationID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 

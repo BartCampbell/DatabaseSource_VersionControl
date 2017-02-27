@@ -29,13 +29,13 @@ INSERT INTO CHSDV.[dbo].[R_ScannedData]
                 a.[RecordSource]
         FROM    CHSStaging.adv.tblScannedDataStage a
 		LEFT OUTER JOIN CHSDV.dbo.R_ScannedData b 
-		ON a.ScannedData_PK = b.ClientScannedDataID AND a.CCI = b.ClientID
+		ON a.ScannedData_PK = b.ClientScannedDataID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
 		WHERE a.CCI = @CCI AND b.ClientScannedDataID IS NULL;
 
 UPDATE  CHSStaging.adv.tblScannedDataStage
 SET     ScannedDataHashKey = b.ScannedDataHashKey
 FROM    CHSStaging.adv.tblScannedDataStage a
-        INNER JOIN CHSDV.dbo.R_ScannedData b ON a.ScannedData_PK = b.ClientScannedDataID
+        INNER JOIN CHSDV.dbo.R_ScannedData b ON a.ScannedData_PK = b.ClientScannedDataID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 
@@ -48,7 +48,7 @@ FROM    CHSStaging.adv.tblScannedDataStage a
 UPDATE  CHSStaging.adv.tblScannedDataStage
 SET  CSI = b.CentauriScannedDataID
 FROM    CHSStaging.adv.tblScannedDataStage a
-        INNER JOIN CHSDV.dbo.R_ScannedData b ON a.ScannedData_PK = b.ClientScannedDataID
+        INNER JOIN CHSDV.dbo.R_ScannedData b ON a.ScannedData_PK = b.ClientScannedDataID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 

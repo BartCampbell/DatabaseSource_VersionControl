@@ -18,13 +18,17 @@ AS
         SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-
+		DECLARE @recordsource VARCHAR(20)
+	SET @recordsource =(SELECT TOP 1 RecordSource FROM adv.AdvanceVariables WHERE  AVKey =(SELECT TOP 1 VariableLoadKey FROM adv.AdvanceVariableLoad))
+     
+      
         
         INSERT  INTO adv.StagingHash
                 ( HashDiff ,
                   ClientID ,
                   TableName ,
-                  CreateDate
+                  CreateDate,
+				  RecordSource
                 )
                 SELECT  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.Location_PK,
@@ -33,7 +37,8 @@ AS
                                                               '')))))), 2)) ,
                         @CCI ,
                         'tblLocation' ,
-                        @Date
+                        @Date,
+						@recordsource
                 FROM    adv.tblLocationStage a
                         LEFT OUTER JOIN adv.StagingHash b ON UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                               UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.Location_PK,
@@ -42,6 +47,7 @@ AS
                                                               '')))))), 2)) = b.HashDiff
                                                              AND b.ClientID = @CCI
                                                              AND b.TableName = 'tblLocation'
+															 AND b.RecordSource = @recordsource
                 WHERE   b.HashDiff IS NULL;
 
 

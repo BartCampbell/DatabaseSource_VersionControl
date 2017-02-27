@@ -29,14 +29,14 @@ AS
                         a.LoadDate ,
                         a.[RecordSource]
                 FROM    CHSStaging.adv.tblProjectStage a
-                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceProject] b ON a.Project_PK = b.ClientProjectID AND a.CCI = b.ClientID
+                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceProject] b ON a.Project_PK = b.ClientProjectID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                 WHERE   a.CCI = @CCI
                         AND b.ClientProjectID IS NULL;
 
         UPDATE  CHSStaging.adv.tblProjectStage
         SET     ProjectHashKey = b.ProjectHashKey
         FROM    CHSStaging.adv.tblProjectStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceProject b ON a.Project_PK = b.ClientProjectID
+                INNER JOIN CHSDV.dbo.R_AdvanceProject b ON a.Project_PK = b.ClientProjectID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 
@@ -52,7 +52,7 @@ AS
         UPDATE  CHSStaging.adv.tblProjectStage
         SET     CPI = b.CentauriProjectID
         FROM    CHSStaging.adv.tblProjectStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceProject b ON a.Project_PK = b.ClientProjectID
+                INNER JOIN CHSDV.dbo.R_AdvanceProject b ON a.Project_PK = b.ClientProjectID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 

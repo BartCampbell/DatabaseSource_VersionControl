@@ -39,7 +39,7 @@ AS
                                 a.LoadDate ,
                                 a.[RecordSource]
                         FROM    CHSStaging.adv.tblUserWCStage a
-                                LEFT OUTER JOIN CHSDV.[dbo].[R_AdvanceUser] b ON a.User_PK = b.ClientUserID AND a.CCI = b.ClientID
+                                LEFT OUTER JOIN CHSDV.[dbo].[R_AdvanceUser] b ON a.User_PK = b.ClientUserID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                         WHERE   a.CCI = @CCI
                                 AND b.ClientUserID IS NULL;
 		
@@ -48,7 +48,7 @@ AS
                 SET     UserHashKey = b.UserHashKey ,
                         CUI = b.CentauriUserID
                 FROM    CHSStaging.adv.tblUserWCStage a
-                        INNER JOIN CHSDV.dbo.R_AdvanceUser b ON a.User_PK = b.ClientUserID
+                        INNER JOIN CHSDV.dbo.R_AdvanceUser b ON a.User_PK = b.ClientUserID AND b.RecordSource = a.RecordSource
                                                               AND a.CCI = b.ClientID;
 
 
@@ -111,7 +111,7 @@ AS
                                 a.LoadDate ,
                                 a.[RecordSource]
                         FROM    CHSStaging.adv.tblUserStage a
-                                LEFT OUTER JOIN CHSDV.[dbo].[R_AdvanceUser] b ON a.User_PK = b.ClientUserID AND a.CCI = b.ClientID
+                                LEFT OUTER JOIN CHSDV.[dbo].[R_AdvanceUser] b ON a.User_PK = b.ClientUserID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                         WHERE   a.CCI = @CCI
                                 AND b.ClientUserID IS NULL;
 		
@@ -119,7 +119,7 @@ AS
                 UPDATE  CHSStaging.adv.tblUserStage
                 SET     UserHashKey = b.UserHashKey,CUI = b.CentauriUserID
                 FROM    CHSStaging.adv.tblUserStage a
-                        INNER JOIN CHSDV.dbo.R_AdvanceUser b ON a.User_PK = b.ClientUserID
+                        INNER JOIN CHSDV.dbo.R_AdvanceUser b ON a.User_PK = b.ClientUserID AND b.RecordSource = a.RecordSource
                                                               AND a.CCI = b.ClientID;
 
 
@@ -140,17 +140,18 @@ AS
                           [RecordSource]
                         )
                         SELECT  DISTINCT
-                                [CCI] ,
-                                Session_PK ,
-                                LoadDate ,
-                                [RecordSource]
-                        FROM    CHSStaging.adv.tblUserSessionStage
-                        WHERE   CCI = @CCI;
+                                a.[CCI] ,
+                                a.Session_PK ,
+                                a.LoadDate ,
+                                a.[RecordSource]
+                        FROM    CHSStaging.adv.tblUserSessionStage a
+						LEFT OUTER JOIN CHSDV.[dbo].[R_Session] b ON b.RecordSource = a.RecordSource AND a.Session_PK=b.ClientSessionID AND a.CCI=b.ClientID
+                        WHERE   CCI = @CCI AND b.CentauriSessionID is null;
 
                 UPDATE  CHSStaging.adv.tblUserSessionStage
                 SET     SessionHashKey = b.SessionHashKey
                 FROM    CHSStaging.adv.tblUserSessionStage a
-                        INNER JOIN CHSDV.dbo.R_Session b ON a.Session_PK = b.ClientSessionID AND a.CCI = b.ClientID
+                        INNER JOIN CHSDV.dbo.R_Session b ON a.Session_PK = b.ClientSessionID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                                                             AND a.CCI = b.ClientID;
 
 
@@ -164,7 +165,7 @@ AS
                 UPDATE  CHSStaging.adv.tblUserSessionStage
                 SET     CSI = b.CentauriSessionID
                 FROM    CHSStaging.adv.tblUserSessionStage a
-                        INNER JOIN CHSDV.dbo.R_Session b ON a.Session_PK = b.ClientSessionID
+                        INNER JOIN CHSDV.dbo.R_Session b ON a.Session_PK = b.ClientSessionID AND b.RecordSource = a.RecordSource
                                                             AND a.CCI = b.ClientID;
 								   
 
@@ -184,7 +185,7 @@ AS
                         a.LoadDate ,
                         a.[RecordSource]
                 FROM    CHSStaging.adv.tblUserRemovedStage a
-                        LEFT OUTER JOIN CHSDV.[dbo].[R_AdvanceUser] b ON a.User_PK = b.ClientUserID AND a.CCI = b.ClientID
+                        LEFT OUTER JOIN CHSDV.[dbo].[R_AdvanceUser] b ON a.User_PK = b.ClientUserID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                 WHERE   a.CCI = @CCI
                         AND b.ClientUserID IS NULL;
 
@@ -192,7 +193,7 @@ AS
         UPDATE  CHSStaging.adv.tblUserRemovedStage
         SET     UserHashKey = b.UserHashKey,CUI = b.CentauriUserID
         FROM    CHSStaging.adv.tblUserRemovedStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceUser b ON a.User_PK = b.ClientUserID
+                INNER JOIN CHSDV.dbo.R_AdvanceUser b ON a.User_PK = b.ClientUserID AND b.RecordSource = a.RecordSource
                                                         AND a.CCI = b.ClientID;
 
 
@@ -215,7 +216,7 @@ AS
                         a.LoadDate ,
                         a.[RecordSource]
                 FROM    CHSStaging.adv.tblUserRemovedStage a
-                        LEFT OUTER JOIN CHSDV.[dbo].[R_AdvanceUser] b ON a.RemovedBy_User_PK = b.ClientUserID AND a.CCI = b.ClientID
+                        LEFT OUTER JOIN CHSDV.[dbo].[R_AdvanceUser] b ON a.RemovedBy_User_PK = b.ClientUserID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                 WHERE   a.CCI = @CCI
                         AND b.ClientUserID IS NULL;
 
@@ -223,7 +224,7 @@ AS
         UPDATE  CHSStaging.adv.tblUserRemovedStage
         SET     RemovedbyUserHashKey = b.UserHashKey
         FROM    CHSStaging.adv.tblUserRemovedStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceUser b ON a.RemovedBy_User_PK = b.ClientUserID
+                INNER JOIN CHSDV.dbo.R_AdvanceUser b ON a.RemovedBy_User_PK = b.ClientUserID AND b.RecordSource = a.RecordSource
                                                         AND a.CCI = b.ClientID;
 
 

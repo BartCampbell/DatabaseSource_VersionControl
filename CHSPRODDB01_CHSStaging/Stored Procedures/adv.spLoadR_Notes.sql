@@ -29,26 +29,26 @@ INSERT INTO CHSDV.[dbo].[R_NoteText]
                 a.[RecordSource]
         FROM    CHSStaging.adv.tblNoteTextStage a
 		LEFT OUTER JOIN CHSDV.dbo.R_NoteText b 
-		ON a.NoteText_PK = b.ClientNoteTextID AND a.CCI = b.ClientID
+		ON a.NoteText_PK = b.ClientNoteTextID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
 		WHERE a.CCI = @CCI AND b.ClientNoteTextID IS NULL;
 
 UPDATE  CHSStaging.adv.tblNoteTextStage
 SET     NoteTextHashKey = b.NoteTextHashKey
 FROM    CHSStaging.adv.tblNoteTextStage a
-        INNER JOIN CHSDV.dbo.R_NoteText b ON a.NoteText_PK = b.ClientNoteTextID
+        INNER JOIN CHSDV.dbo.R_NoteText b ON a.NoteText_PK = b.ClientNoteTextID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 
 UPDATE  CHSStaging.adv.tblNoteTextStage
 SET     ClientHashKey = b.[ClientHashKey]
 FROM    CHSStaging.adv.tblNoteTextStage a
-        INNER JOIN CHSDV.dbo.R_Client b ON a.CCI = b.CentauriClientID;
+        INNER JOIN CHSDV.dbo.R_Client b ON a.CCI = b.CentauriClientID; 
 
 
 UPDATE  CHSStaging.adv.tblNoteTextStage
 SET  CNI = b.CentauriNoteTextID
 FROM    CHSStaging.adv.tblNoteTextStage a
-        INNER JOIN CHSDV.dbo.R_NoteText b ON a.NoteText_PK = b.ClientNoteTextID
+        INNER JOIN CHSDV.dbo.R_NoteText b ON a.NoteText_PK = b.ClientNoteTextID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 
@@ -63,13 +63,13 @@ INSERT INTO CHSDV.[dbo].[R_NoteType]
                 a.[RecordSource]
         FROM    CHSStaging.adv.tblNoteTypeStage a
 		LEFT OUTER JOIN CHSDV.dbo.R_NoteType b 
-		ON a.NoteType_PK = b.ClientNoteTypeID AND a.CCI = b.ClientID
+		ON a.NoteType_PK = b.ClientNoteTypeID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
 		WHERE a.CCI = @CCI AND b.ClientNoteTypeID IS NULL;
 
 UPDATE  CHSStaging.adv.tblNoteTypeStage
 SET     NoteTypeHashKey = b.NoteTypeHashKey
 FROM    CHSStaging.adv.tblNoteTypeStage a
-        INNER JOIN CHSDV.dbo.R_NoteType b ON a.NoteType_PK = b.ClientNoteTypeID
+        INNER JOIN CHSDV.dbo.R_NoteType b ON a.NoteType_PK = b.ClientNoteTypeID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 
@@ -82,7 +82,7 @@ FROM    CHSStaging.adv.tblNoteTypeStage a
 UPDATE  CHSStaging.adv.tblNoteTypeStage
 SET  CTI = b.CentauriNoteTypeID
 FROM    CHSStaging.adv.tblNoteTypeStage a
-        INNER JOIN CHSDV.dbo.R_NoteType b ON a.NoteType_PK = b.ClientNoteTypeID
+        INNER JOIN CHSDV.dbo.R_NoteType b ON a.NoteType_PK = b.ClientNoteTypeID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 

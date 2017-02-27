@@ -28,13 +28,13 @@ INSERT INTO CHSDV.[dbo].[R_ExtractionQueue]
                 a.[RecordSource]
         FROM    CHSStaging.adv.tblExtractionQueueStage a
 		LEFT OUTER JOIN CHSDV.dbo.R_ExtractionQueue b 
-		ON a.ExtractionQueue_PK = b.ClientExtractionQueueID AND a.CCI = b.ClientID
+		ON a.ExtractionQueue_PK = b.ClientExtractionQueueID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
 		WHERE a.CCI = @CCI AND b.ClientExtractionQueueID IS NULL;
 
 UPDATE  CHSStaging.adv.tblExtractionQueueStage
 SET     ExtractionQueueHashKey = b.ExtractionQueueHashKey, CEI = b.CentauriExtractionQueueID
 FROM    CHSStaging.adv.tblExtractionQueueStage a
-        INNER JOIN CHSDV.dbo.R_ExtractionQueue b ON a.ExtractionQueue_PK = b.ClientExtractionQueueID
+        INNER JOIN CHSDV.dbo.R_ExtractionQueue b ON a.ExtractionQueue_PK = b.ClientExtractionQueueID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 
@@ -47,7 +47,7 @@ FROM    CHSStaging.adv.tblExtractionQueueStage a
 UPDATE  CHSStaging.adv.tblExtractionQueueStage
 SET  CEI = b.CentauriExtractionQueueID
 FROM    CHSStaging.adv.tblExtractionQueueStage a
-        INNER JOIN CHSDV.dbo.R_ExtractionQueue b ON a.ExtractionQueue_PK = b.ClientExtractionQueueID
+        INNER JOIN CHSDV.dbo.R_ExtractionQueue b ON a.ExtractionQueue_PK = b.ClientExtractionQueueID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 

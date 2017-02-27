@@ -29,14 +29,14 @@ AS
                         a.LoadDate ,
                         a.[RecordSource]
                 FROM    CHSStaging.adv.tblInvoiceVendorStage a
-                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceInvoiceVendor] b ON a.InvoiceVendor_PK = b.ClientInvoiceVendorID AND a.CCI = b.ClientID
+                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceInvoiceVendor] b ON a.InvoiceVendor_PK = b.ClientInvoiceVendorID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                 WHERE   a.CCI = @CCI
                         AND b.ClientInvoiceVendorID IS NULL;
 
         UPDATE  CHSStaging.adv.tblInvoiceVendorStage
         SET     InvoiceVendorHashKey = b.InvoiceVendorHashKey
         FROM    CHSStaging.adv.tblInvoiceVendorStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceInvoiceVendor b ON a.InvoiceVendor_PK = b.ClientInvoiceVendorID
+                INNER JOIN CHSDV.dbo.R_AdvanceInvoiceVendor b ON a.InvoiceVendor_PK = b.ClientInvoiceVendorID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 
@@ -52,7 +52,7 @@ AS
         UPDATE  CHSStaging.adv.tblInvoiceVendorStage
         SET     CVI = b.CentauriInvoiceVendorID
         FROM    CHSStaging.adv.tblInvoiceVendorStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceInvoiceVendor b ON a.InvoiceVendor_PK = b.ClientInvoiceVendorID
+                INNER JOIN CHSDV.dbo.R_AdvanceInvoiceVendor b ON a.InvoiceVendor_PK = b.ClientInvoiceVendorID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 

@@ -1,0 +1,32 @@
+CREATE TABLE [dbo].[TRRVerbatimStaging]
+(
+[HICN] [varchar] (12) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Surname] [varchar] (12) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[FirstName] [varchar] (7) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MiddleInitial] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[GenderCode] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[DOB] [varchar] (8) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[RecordType] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ContractNumber] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PlanTransactionText] [varchar] (300) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Filler] [varchar] (126) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[TransactionAcceptRejectStatus] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[SystemAssignedTransactionTrackingID] [varchar] (11) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PlanAssignedTransactionTrackingID] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[FileName] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ClientID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[LoadDate] [datetime] NULL,
+[H_Member_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CentauriMemberID] [int] NULL,
+[H_TRRVerbatim_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[L_MemberTRRVerbatim_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[S_MemberDemo_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[S_MemberDemo_HashDiff] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[S_TRRVerbatim_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[S_TRRVerbatim_HashDiff] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[S_MemberHICN_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[S_MemberHICN_HashDiff] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[TRRVerbatim_BK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ClientMemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+) ON [PRIMARY]
+GO

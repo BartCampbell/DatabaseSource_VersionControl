@@ -29,13 +29,13 @@ AS
                         a.LoadDate ,
                         a.[RecordSource]
                 FROM    CHSStaging.adv.tblScanningNotesStage a
-                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceScanningNotes] b ON a.ScanningNote_PK = b.ClientScanningNotesID AND a.CCI = b.ClientID
+                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceScanningNotes] b ON a.ScanningNote_PK = b.ClientScanningNotesID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                 WHERE   a.CCI = @CCI                         AND 				b.ClientScanningNotesID IS NULL;
 
         UPDATE  CHSStaging.adv.tblScanningNotesStage
         SET     ScanningNotesHashKey = b.ScanningNotesHashKey
         FROM    CHSStaging.adv.tblScanningNotesStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceScanningNotes b ON a.ScanningNote_PK = b.ClientScanningNotesID
+                INNER JOIN CHSDV.dbo.R_AdvanceScanningNotes b ON a.ScanningNote_PK = b.ClientScanningNotesID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 
@@ -51,7 +51,7 @@ AS
         UPDATE  CHSStaging.adv.tblScanningNotesStage
         SET     CNI = b.CentauriScanningNotesID
         FROM    CHSStaging.adv.tblScanningNotesStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceScanningNotes b ON a.ScanningNote_PK = b.ClientScanningNotesID
+                INNER JOIN CHSDV.dbo.R_AdvanceScanningNotes b ON a.ScanningNote_PK = b.ClientScanningNotesID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 

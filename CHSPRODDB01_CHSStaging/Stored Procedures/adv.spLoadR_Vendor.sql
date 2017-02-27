@@ -29,14 +29,14 @@ AS
                         a.LoadDate ,
                         a.[RecordSource]
                 FROM    CHSStaging.adv.tblVendorStage a
-                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceVendor] b ON a.Vendor_PK = b.ClientVendorID AND a.CCI = b.ClientID
+                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceVendor] b ON a.Vendor_PK = b.ClientVendorID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                 WHERE   a.CCI = @CCI
                         AND b.ClientVendorID IS NULL;
 
         UPDATE  CHSStaging.adv.tblVendorStage
         SET     VendorHashKey = b.VendorHashKey
         FROM    CHSStaging.adv.tblVendorStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceVendor b ON a.Vendor_PK = b.ClientVendorID
+                INNER JOIN CHSDV.dbo.R_AdvanceVendor b ON a.Vendor_PK = b.ClientVendorID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 
@@ -52,7 +52,7 @@ AS
         UPDATE  CHSStaging.adv.tblVendorStage
         SET     CVI = b.CentauriVendorID
         FROM    CHSStaging.adv.tblVendorStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceVendor b ON a.Vendor_PK = b.ClientVendorID
+                INNER JOIN CHSDV.dbo.R_AdvanceVendor b ON a.Vendor_PK = b.ClientVendorID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 

@@ -8,7 +8,7 @@ GO
 -- Description:	Load the R_ClaimData reference table and pull back the hashClaimDatakey
 -- =============================================
 
-create PROCEDURE [adv].[spLoadR_ClaimData] 
+CREATE PROCEDURE [adv].[spLoadR_ClaimData] 
 	-- Add the parameters for the stored procedure here
 @CCI VARCHAR(100)
 AS
@@ -29,27 +29,27 @@ INSERT INTO CHSDV.[dbo].[R_ClaimData]
                 a.[RecordSource]
         FROM    CHSStaging.adv.tblClaimDataStage a
 		LEFT OUTER JOIN CHSDV.dbo.R_ClaimData b 
-		ON a.ClaimData_PK = b.ClientClaimDataID
-		WHERE a.CCI = @CCI AND b.ClientClaimDataID IS NULL;
+		ON a.ClaimData_PK = b.ClientClaimDataID AND b.RecordSource = a.RecordSource
+		WHERE a.CCI = @CCI AND b.ClientClaimDataID IS NULL ;
 
 UPDATE  CHSStaging.adv.tblClaimDataStage
 SET     ClaimDataHashKey = b.ClaimDataHashKey
 FROM    CHSStaging.adv.tblClaimDataStage a
         INNER JOIN CHSDV.dbo.R_ClaimData b ON a.ClaimData_PK = b.ClientClaimDataID
-                                           AND a.CCI = b.ClientID;
+                                           AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource;
 
 
 UPDATE  CHSStaging.adv.tblClaimDataStage
 SET     ClientHashKey = b.[ClientHashKey]
 FROM    CHSStaging.adv.tblClaimDataStage a
-        INNER JOIN CHSDV.dbo.R_Client b ON a.CCI = b.CentauriClientID;
+        INNER JOIN CHSDV.dbo.R_Client b ON a.CCI = b.CentauriClientID ;
 
 
 UPDATE  CHSStaging.adv.tblClaimDataStage
 SET  CDI = b.CentauriClaimDataID
 FROM    CHSStaging.adv.tblClaimDataStage a
         INNER JOIN CHSDV.dbo.R_ClaimData b ON a.ClaimData_PK = b.ClientClaimDataID
-                                           AND a.CCI = b.ClientID;
+                                           AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource;
 
 
 

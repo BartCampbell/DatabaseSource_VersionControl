@@ -37,7 +37,7 @@ AS
                         a.LoadDate ,
                         a.[RecordSource]
                 FROM    CHSStaging.adv.tblSuspectWCStage a
-                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceSuspect] b ON a.Suspect_PK = b.ClientSuspectID AND a.CCI = b.ClientID
+                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceSuspect] b ON a.Suspect_PK = b.ClientSuspectID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                 WHERE   a.CCI = @CCI
                         AND b.ClientSuspectID IS NULL;
 
@@ -45,7 +45,7 @@ AS
         UPDATE  CHSStaging.adv.tblSuspectWCStage
         SET     SuspectHashKey = b.SuspectHashKey,CSI = b.CentauriSuspectID
         FROM    CHSStaging.adv.tblSuspectWCStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID
+                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 
@@ -62,7 +62,7 @@ AS
                 CUI = b.CentauriUserID
         FROM    CHSStaging.adv.[tblSuspectScanningNotesStage] a
                 INNER JOIN CHSDV.dbo.R_AdvanceUser b ON ISNULL(a.User_PK, '') = ISNULL(b.ClientUserID,
-                                                              '')
+                                                              '') AND b.RecordSource = a.RecordSource
                                                         AND a.CCI = b.ClientID;
 
 																											   
@@ -70,7 +70,7 @@ AS
         SET     ScanningNoteHashKey = b.ScanningNotesHashKey ,
                 CNI = b.CentauriScanningNotesID
         FROM    CHSStaging.adv.[tblSuspectScanningNotesStage] a
-                INNER JOIN CHSDV.dbo.R_AdvanceScanningNotes b ON a.ScanningNote_PK = b.ClientScanningNotesID
+                INNER JOIN CHSDV.dbo.R_AdvanceScanningNotes b ON a.ScanningNote_PK = b.ClientScanningNotesID AND b.RecordSource = a.RecordSource
                                                               AND a.CCI = b.ClientID;
 
 
@@ -78,7 +78,7 @@ AS
         SET     SuspectHashKey = b.SuspectHashKey ,
                 CSI = b.CentauriSuspectID
         FROM    CHSStaging.adv.[tblSuspectScanningNotesStage] a
-                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID
+                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID AND b.RecordSource = a.RecordSource
 		                                                   AND a.CCI = b.ClientID;
 
 
@@ -99,14 +99,14 @@ AS
                         a.LoadDate ,
                         a.[RecordSource]
                 FROM    CHSStaging.adv.tblSuspectStage a
-                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceSuspect] b ON a.Suspect_PK = b.ClientSuspectID AND a.CCI = b.ClientID
+                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceSuspect] b ON a.Suspect_PK = b.ClientSuspectID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
                 WHERE   a.CCI = @CCI
                         AND b.ClientSuspectID IS NULL;
 
         UPDATE  CHSStaging.adv.tblSuspectStage
         SET     SuspectHashKey = b.SuspectHashKey
         FROM    CHSStaging.adv.tblSuspectStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID
+                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 
@@ -119,14 +119,14 @@ AS
         UPDATE  CHSStaging.adv.tblSuspectStage
         SET     CSI = b.CentauriSuspectID
         FROM    CHSStaging.adv.tblSuspectStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID
+                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
         UPDATE  CHSStaging.adv.[tblSuspectInvoiceInfoStage]
         SET     SuspectHashKey = b.SuspectHashKey ,
                 CSI = b.CentauriSuspectID
         FROM    CHSStaging.adv.[tblSuspectInvoiceInfoStage] a
-                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID
+                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 
@@ -135,7 +135,7 @@ AS
                 CUI = b.CentauriUserID
         FROM    CHSStaging.adv.[tblSuspectInvoiceInfoStage] a
                 INNER JOIN CHSDV.dbo.R_AdvanceUser b ON ISNULL(a.User_PK, '') = ISNULL(b.ClientUserID,
-                                                              '')
+                                                              '') AND b.RecordSource = a.RecordSource
                                                         AND a.CCI = b.ClientID;
 
 
@@ -147,7 +147,7 @@ AS
         FROM    CHSStaging.adv.[tblSuspectInvoiceInfoStage] a
                 INNER JOIN CHSDV.dbo.R_AdvanceUser b ON ISNULL(a.Update_User_PK,
                                                               '') = ISNULL(b.ClientUserID,
-                                                              '')
+                                                              '') AND b.RecordSource = a.RecordSource
                                                         AND a.CCI = b.ClientID;
 
 														   
@@ -155,7 +155,7 @@ AS
         SET     InvoiceVendorHashKey = b.InvoiceVendorHashKey ,
                 CVI = b.CentauriInvoiceVendorID
         FROM    CHSStaging.adv.[tblSuspectInvoiceInfoStage] a
-                INNER JOIN CHSDV.dbo.R_AdvanceInvoiceVendor b ON a.InvoiceVendor_PK = b.ClientInvoiceVendorID
+                INNER JOIN CHSDV.dbo.R_AdvanceInvoiceVendor b ON a.InvoiceVendor_PK = b.ClientInvoiceVendorID AND b.RecordSource = a.RecordSource
                                                               AND a.CCI = b.ClientID;
 
         UPDATE  CHSStaging.adv.[tblSuspectNoteStage]
@@ -164,14 +164,14 @@ AS
         FROM    CHSStaging.adv.[tblSuspectNoteStage] a
                 INNER JOIN CHSDV.dbo.R_AdvanceUser b ON ISNULL(a.Coded_User_PK,
                                                               '') = ISNULL(b.ClientUserID,
-                                                              '')
+                                                              '') AND b.RecordSource = a.RecordSource
                                                         AND a.CCI = b.ClientID;
 												   
         UPDATE  CHSStaging.adv.[tblSuspectNoteStage]
         SET     NoteTextHashKey = b.NoteTextHashKey ,
                 CNI = b.CentauriNoteTextID
         FROM    CHSStaging.adv.[tblSuspectNoteStage] a
-                INNER JOIN CHSDV.dbo.R_NoteText b ON a.NoteText_PK = b.ClientNoteTextID
+                INNER JOIN CHSDV.dbo.R_NoteText b ON a.NoteText_PK = b.ClientNoteTextID AND b.RecordSource = a.RecordSource
                                                      AND a.CCI = b.ClientID;
 
 
@@ -179,7 +179,7 @@ AS
         SET     SuspectHashKey = b.SuspectHashKey ,
                 CSI = b.CentauriSuspectID
         FROM    CHSStaging.adv.[tblSuspectNoteStage] a
-                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID
+                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 
@@ -188,7 +188,7 @@ AS
                 CUI = b.CentauriUserID
         FROM    CHSStaging.adv.[tblSuspectScanningNotesStage] a
                 INNER JOIN CHSDV.dbo.R_AdvanceUser b ON ISNULL(a.User_PK, '') = ISNULL(b.ClientUserID,
-                                                              '')
+                                                              '') AND b.RecordSource = a.RecordSource
                                                         AND a.CCI = b.ClientID;
 
 
@@ -198,7 +198,7 @@ AS
         SET     ScanningNoteHashKey = b.ScanningNotesHashKey ,
                 CNI = b.CentauriScanningNotesID
         FROM    CHSStaging.adv.[tblSuspectScanningNotesStage] a
-                INNER JOIN CHSDV.dbo.R_AdvanceScanningNotes b ON a.ScanningNote_PK = b.ClientScanningNotesID
+                INNER JOIN CHSDV.dbo.R_AdvanceScanningNotes b ON a.ScanningNote_PK = b.ClientScanningNotesID AND b.RecordSource = a.RecordSource
                                                               AND a.CCI = b.ClientID;
 
 
@@ -206,7 +206,7 @@ AS
         SET     SuspectHashKey = b.SuspectHashKey ,
                 CSI = b.CentauriSuspectID
         FROM    CHSStaging.adv.[tblSuspectScanningNotesStage] a
-                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID
+                INNER JOIN CHSDV.dbo.R_AdvanceSuspect b ON a.Suspect_PK = b.ClientSuspectID AND b.RecordSource = a.RecordSource
                                                            AND a.CCI = b.ClientID;
 
 END 

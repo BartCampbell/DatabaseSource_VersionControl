@@ -35,7 +35,7 @@ INSERT INTO CHSDV.[dbo].[R_DocumentType]
 UPDATE  CHSStaging.adv.tblDocumentTypeStage
 SET     DocumentTypeHashKey = b.DocumentTypeHashKey
 FROM    CHSStaging.adv.tblDocumentTypeStage a
-        INNER JOIN CHSDV.dbo.R_DocumentType b ON a.DocumentType_PK = b.ClientDocumentTypeID
+        INNER JOIN CHSDV.dbo.R_DocumentType b ON a.DocumentType_PK = b.ClientDocumentTypeID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 
@@ -48,7 +48,7 @@ FROM    CHSStaging.adv.tblDocumentTypeStage a
 UPDATE  CHSStaging.adv.tblDocumentTypeStage
 SET  CDI = b.CentauriDocumentTypeID
 FROM    CHSStaging.adv.tblDocumentTypeStage a
-        INNER JOIN CHSDV.dbo.R_DocumentType b ON a.DocumentType_PK = b.ClientDocumentTypeID
+        INNER JOIN CHSDV.dbo.R_DocumentType b ON a.DocumentType_PK = b.ClientDocumentTypeID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 

@@ -31,13 +31,13 @@ INSERT INTO CHSDV.[dbo].[R_AdvanceContactNote]
                 a.[RecordSource]
         FROM    CHSStaging.adv.tblContactNoteStage a
 		LEFT OUTER JOIN CHSDV.dbo.R_AdvanceContactNote b 
-		ON a.ContactNote_PK = b.ClientContactNoteID AND a.CCI = b.ClientID
+		ON a.ContactNote_PK = b.ClientContactNoteID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
 		WHERE a.CCI = @CCI AND b.ClientContactNoteID IS NULL;
 
 UPDATE  CHSStaging.adv.tblContactNoteStage
 SET     ContactNoteHashKey = b.ContactNoteHashKey
 FROM    CHSStaging.adv.tblContactNoteStage a
-        INNER JOIN CHSDV.dbo.R_AdvanceContactNote b ON a.ContactNote_PK = b.ClientContactNoteID
+        INNER JOIN CHSDV.dbo.R_AdvanceContactNote b ON a.ContactNote_PK = b.ClientContactNoteID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 
@@ -50,7 +50,7 @@ FROM    CHSStaging.adv.tblContactNoteStage a
 UPDATE  CHSStaging.adv.tblContactNoteStage
 SET  CNI = b.CentauriContactNoteID
 FROM    CHSStaging.adv.tblContactNoteStage a
-        INNER JOIN CHSDV.dbo.R_AdvanceContactNote b ON a.ContactNote_PK = b.ClientContactNoteID
+        INNER JOIN CHSDV.dbo.R_AdvanceContactNote b ON a.ContactNote_PK = b.ClientContactNoteID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 INSERT INTO CHSDV.[dbo].[R_AdvanceContactNotesOffice]
@@ -70,7 +70,7 @@ INSERT INTO CHSDV.[dbo].[R_AdvanceContactNotesOffice]
 UPDATE  CHSStaging.adv.tblContactNotesOfficeStage
 SET     ContactNotesOfficeHashKey = b.ContactNotesOfficeHashKey
 FROM    CHSStaging.adv.tblContactNotesOfficeStage a
-        INNER JOIN CHSDV.dbo.R_AdvanceContactNotesOffice b ON a.ContactNotesOffice_PK = b.ClientContactNotesOfficeID
+        INNER JOIN CHSDV.dbo.R_AdvanceContactNotesOffice b ON a.ContactNotesOffice_PK = b.ClientContactNotesOfficeID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 
@@ -83,10 +83,48 @@ FROM    CHSStaging.adv.tblContactNotesOfficeStage a
 UPDATE  CHSStaging.adv.tblContactNotesOfficeStage
 SET  CNI = b.CentauriContactNotesOfficeID
 FROM    CHSStaging.adv.tblContactNotesOfficeStage a
-        INNER JOIN CHSDV.dbo.R_AdvanceContactNotesOffice b ON a.ContactNotesOffice_PK = b.ClientContactNotesOfficeID
+        INNER JOIN CHSDV.dbo.R_AdvanceContactNotesOffice b ON a.ContactNotesOffice_PK = b.ClientContactNotesOfficeID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 END
 
 
+--GO
+--IF @@ERROR <> 0 SET NOEXEC ON
+--GO
+--PRINT N'Altering [adv].[tblSuspectScanningNotesStage]'
+--GO
+--IF @@ERROR <> 0 SET NOEXEC ON
+--GO
+--ALTER TABLE [adv].[tblSuspectScanningNotesStage] ADD
+--[DatabaseName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+--GO
+--IF @@ERROR <> 0 SET NOEXEC ON
+--GO
+--PRINT N'Altering [adv].[tblCodedSourceStage]'
+--GO
+--IF @@ERROR <> 0 SET NOEXEC ON
+--GO
+--ALTER TABLE [adv].[tblCodedSourceStage] ADD
+--[DatabaseName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+--GO
+--IF @@ERROR <> 0 SET NOEXEC ON
+--GO
+--PRINT N'Altering [adv].[tblNoteTypeStage]'
+--GO
+--IF @@ERROR <> 0 SET NOEXEC ON
+--GO
+--ALTER TABLE [adv].[tblNoteTypeStage] ADD
+--[DatabaseName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+--GO
+--IF @@ERROR <> 0 SET NOEXEC ON
+--GO
+--PRINT N'Altering [adv].[tblNoteTextStage]'
+--GO
+--IF @@ERROR <> 0 SET NOEXEC ON
+--GO
+--ALTER TABLE [adv].[tblNoteTextStage] ADD
+--[DatabaseName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+--GO
+IF @@ERROR <> 0 SET NOEXEC ON
 GO

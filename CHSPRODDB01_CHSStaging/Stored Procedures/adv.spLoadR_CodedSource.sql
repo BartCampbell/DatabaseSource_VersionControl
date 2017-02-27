@@ -29,27 +29,27 @@ INSERT INTO CHSDV.[dbo].[R_CodedSource]
                 a.[RecordSource]
         FROM    CHSStaging.adv.tblCodedSourceStage a
 		LEFT OUTER JOIN CHSDV.dbo.R_CodedSource b 
-		ON a.CodedSource_PK = b.ClientCodedSourceID AND a.CCI = b.ClientID
+		ON a.CodedSource_PK = b.ClientCodedSourceID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
 		WHERE a.CCI = @CCI AND b.ClientCodedSourceID IS NULL;
 
 UPDATE  CHSStaging.adv.tblCodedSourceStage
 SET     CodedSourceHashKey = b.CodedSourceHashKey
 FROM    CHSStaging.adv.tblCodedSourceStage a
-        INNER JOIN CHSDV.dbo.R_CodedSource b ON a.CodedSource_PK = b.ClientCodedSourceID
+        INNER JOIN CHSDV.dbo.R_CodedSource b ON a.CodedSource_PK = b.ClientCodedSourceID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 
 UPDATE  CHSStaging.adv.tblCodedSourceStage
 SET     ClientHashKey = b.[ClientHashKey]
 FROM    CHSStaging.adv.tblCodedSourceStage a
-        INNER JOIN CHSDV.dbo.R_Client b ON a.CCI = b.CentauriClientID;
+        INNER JOIN CHSDV.dbo.R_Client b ON a.CCI = b.CentauriClientID ;
 
 
 UPDATE  CHSStaging.adv.tblCodedSourceStage
 SET  CSI = b.CentauriCodedSourceID
 FROM    CHSStaging.adv.tblCodedSourceStage a
         INNER JOIN CHSDV.dbo.R_CodedSource b ON a.CodedSource_PK = b.ClientCodedSourceID
-                                           AND a.CCI = b.ClientID;
+                                           AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource;
 
 
 

@@ -31,13 +31,13 @@ INSERT INTO CHSDV.[dbo].[R_AdvanceScheduleType]
                 a.[RecordSource]
         FROM    CHSStaging.adv.tblScheduleTypeStage a
 		LEFT OUTER JOIN CHSDV.dbo.R_AdvanceScheduleType b 
-		ON a.ScheduleType_PK = b.ClientScheduleTypeID AND a.CCI = b.ClientID
+		ON a.ScheduleType_PK = b.ClientScheduleTypeID AND a.CCI = b.ClientID AND b.RecordSource = a.RecordSource
 		WHERE a.CCI = @CCI AND b.ClientScheduleTypeID IS NULL;
 
 UPDATE  CHSStaging.adv.tblScheduleTypeStage
 SET     ScheduleTypeHashKey = b.ScheduleTypeHashKey
 FROM    CHSStaging.adv.tblScheduleTypeStage a
-        INNER JOIN CHSDV.dbo.R_AdvanceScheduleType b ON a.ScheduleType_PK = b.ClientScheduleTypeID
+        INNER JOIN CHSDV.dbo.R_AdvanceScheduleType b ON a.ScheduleType_PK = b.ClientScheduleTypeID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 
 
@@ -50,7 +50,7 @@ FROM    CHSStaging.adv.tblScheduleTypeStage a
 UPDATE  CHSStaging.adv.tblScheduleTypeStage
 SET  CSI = b.CentauriScheduleTypeID
 FROM    CHSStaging.adv.tblScheduleTypeStage a
-        INNER JOIN CHSDV.dbo.R_AdvanceScheduleType b ON a.ScheduleType_PK = b.ClientScheduleTypeID
+        INNER JOIN CHSDV.dbo.R_AdvanceScheduleType b ON a.ScheduleType_PK = b.ClientScheduleTypeID AND b.RecordSource = a.RecordSource
                                            AND a.CCI = b.ClientID;
 END
 

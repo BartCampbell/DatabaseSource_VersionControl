@@ -29,7 +29,7 @@ AS
                         a.LoadDate ,
                         a.[RecordSource]
                 FROM    CHSStaging.adv.tblIssueResponseStage a
-                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceIssueResponse] b ON a.IssueResponse_PK = b.ClientIssueResponseID
+                        LEFT OUTER JOIN [CHSDV].[dbo].[R_AdvanceIssueResponse] b ON a.IssueResponse_PK = b.ClientIssueResponseID AND b.RecordSource = a.RecordSource
                                                               AND a.CCI = b.ClientID
                 WHERE   a.CCI = @CCI
                         AND b.ClientIssueResponseID IS NULL;
@@ -37,7 +37,7 @@ AS
         UPDATE  CHSStaging.adv.tblIssueResponseStage
         SET     IssueResponseHashKey = b.IssueResponseHashKey
         FROM    CHSStaging.adv.tblIssueResponseStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceIssueResponse b ON a.IssueResponse_PK = b.ClientIssueResponseID
+                INNER JOIN CHSDV.dbo.R_AdvanceIssueResponse b ON a.IssueResponse_PK = b.ClientIssueResponseID AND b.RecordSource = a.RecordSource
                                                               AND a.CCI = b.ClientID;
 
 
@@ -47,7 +47,7 @@ AS
         UPDATE  CHSStaging.adv.tblIssueResponseStage
         SET     CRI = b.CentauriIssueResponseID
         FROM    CHSStaging.adv.tblIssueResponseStage a
-                INNER JOIN CHSDV.dbo.R_AdvanceIssueResponse b ON a.IssueResponse_PK = b.ClientIssueResponseID
+                INNER JOIN CHSDV.dbo.R_AdvanceIssueResponse b ON a.IssueResponse_PK = b.ClientIssueResponseID AND b.RecordSource = a.RecordSource
                                                               AND a.CCI = b.ClientID;
 
 
