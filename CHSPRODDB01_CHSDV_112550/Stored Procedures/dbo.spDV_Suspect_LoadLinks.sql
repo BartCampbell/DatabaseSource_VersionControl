@@ -16,7 +16,7 @@ GO
  --Update 09/27/2016 Adding LoadDate to Primary Key PJ
  --Update 10/04/2016 Replace RecordEndDate/LoadDate with Link Satellite PJ
  --Update 10/25/2016 Adding provideroffice to LS_SuspectProvider PJ
- --Update 12/27/2016 Add Provider_PK to S_SuspectDetail PJ
+ --Updated 02/07/2017 Adding RecordSource to joins PJ
 -- Description:	Load all Link Tables from the tblSuspectWCStage table
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_Suspect_LoadLinks]
@@ -64,7 +64,7 @@ AS --DECLARE  @CCI VARCHAR(50)
                         NULL
                 FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceProject b WITH ( NOLOCK ) ON a.Project_PK = b.ClientProjectID
-                                                                                   AND b.ClientID = @CCI
+                                                                                   AND b.ClientID = @CCI AND b.RecordSource = a.RecordSource
                         --INNER JOIN CHSStaging.adv.tblProjectStage b WITH ( NOLOCK ) ON a.Project_PK = b.Project_PK AND b.ClientID = @CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriProjectID, '')))))), 2)) NOT IN (
@@ -106,7 +106,7 @@ AS --DECLARE  @CCI VARCHAR(50)
                         a.RecordSource
                 FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceProject b WITH ( NOLOCK ) ON a.Project_PK = b.ClientProjectID
-                                                                                   AND b.ClientID = @CCI
+                                                                                   AND b.ClientID = @CCI AND b.RecordSource = a.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriProjectID, ''))),
                                                                        ':Y'))), 2)) NOT IN ( SELECT HashDiff
@@ -150,8 +150,8 @@ AS --DECLARE  @CCI VARCHAR(50)
                         a.RecordSource ,
                         NULL
                FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
-				        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK FROM dbo.L_ProviderMasterOffice l INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK AND d.RecordEndDate IS NULL ) b
-									ON CAST(a.Provider_PK AS VARCHAR) = b.Provider_PK
+				        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK,l.RecordSource FROM dbo.L_ProviderMasterOffice l INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK AND d.RecordSource = l.RecordSource AND d.RecordEndDate IS NULL ) b
+									ON CAST(a.Provider_PK AS VARCHAR) = b.Provider_PK AND b.RecordSource = a.RecordSource
                         
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, '')))))), 2)) NOT IN (
@@ -181,9 +181,9 @@ SET @LoadDate=GETDATE()
                         NULL
                    FROM    dbo.H_Suspect h
 				   INNER JOIN dbo.S_SuspectDetail s
-				   ON s.H_Suspect_RK = h.H_Suspect_RK AND s.RecordEndDate IS NULL
-				        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK,l.LoadDate,d.LoadDate AS LoadDate2,d.RecordSource FROM dbo.L_ProviderMasterOffice l INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK AND d.RecordEndDate IS NULL ) b
-									ON s.Provider_PK = b.Provider_PK 
+				   ON s.H_Suspect_RK = h.H_Suspect_RK
+				        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK,l.LoadDate,d.LoadDate AS LoadDate2,d.RecordSource FROM dbo.L_ProviderMasterOffice l INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK AND d.RecordSource = l.RecordSource AND d.RecordEndDate IS NULL ) b
+									ON s.Provider_PK = b.Provider_PK AND b.RecordSource = s.RecordSource
                   WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, '')))))), 2))  NOT IN (
                         SELECT  L_SuspectProvider_RK
@@ -228,9 +228,9 @@ SET @LoadDate=GETDATE()
 														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':Y'))), 2)) ,
                         a.RecordSource
                    FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
-                        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK,l.H_ProviderOffice_RK FROM dbo.L_ProviderMasterOffice l 
-						INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK  WHERE d.RecordEndDate IS null ) b
-									ON CAST(a.Provider_PK AS VARCHAR) = b.Provider_PK
+                        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK,l.H_ProviderOffice_RK,l.RecordSource FROM dbo.L_ProviderMasterOffice l 
+						INNER JOIN dbo.LS_ProviderMasterOffice d ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK AND d.RecordSource = l.RecordSource WHERE d.RecordEndDate IS null ) b
+									ON CAST(a.Provider_PK AS VARCHAR) = b.Provider_PK AND b.RecordSource = a.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
 														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':Y'))), 2)) NOT IN (
@@ -294,11 +294,11 @@ SET @LoadDate=GETDATE()
 														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':Y'))), 2)) ,
                         b.RecordSource
 					FROM    dbo.H_Suspect h
-						INNER JOIN dbo.S_SuspectDetail s ON s.H_Suspect_RK = h.H_Suspect_RK AND s.RecordEndDate IS NULL
+						INNER JOIN dbo.S_SuspectDetail s ON s.H_Suspect_RK = h.H_Suspect_RK
 				        INNER JOIN ( SELECT d.Provider_PK,l.H_Provider_RK,l.H_ProviderOffice_RK ,l.LoadDate,d.LoadDate AS LoadDate2,d.RecordSource 
 										FROM dbo.L_ProviderMasterOffice l INNER JOIN dbo.LS_ProviderMasterOffice d 
-											ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK AND d.RecordEndDate IS NULL ) b
-									ON s.Provider_PK = b.Provider_PK 
+											ON d.L_ProviderMasterOffice_RK = l.L_ProviderMasterOffice_RK AND d.RecordEndDate IS NULL AND d.RecordSource = l.RecordSource) b
+									ON s.Provider_PK = b.Provider_PK AND b.RecordSource = s.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Suspect_BK, ''))), ':', RTRIM(LTRIM(COALESCE(b.Provider_PK, ''))), ':',
 														   RTRIM(LTRIM(COALESCE(b.[H_ProviderOffice_RK], ''))), ':Y'))), 2)) NOT IN (
@@ -340,9 +340,9 @@ SET @LoadDate=GETDATE()
                         a.RecordSource ,
                         NULL
                 FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
-                        INNER JOIN dbo.S_MemberDetail d WITH ( NOLOCK ) ON d.Member_PK = a.Member_PK
+                        INNER JOIN dbo.S_MemberDetail d WITH ( NOLOCK ) ON d.Member_PK = a.Member_PK AND d.RecordSource = a.RecordSource
                         INNER JOIN CHSDV.dbo.R_Member b WITH ( NOLOCK ) ON d.H_Member_RK = b.MemberHashKey
-                                                                           AND b.[ClientID] = @CCI
+                                                                           AND b.[ClientID] = @CCI 
 
                         --INNER JOIN CHSStaging.adv.tblMemberWCStage b WITH ( NOLOCK ) ON a.Member_PK = b.Member_PK
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
@@ -384,7 +384,7 @@ SET @LoadDate=GETDATE()
                                                                        ':Y'))), 2)) ,
                         a.RecordSource
                 FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
-                        INNER JOIN dbo.S_MemberDetail d WITH ( NOLOCK ) ON d.Member_PK = a.Member_PK
+                        INNER JOIN dbo.S_MemberDetail d WITH ( NOLOCK ) ON d.Member_PK = a.Member_PK AND d.RecordSource = a.RecordSource
                         INNER JOIN CHSDV.dbo.R_Member b WITH ( NOLOCK ) ON d.H_Member_RK = b.MemberHashKey
                                                                            AND b.[ClientID] = @CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
@@ -429,7 +429,7 @@ SET @LoadDate=GETDATE()
                         NULL
                 FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceUser b WITH ( NOLOCK ) ON a.Scanned_User_PK = b.[ClientUserID]
-                                                                                AND b.[ClientID] = @CCI
+                                                                                AND b.[ClientID] = @CCI AND b.RecordSource = a.RecordSource
                         --INNER JOIN CHSStaging.adv.tblUserWCStage b WITH ( NOLOCK ) ON a.Scanned_User_PK = b.User_PK
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriUserID, '')))))), 2)) NOT IN (
@@ -459,7 +459,7 @@ SET @LoadDate=GETDATE()
                         NULL
                 FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceUser b WITH ( NOLOCK ) ON a.CNA_User_PK = b.[ClientUserID]
-                                                                                AND b.[ClientID] = @CCI
+                                                                                AND b.[ClientID] = @CCI AND b.RecordSource = a.RecordSource
                         --INNER JOIN CHSStaging.adv.tblUserWCStage b WITH ( NOLOCK ) ON a.CNA_User_PK = b.User_PK
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriUserID, '')))))), 2)) NOT IN (
@@ -488,7 +488,7 @@ SET @LoadDate=GETDATE()
                         NULL
                 FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceUser b WITH ( NOLOCK ) ON a.Coded_User_PK = b.[ClientUserID]
-                                                                                AND b.[ClientID] = @CCI
+                                                                                AND b.[ClientID] = @CCI AND b.RecordSource = a.RecordSource
                         --INNER JOIN CHSStaging.adv.tblUserWCStage b WITH ( NOLOCK ) ON a.Coded_User_PK = b.User_PK
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriUserID, '')))))), 2)) NOT IN (
@@ -516,7 +516,7 @@ SET @LoadDate=GETDATE()
                         NULL
                 FROM    CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceUser b WITH ( NOLOCK ) ON a.QA_User_PK = b.[ClientUserID]
-                                                                                AND b.[ClientID] = @CCI
+                                                                                AND b.[ClientID] = @CCI AND b.RecordSource = a.RecordSource
                         --INNER JOIN CHSStaging.adv.tblUserWCStage b WITH ( NOLOCK ) ON a.QA_User_PK = b.User_PK
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CSI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriUserID, '')))))), 2)) NOT IN (
@@ -544,10 +544,10 @@ SET @LoadDate=GETDATE()
                         NULL
                 FROM    CHSStaging.[adv].[tblSuspectChartRecLogStage] rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.[dbo].[R_AdvanceSuspect] a WITH ( NOLOCK ) ON rw.Suspect_PK = a.[ClientSuspectID]
-                                                                                       AND a.ClientID = @CCI
+                                                                                       AND a.ClientID = @CCI AND a.RecordSource = rw.RecordSource
 						--INNER JOIN	CHSStaging.adv.tblSuspectWCStage a WITH ( NOLOCK ) ON rw.suspect_pk = a.suspect_pk
                         INNER JOIN CHSDV.dbo.R_AdvanceUser b WITH ( NOLOCK ) ON rw.User_PK = b.[ClientUserID]
-                                                                                AND b.[ClientID] = @CCI
+                                                                                AND b.[ClientID] = @CCI AND b.RecordSource = rw.RecordSource
                         --INNER JOIN CHSStaging.adv.tblUserWCStage b WITH ( NOLOCK ) ON rw.User_PK = b.User_PK
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.[CentauriSuspectID], ''))), ':',
@@ -844,7 +844,7 @@ SET @LoadDate=GETDATE()
                 INNER JOIN [dbo].[L_SuspectUserScanningNotes] c ON ISNULL(a.SuspectHashKey, '') = ISNULL(c.H_Suspect_RK, '')
                                                                    AND ISNULL(a.UserHashKey, '') = ISNULL(c.H_User_RK, '')
                                                                    AND ISNULL(a.ScanningNoteHashKey, '') = ISNULL(c.H_ScanningNotes_RK, '')
-                                                                   AND c.RecordEndDate IS NULL
+                                                                   
         WHERE   a.CCI = @CCI;
 
 
@@ -1260,5 +1260,5 @@ SET @LoadDate=GETDATE()
     END;
 
 
-	
+
 GO
