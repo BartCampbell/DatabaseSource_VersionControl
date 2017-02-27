@@ -33,6 +33,8 @@ CREATE TABLE [stage].[WPSChaseList20160208]
 [Provider_PK] [bigint] NULL,
 [ProviderMaster_PK] [bigint] NULL,
 [ProviderOffice_PK] [bigint] NULL,
-[Chase_ID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[Chase_ID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Dos_To_Date] [datetime] NULL,
+[Dos_From_Date] [datetime] NULL
 ) ON [PRIMARY]
 GO
