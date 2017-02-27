@@ -9,7 +9,6 @@ GO
 -- Create date: 09/19/2016
 --Update 09/27/2016 Adding LoadDate to Primary Key PJ
 --Update 09/29/2018 Adding Channel_PK and EDGEMemberID  PJ
---Update 12/27/2016 Add Provider_PK to S_SuspectDetail PJ
 -- Description:	Data Vault Suspect Load Satelites
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_Suspect_LoadSats]
@@ -700,7 +699,6 @@ AS
 
 
     END;
-
 
 
 
