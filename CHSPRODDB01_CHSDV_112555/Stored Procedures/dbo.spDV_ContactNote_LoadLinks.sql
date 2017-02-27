@@ -12,6 +12,7 @@ GO
  --Updated 09/26/2016 Added record end date cleanup code PJ
  --Update 09/27/2016 Adding LoadDate to Prmiary Key PJ
  --Update 10/03/2016 Removing RecordEndDate and LoadDate , replacing with Link Satellite PJ
+ --Update 02/07/2017 Adding record source to joins PJ
 -- Description:	Load all Link Tables from the tblContactNotesOfficeStage table.  BAsed on CHSDV.dbo.prDV_ContactNotesOffice_LoadLinks
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_ContactNote_LoadLinks]
@@ -36,7 +37,7 @@ AS
                         NULL
                 FROM    CHSStaging.adv.tblContactNotesOfficeStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_ProviderOffice b WITH ( NOLOCK ) ON rw.Office_PK = b.ClientProviderOfficeID
-                                                                                   AND b.ClientID = rw.CCI
+                                                                                   AND b.ClientID = rw.CCI AND b.RecordSource=rw.RecordSource
 --                        INNER JOIN CHSStaging.adv.tblProviderOfficeWCStage b WITH ( NOLOCK ) ON b.ProviderOffice_PK = rw.Office_PK AND b.CCI = rw.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriProviderOfficeID, ''))), ':',
@@ -81,7 +82,7 @@ AS
                         rw.[RecordSource]
                 FROM    CHSStaging.adv.tblContactNotesOfficeStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_ProviderOffice b WITH ( NOLOCK ) ON rw.Office_PK = b.ClientProviderOfficeID
-                                                                                   AND b.ClientID = rw.CCI
+                                                                                   AND b.ClientID = rw.CCI AND b.RecordSource=rw.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriProviderOfficeID, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.CNI, ''))), ':', 'Y'))), 2)) NOT IN (
@@ -127,7 +128,7 @@ AS
                         NULL
                 FROM    CHSStaging.adv.tblContactNotesOfficeStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceUser b WITH ( NOLOCK ) ON b.ClientUserID = rw.LastUpdated_User_PK
-                                                                                AND b.ClientID = rw.CCI
+                                                                                AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
 						--INNER JOIN CHSStaging.adv.tblUserWCStage b WITH ( NOLOCK ) ON b.User_PK = rw.LastUpdated_User_PK  AND rw.CCi = b.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriUserID, ''))), ':', RTRIM(LTRIM(COALESCE(rw.CNI, '')))))), 2)) NOT IN (
@@ -169,7 +170,7 @@ AS
                         rw.RecordSource
                 FROM    CHSStaging.adv.tblContactNotesOfficeStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceUser b WITH ( NOLOCK ) ON b.ClientUserID = rw.LastUpdated_User_PK
-                                                                                AND b.ClientID = rw.CCI
+                                                                                AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriUserID, ''))), ':', RTRIM(LTRIM(COALESCE(rw.CNI, '')))))), 2)) NOT IN (
                         SELECT  HashDiff
@@ -213,7 +214,7 @@ AS
                         NULL
                 FROM    CHSStaging.adv.tblContactNotesOfficeStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceContactNote b WITH ( NOLOCK ) ON b.ClientContactNoteID = rw.ContactNote_PK
-                                                                                       AND b.ClientID = rw.CCI
+                                                                                       AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
                 --        INNER JOIN CHSStaging.adv.tblContactNoteStage b WITH ( NOLOCK ) ON b.ContactNote_PK = rw.ContactNote_PK AND rw.CCi = b.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriContactNoteID, ''))), ':',
@@ -257,7 +258,7 @@ AS
                         rw.RecordSource
                 FROM    CHSStaging.adv.tblContactNotesOfficeStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceContactNote b WITH ( NOLOCK ) ON b.ClientContactNoteID = rw.ContactNote_PK
-                                                                                       AND b.ClientID = rw.CCI
+                                                                                       AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriContactNoteID, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.CNI, ''))), ':', 'Y'))), 2)) NOT IN (
@@ -302,7 +303,7 @@ AS
                         NULL
                 FROM    CHSStaging.adv.tblContactNotesOfficeStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceProject b WITH ( NOLOCK ) ON b.ClientProjectID = rw.Project_PK
-                                                                                   AND b.ClientID = rw.CCI
+                                                                                   AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
                         --INNER JOIN CHSStaging.adv.tblProjectStage b WITH ( NOLOCK ) ON b.Project_PK = rw.Project_PK  AND rw.CCi = b.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriProjectID, ''))), ':', RTRIM(LTRIM(COALESCE(rw.CNI, '')))))), 2)) NOT IN (
@@ -344,7 +345,7 @@ AS
                         rw.RecordSource
                 FROM    CHSStaging.adv.tblContactNotesOfficeStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceProject b WITH ( NOLOCK ) ON b.ClientProjectID = rw.Project_PK
-                                                                                   AND b.ClientID = rw.CCI
+                                                                                   AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriProjectID, ''))), ':', RTRIM(LTRIM(COALESCE(rw.CNI, ''))),
                                                                        ':', 'Y'))), 2)) NOT IN ( SELECT HashDiff
