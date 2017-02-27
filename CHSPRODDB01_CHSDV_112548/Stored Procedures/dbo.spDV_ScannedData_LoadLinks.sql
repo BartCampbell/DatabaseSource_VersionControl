@@ -11,6 +11,7 @@ GO
 --Updated 09/26/2016 Added record end date cleanup code PJ
  --Update 09/27/2016 Adding LoadDate to Primary Key PJ
  --Update 10/04/2016 Replacing RecordEndDate and LoadDate with Link Satellite PJ
+ --Updated 02/07/2017 Adding RecordSource to joins PJ
 -- Description:	Load all Link Tables from the tblScannedDataStage table.  BAsed on CHSDV.dbo.prDV_ScannedData_LoadLinks
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_ScannedData_LoadLinks]
@@ -34,7 +35,7 @@ AS
                         NULL
                 FROM    CHSStaging.adv.tblScannedDataStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceUser b WITH ( NOLOCK ) ON b.ClientUserID = rw.User_PK
-                                                                                AND b.ClientID = rw.CCI
+                                                                                AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
 	 --INNER JOIN CHSStaging.adv.tblUserWCStage b with(nolock) 	 ON b.User_PK = rw.User_PK AND rw.CCi = b.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriUserID, ''))), ':', RTRIM(LTRIM(COALESCE(rw.CSI, '')))))), 2)) NOT IN (
@@ -77,7 +78,7 @@ AS
                         rw.RecordSource
                 FROM    CHSStaging.adv.tblScannedDataStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceUser b WITH ( NOLOCK ) ON b.ClientUserID = rw.User_PK
-                                                                                AND b.ClientID = rw.CCI
+                                                                                AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriUserID, ''))), ':', RTRIM(LTRIM(COALESCE(rw.CSI, ''))),
                                                                        ':Y'))), 2)) NOT IN ( SELECT HashDiff
@@ -121,7 +122,7 @@ AS
                         NULL
                 FROM    CHSStaging.adv.tblScannedDataStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceSuspect b WITH ( NOLOCK ) ON b.ClientSuspectID = rw.Suspect_PK
-                                                                                   AND b.ClientID = rw.CCI
+                                                                                   AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
 	 --INNER JOIN CHSStaging.adv.tblSuspectWCStage b WITH(NOLOCK) 	 ON b.Suspect_PK = rw.Suspect_PK AND rw.CCi = b.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriSuspectID, ''))), ':', RTRIM(LTRIM(COALESCE(rw.CSI, '')))))), 2)) NOT IN (
@@ -164,7 +165,7 @@ AS
                         rw.RecordSource
                 FROM    CHSStaging.adv.tblScannedDataStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceSuspect b WITH ( NOLOCK ) ON b.ClientSuspectID = rw.Suspect_PK
-                                                                                   AND b.ClientID = rw.CCI
+                                                                                   AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriSuspectID, ''))), ':', RTRIM(LTRIM(COALESCE(rw.CSI, ''))),
                                                                        ':Y'))), 2)) NOT IN ( SELECT HashDiff
@@ -206,7 +207,7 @@ AS
                         NULL
                 FROM    CHSStaging.adv.tblScannedDataStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_DocumentType b WITH ( NOLOCK ) ON b.ClientDocumentTypeID = rw.DocumentType_PK
-                                                                                 AND b.ClientID = rw.CCI
+                                                                                 AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
 	 	 --INNER JOIN CHSStaging.adv.tblDocumentTypeStage b WITH(NOLOCK) 	 ON b.DocumentType_PK = rw.DocumentType_PK AND rw.CCi = b.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriDocumentTypeID, ''))), ':',
@@ -250,7 +251,7 @@ AS
                         rw.RecordSource
                 FROM    CHSStaging.adv.tblScannedDataStage rw WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_DocumentType b WITH ( NOLOCK ) ON b.ClientDocumentTypeID = rw.DocumentType_PK
-                                                                                 AND b.ClientID = rw.CCI
+                                                                                 AND b.ClientID = rw.CCI AND b.RecordSource = rw.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(b.CentauriDocumentTypeID, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.CSI, ''))), ':Y'))), 2)) NOT IN (
