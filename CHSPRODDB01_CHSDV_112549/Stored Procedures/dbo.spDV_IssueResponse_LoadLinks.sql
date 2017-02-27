@@ -8,6 +8,7 @@ GO
 -- Author:		Paul Johnson
 -- Create date: 08/30/2016
 --Updated 09/21/2016 Linked tables changed to CHSDV PJ
+--Updated 02/07/2017 Adding RecordSource to joins PJ
 -- Description:	Load all Link Tables from the tblIssueResponseStage table
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_IssueResponse_LoadLinks]
@@ -47,12 +48,12 @@ AS
                         b.RecordSource
                 FROM    CHSDV.dbo.R_AdvanceIssueResponse a WITH ( NOLOCK )
                         INNER JOIN CHSStaging.adv.tblIssueResponseOfficeStage b
-                        WITH ( NOLOCK ) ON a.ClientIssueResponseID = b.IssueResponse_PK
+                        WITH ( NOLOCK ) ON a.ClientIssueResponseID = b.IssueResponse_PK AND b.RecordSource = a.RecordSource
                                            AND a.ClientID = b.CCI
                         INNER JOIN CHSDV.dbo.R_AdvanceUser c WITH ( NOLOCK ) ON b.User_PK = c.ClientUserID
-                                                              AND b.CCI = c.ClientID
+                                                              AND b.CCI = c.ClientID AND c.RecordSource = a.RecordSource
                         INNER JOIN CHSDV.dbo.R_AdvanceContactNotesOffice d
-                        WITH ( NOLOCK ) ON d.ClientContactNotesOfficeID = b.ContactNotesOffice_PK
+                        WITH ( NOLOCK ) ON d.ClientContactNotesOfficeID = b.ContactNotesOffice_PK AND d.RecordSource = a.RecordSource
                                            AND d.ClientID = b.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CentauriIssueResponseID,
@@ -122,13 +123,13 @@ AS
                                                               '')))))), 2)) ,
                         b.[RecordSource]
                 FROM    CHSDV.dbo.R_AdvanceIssueResponse a WITH ( NOLOCK )
-                        INNER JOIN CHSStaging.adv.tblIssueResponseOfficeStage b
-                        WITH ( NOLOCK ) ON a.ClientIssueResponseID = b.IssueResponse_PK
+                        INNER JOIN CHSStaging.adv.tblIssueResponseOfficeStage b 
+                        WITH ( NOLOCK ) ON a.ClientIssueResponseID = b.IssueResponse_PK AND b.RecordSource = a.RecordSource
                                            AND a.ClientID = b.CCI
                         INNER JOIN CHSDV.dbo.R_AdvanceUser c WITH ( NOLOCK ) ON b.User_PK = c.ClientUserID
-                                                              AND b.CCI = c.ClientID
+                                                              AND b.CCI = c.ClientID AND c.RecordSource = a.RecordSource
                         INNER JOIN CHSDV.dbo.R_AdvanceContactNotesOffice d
-                        WITH ( NOLOCK ) ON d.ClientContactNotesOfficeID = b.ContactNotesOffice_PK
+                        WITH ( NOLOCK ) ON d.ClientContactNotesOfficeID = b.ContactNotesOffice_PK AND d.RecordSource = a.RecordSource
                                            AND d.ClientID = b.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CentauriIssueResponseID,
