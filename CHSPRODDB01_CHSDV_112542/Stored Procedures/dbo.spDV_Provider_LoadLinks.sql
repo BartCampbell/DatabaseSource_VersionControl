@@ -11,6 +11,7 @@ GO
 --Updated 09/26/2016 Added record end date cleanup code PJ
 --Uddate 09/27/2016 Adding ContactPerson and LoadDate to hash PJ
 --Update 10/04/2016 Replacing RecordEndDate and LoadDate with Link Satellites PJ
+--Updated 02/07/2017 Adding RecordSource to joins PJ
 -- Description:	Load all Link Tables from the ProviderOffice staging raw table.  based on CHSDV.[dbo].[prDV_ProviderOffice_LoadLinks]
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_Provider_LoadLinks]
@@ -269,9 +270,9 @@ AS
                         p.RecordSource
                 FROM    [CHSStaging].[adv].[tblProviderStage] p WITH ( NOLOCK )
                         INNER JOIN [CHSStaging].[adv].[tblProviderMasterStage] a WITH ( NOLOCK ) ON p.ProviderMaster_PK = a.ProviderMaster_PK
-                                                                                                    AND a.CCI = p.CCI
+                                                                                                    AND a.CCI = p.CCI AND a.RecordSource = p.RecordSource
                         INNER JOIN CHSDV.dbo.R_ProviderOffice b WITH ( NOLOCK ) ON b.ClientProviderOfficeID = p.ProviderOffice_PK
-                                                                                   AND b.ClientID = p.CCI
+                                                                                   AND b.ClientID = p.CCI AND b.RecordSource = p.RecordSource
 
 
 	                   --INNER JOIN [CHSStaging].[adv].[tblProviderMasterStage] b ON a.ProviderMaster_PK = b.ProviderMaster_PK AND b.CCI = a.CCI
@@ -307,10 +308,10 @@ AS
                         p.LoadDate ,
                         p.RecordSource
                 FROM    [CHSStaging].[adv].[tblProviderStage] p WITH ( NOLOCK )
-                        INNER JOIN dbo.S_ProviderMasterDemo a WITH ( NOLOCK ) ON p.ProviderMaster_PK = a.ProviderMaster_PK AND a.RecordEndDate IS NULL
-                        INNER JOIN dbo.H_Provider h ON h.H_Provider_RK = a.H_Provider_RK
+                        INNER JOIN dbo.S_ProviderMasterDemo a WITH ( NOLOCK ) ON p.ProviderMaster_PK = a.ProviderMaster_PK AND a.RecordEndDate IS NULL AND a.RecordSource = p.RecordSource
+                        INNER JOIN dbo.H_Provider h ON h.H_Provider_RK = a.H_Provider_RK 
                         INNER JOIN CHSDV.dbo.R_ProviderOffice b WITH ( NOLOCK ) ON b.ClientProviderOfficeID = p.ProviderOffice_PK
-                                                                                   AND b.ClientID = p.CCI
+                                                                                   AND b.ClientID = p.CCI AND b.RecordSource = p.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(h.Provider_BK, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(b.CentauriProviderOfficeID, '')))))), 2)) NOT IN (
@@ -356,9 +357,9 @@ AS
                         p.[RecordSource]
                 FROM    [CHSStaging].[adv].[tblProviderStage] p WITH ( NOLOCK )
                         INNER JOIN [CHSStaging].[adv].[tblProviderMasterStage] a WITH ( NOLOCK ) ON p.ProviderMaster_PK = a.ProviderMaster_PK
-                                                                                                    AND a.CCI = p.CCI
+                                                                                                    AND a.CCI = p.CCI AND a.RecordSource = p.RecordSource
                         INNER JOIN CHSDV.dbo.R_ProviderOffice b WITH ( NOLOCK ) ON b.ClientProviderOfficeID = p.ProviderOffice_PK
-                                                                                   AND b.ClientID = p.CCI
+                                                                                   AND b.ClientID = p.CCI AND b.RecordSource = p.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(p.Provider_PK, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.ProviderMaster_PK, ''))), ':',
@@ -411,9 +412,9 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(b.ClientProviderOfficeID, '')))))), 2)) ,
                         p.[RecordSource]
                 FROM    [CHSStaging].[adv].[tblProviderStage] p WITH ( NOLOCK )
-                        INNER JOIN dbo.S_ProviderMasterDemo a WITH ( NOLOCK ) ON p.ProviderMaster_PK = a.ProviderMaster_PK AND a.RecordEndDate IS null
+                        INNER JOIN dbo.S_ProviderMasterDemo a WITH ( NOLOCK ) ON p.ProviderMaster_PK = a.ProviderMaster_PK AND a.RecordEndDate IS NULL AND a.RecordSource = p.RecordSource
                         INNER JOIN dbo.H_Provider h ON h.H_Provider_RK = a.H_Provider_RK
-                        INNER JOIN CHSDV.dbo.R_ProviderOffice b WITH ( NOLOCK ) ON b.ClientProviderOfficeID = p.ProviderOffice_PK AND b.ClientID = p.CCI
+                        INNER JOIN CHSDV.dbo.R_ProviderOffice b WITH ( NOLOCK ) ON b.ClientProviderOfficeID = p.ProviderOffice_PK AND b.ClientID = p.CCI AND b.RecordSource = p.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(p.Provider_PK, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.ProviderMaster_PK, ''))), ':',
@@ -516,7 +517,7 @@ AS
                         b.RecordSource
                 FROM    CHSDV.dbo.R_ProviderOffice a WITH ( NOLOCK )
                         INNER JOIN [CHSStaging].[adv].[tblProviderOfficeScheduleStage] b ON a.ClientProviderOfficeID = b.ProviderOffice_PK
-                                                                                            AND b.CCI = a.ClientID
+                                                                                            AND b.CCI = a.ClientID AND b.RecordSource = a.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CentauriProviderOfficeID, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(b.CPI, '')))))), 2)) NOT IN (
@@ -561,7 +562,7 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(b.CPI, ''))), ':Y'))), 2)) ,
                         b.RecordSource
                 FROM    CHSDV.dbo.R_ProviderOffice a WITH ( NOLOCK )
-                        INNER JOIN [CHSStaging].[adv].[tblProviderOfficeScheduleStage] b ON a.ClientProviderOfficeID = b.ProviderOffice_PK
+                        INNER JOIN [CHSStaging].[adv].[tblProviderOfficeScheduleStage] b ON a.ClientProviderOfficeID = b.ProviderOffice_PK AND b.RecordSource = a.RecordSource
                                                                                             AND b.CCI = a.ClientID
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CentauriProviderOfficeID, ''))), ':',
@@ -615,7 +616,7 @@ AS
                         a.RecordSource
                 FROM    [CHSStaging].[adv].[tblProviderOfficeScheduleStage] a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceUser b WITH ( NOLOCK ) ON b.ClientUserID = a.LastUpdated_User_PK
-                                                                                AND b.ClientID = a.CCI
+                                                                                AND b.ClientID = a.CCI AND b.RecordSource = a.RecordSource
 			 --        INNER JOIN [CHSStaging].[adv].[tblUserWCStage] b ON a.LastUpdated_User_PK = b.User_PK AND b.CCI = a.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CPI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriUserID, '')))))), 2)) NOT IN (
@@ -656,7 +657,7 @@ AS
                         a.RecordSource
                 FROM    [CHSStaging].[adv].[tblProviderOfficeScheduleStage] a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceUser b WITH ( NOLOCK ) ON b.ClientUserID = a.LastUpdated_User_PK
-                                                                                AND b.ClientID = a.CCI
+                                                                                AND b.ClientID = a.CCI AND b.RecordSource = a.RecordSource
 			 --        INNER JOIN [CHSStaging].[adv].[tblUserWCStage] b ON a.LastUpdated_User_PK = b.User_PK AND b.CCI = a.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CPI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriUserID, ''))),
@@ -705,7 +706,7 @@ AS
                         a.RecordSource
                 FROM    [CHSStaging].[adv].[tblProviderOfficeScheduleStage] a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceProject b WITH ( NOLOCK ) ON b.ClientProjectID = a.Project_PK
-                                                                                   AND b.ClientID = a.CCI
+                                                                                   AND b.ClientID = a.CCI AND b.RecordSource = a.RecordSource
                         --INNER JOIN [CHSStaging].[adv].[tblProjectStage] b ON a.Project_PK = b.Project_PK AND b.CCI = a.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CPI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriProjectID, '')))))), 2)) NOT IN (
@@ -748,7 +749,7 @@ AS
                         a.RecordSource
                 FROM    [CHSStaging].[adv].[tblProviderOfficeScheduleStage] a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceProject b WITH ( NOLOCK ) ON b.ClientProjectID = a.Project_PK
-                                                                                   AND b.ClientID = a.CCI
+                                                                                   AND b.ClientID = a.CCI AND b.RecordSource = a.RecordSource
                         --INNER JOIN [CHSStaging].[adv].[tblProjectStage] b ON a.Project_PK = b.Project_PK AND b.CCI = a.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CPI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriProjectID, ''))),
@@ -798,7 +799,7 @@ AS
                         a.RecordSource
                 FROM    [CHSStaging].[adv].[tblProviderOfficeScheduleStage] a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceScheduleType b WITH ( NOLOCK ) ON b.ClientScheduleTypeID = a.sch_type
-                                                                                        AND a.CCI = b.ClientID
+                                                                                        AND a.CCI = b.ClientID 
                 --        INNER JOIN [CHSStaging].[adv].[tblScheduleTypeStage] b ON a.sch_type = b.ScheduleType_PK                                                              AND b.CCI = a.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CPI, ''))), ':',
@@ -844,7 +845,7 @@ AS
                         a.RecordSource
                 FROM    [CHSStaging].[adv].[tblProviderOfficeScheduleStage] a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_AdvanceScheduleType b WITH ( NOLOCK ) ON b.ClientScheduleTypeID = a.sch_type
-                                                                                        AND a.CCI = b.ClientID
+                                                                                        AND a.CCI = b.ClientID 
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CPI, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(b.CentauriScheduleTypeID, ''))), ':Y'))), 2)) NOT IN (

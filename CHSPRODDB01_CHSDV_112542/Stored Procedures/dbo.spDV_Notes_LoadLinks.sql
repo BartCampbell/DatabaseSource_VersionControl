@@ -11,6 +11,7 @@ GO
 --Updated 09/26/2016 Added record end date cleanup code PJ
  --Update 09/27/2016 Adding LoadDate to Primary Key PJ
  --Update 10/04/2016 Replacing RecordEndDate/LoadDate with Link Satellite PJ
+ --Updated 02/07/2017 Adding RecordSource to joins PJ
 -- Description:	Load all Link Tables from the tblNoteTextStage table.
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_Notes_LoadLinks]
@@ -95,7 +96,7 @@ AS
                         a.RecordSource
                 FROM    CHSStaging.adv.tblNoteTextStage a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_NoteType b WITH ( NOLOCK ) ON b.ClientNoteTypeID = a.NoteType_PK
-                                                                             AND b.ClientID = a.CCI
+                                                                             AND b.ClientID = a.CCI AND b.RecordSource = a.RecordSource
 	 --INNER JOIN CHSStaging.adv.tblNoteTypeStage b WITH(NOLOCK)	 ON b.NoteType_PK = a.NoteType_PK AND b.CCI = a.CCI
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CNI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriNoteTypeID, '')))))), 2)) NOT IN (
@@ -137,7 +138,7 @@ AS
                         a.RecordSource
                 FROM    CHSStaging.adv.tblNoteTextStage a WITH ( NOLOCK )
                         INNER JOIN CHSDV.dbo.R_NoteType b WITH ( NOLOCK ) ON b.ClientNoteTypeID = a.NoteType_PK
-                                                                             AND b.ClientID = a.CCI
+                                                                             AND b.ClientID = a.CCI AND b.RecordSource = a.RecordSource
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CNI, ''))), ':', RTRIM(LTRIM(COALESCE(b.CentauriNoteTypeID, ''))),
                                                                        ':Y'))), 2)) NOT IN ( SELECT HashDiff

@@ -53,7 +53,7 @@ AS
                                                               '')))))), 2)) ,
                         LoadDate ,
                         ContactNotesOfficeHashKey ,
-                        [ContactNoteText] ,
+                        LTRIM(RTRIM([ContactNoteText])) ,
                         [LastUpdated_Date] ,
                         [contact_num] ,
                         [followup] ,
