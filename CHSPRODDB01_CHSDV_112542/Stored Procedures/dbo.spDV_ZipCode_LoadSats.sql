@@ -49,12 +49,12 @@ AS
                                                               '')))))), 2)) ,
                         LoadDate ,
                         ZipCodeHashKey ,
-                        [ZipCode] ,
-                        [City] ,
-                        [State] ,
-                        [County] ,
-                        [Latitude] ,
-                        [Longitude] ,
+                        RTRIM(LTRIM(ISNULL([ZipCode],''))) ,
+                        RTRIM(LTRIM(ISNULL([City] ,''))) ,
+                        RTRIM(LTRIM(ISNULL([State] ,''))) ,
+                        RTRIM(LTRIM(ISNULL([County] ,''))) ,
+                        RTRIM(LTRIM(ISNULL([Latitude] ,''))) ,
+                        RTRIM(LTRIM(ISNULL([Longitude],'' ))),
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[ZipCode],
                                                               ''))), ':',
@@ -87,7 +87,7 @@ AS
                         FROM    S_ZipCodeDetail
                         WHERE   H_ZipCode_RK = rw.ZipCodeHashKey
                                 AND RecordEndDate IS NULL )
-                        AND rw.cci = @CCI
+                        --AND rw.cci = @CCI
                 GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                            UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.CZI,
                                                               ''))), ':',
@@ -105,12 +105,12 @@ AS
                                                               '')))))), 2)) ,
                         LoadDate ,
                         ZipCodeHashKey ,
-                        [ZipCode] ,
-                        [City] ,
-                        [State] ,
-                        [County] ,
-                        [Latitude] ,
-                        [Longitude] ,
+                      RTRIM(LTRIM(ISNULL([ZipCode],''))) ,
+                        RTRIM(LTRIM(ISNULL([City] ,''))) ,
+                        RTRIM(LTRIM(ISNULL([State] ,''))) ,
+                        RTRIM(LTRIM(ISNULL([County] ,''))) ,
+                        RTRIM(LTRIM(ISNULL([Latitude] ,''))) ,
+                        RTRIM(LTRIM(ISNULL([Longitude] ,''))),
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[ZipCode],
                                                               ''))), ':',
@@ -125,12 +125,15 @@ AS
                                                               RTRIM(LTRIM(COALESCE(rw.[Longitude],
                                                               '')))))), 2)) ,
                         RecordSource;
+
+
+
 	--RECORD END DATE CLEANUP
         UPDATE  dbo.S_ZipCodeDetail
         SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
                                   FROM      dbo.S_ZipCodeDetail z
                                   WHERE     z.H_ZipCode_RK = a.H_ZipCode_RK
-                                            AND z.LoadDate > a.LoadDate
+										AND z.LoadDate>a.LoadDate
                                 )
         FROM    dbo.S_ZipCodeDetail a
         WHERE   a.RecordEndDate IS NULL; 
@@ -138,8 +141,5 @@ AS
 
 
     END;
-
-
-
 
 GO
