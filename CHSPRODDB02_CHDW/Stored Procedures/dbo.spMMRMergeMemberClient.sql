@@ -40,7 +40,7 @@ AS
                         INNER JOIN dim.Client c ON c.CentauriClientID = s.CentauriClientID
                         LEFT JOIN dim.MemberClient mc ON mc.ClientID = c.ClientID
                                                          AND mc.MemberID = m.MemberID
-                                                         AND mc.ClientMemberID = s.ClientMemberID
+                                                         AND mc.ClientMemberID = ISNULL(s.ClientMemberID,'')
                 WHERE   mc.MemberClientID IS NULL;
 
 
@@ -52,11 +52,9 @@ AS
                 INNER JOIN dim.Client c ON c.CentauriClientID = s.CentauriClientID
                 INNER JOIN dim.MemberClient mc ON mc.ClientID = c.ClientID
                                                   AND mc.MemberID = m.MemberID
-        WHERE   mc.ClientMemberID <> s.ClientMemberID AND mc.RecordEndDate = '2999-12-31 00:00:00.000';
+        WHERE   mc.ClientMemberID <> ISNULL(s.ClientMemberID,'') AND mc.RecordEndDate = '2999-12-31 00:00:00.000';
 
     END;     
-
-
 
 
 GO

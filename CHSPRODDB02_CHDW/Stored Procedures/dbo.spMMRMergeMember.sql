@@ -23,12 +23,14 @@ AS
     
         MERGE INTO dim.Member AS t
         USING
-            ( SELECT    CentauriMemberID ,
+            ( SELECT DISTINCT
+                        CentauriMemberID ,
                         LastName ,
                         FirstName ,
                         MiddleName ,
                         Gender ,
-                        DOB
+                        DOB ,
+                        RecordSource
               FROM      stage.Member_MMR
             ) AS s
         ON t.CentauriMemberID = s.CentauriMemberID
@@ -38,14 +40,20 @@ AS
                      FirstName ,
                      MiddleName ,
                      Gender ,
-                     DOB
+                     DOB ,
+                     RecordSource ,
+                     CreateDate ,
+                     LastUpdate
                    )
             VALUES ( s.CentauriMemberID ,
                      s.LastName ,
                      s.FirstName ,
                      s.MiddleName ,
                      s.Gender ,
-                     s.DOB
+                     s.DOB ,
+                     s.RecordSource ,
+                     GETDATE() ,
+                     GETDATE()
                    );
 
     END;     
