@@ -1,0 +1,2 @@
+CREATE SYNONYM [RDSM].[Providers] FOR [CHSTAGING].[RDSM].[Providers]
+GO
