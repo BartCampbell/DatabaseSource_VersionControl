@@ -1,0 +1,2 @@
+CREATE USER [pref1_ssrs] WITHOUT LOGIN
+GO
