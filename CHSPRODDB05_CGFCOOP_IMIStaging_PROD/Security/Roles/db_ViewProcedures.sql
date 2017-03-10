@@ -1,5 +1,7 @@
 CREATE ROLE [db_ViewProcedures]
 AUTHORIZATION [dbo]
+EXEC sp_addrolemember N'db_ViewProcedures', N'INTERNAL\Melody.Jones'
+
 GO
 EXEC sp_addrolemember N'db_ViewProcedures', N'IMIHEALTH\IMI.SQL.Developers'
 GO

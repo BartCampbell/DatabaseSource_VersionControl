@@ -45,6 +45,8 @@ CREATE NONCLUSTERED INDEX [IX_ResultsByMember_Client_EndSeedDate_IsDenominator_M
 GO
 CREATE NONCLUSTERED INDEX [idx3] ON [CGF].[ResultsByMember] ([DataRunGuid]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [<Name of Missing Index, sysname,>] ON [CGF].[ResultsByMember] ([DataRunGuid]) INCLUDE ([CustomerMemberID], [IHDSMemberID], [IsDenominator], [IsExclusion], [IsNumerator], [MeasureXrefGuid], [MetricXrefGuid], [PopulationDesc]) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IX_ResultsByMember_DataRunGuid_IsDenominator] ON [CGF].[ResultsByMember] ([DataRunGuid], [IsDenominator]) INCLUDE ([IHDSMemberID], [IsNumerator], [MeasureXrefGuid], [MetricXrefGuid]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [idx1] ON [CGF].[ResultsByMember] ([DataRunGuid], [IsDenominator], [MeasureMetricDesc]) ON [PRIMARY]
