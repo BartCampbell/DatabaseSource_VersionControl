@@ -1,0 +1,6 @@
+IF NOT EXISTS (SELECT * FROM master.dbo.syslogins WHERE loginname = N'INTERNAL\George.Graves')
+CREATE LOGIN [INTERNAL\George.Graves] FROM WINDOWS
+GO
+CREATE USER [INTERNAL\George.Graves] FOR LOGIN [INTERNAL\George.Graves] WITH DEFAULT_SCHEMA=[INTERNAL\George.Graves]
+GO
+REVOKE CONNECT TO [INTERNAL\George.Graves]
