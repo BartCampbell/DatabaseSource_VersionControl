@@ -1,2 +1,2 @@
-CREATE SYNONYM [RDSM].[MemberMeasureMetricScoring] FOR [CHSTAGING].[RDSM].[MemberMeasureMetricScoring]
+CREATE SYNONYM [RDSM].[MemberMeasureMetricScoring] FOR [ChartNet_BCBSAZ_RDSM].[dbo].[MemberMeasureMetricScoring]
 GO

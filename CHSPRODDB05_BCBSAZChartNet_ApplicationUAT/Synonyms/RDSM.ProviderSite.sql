@@ -1,2 +1,2 @@
-CREATE SYNONYM [RDSM].[ProviderSite] FOR [CHSTAGING].[RDSM].[ProviderSite]
+CREATE SYNONYM [RDSM].[ProviderSite] FOR [ChartNet_BCBSAZ_RDSM].[dbo].[ProviderSite]
 GO

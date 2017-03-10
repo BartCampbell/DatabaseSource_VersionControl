@@ -1,2 +1,2 @@
-CREATE SYNONYM [RDSM].[MemberMeasureSample] FOR [CHSTAGING].[RDSM].[MemberMeasureSample]
+CREATE SYNONYM [RDSM].[MemberMeasureSample] FOR [ChartNet_BCBSAZ_RDSM].[dbo].[MemberMeasureSample]
 GO
