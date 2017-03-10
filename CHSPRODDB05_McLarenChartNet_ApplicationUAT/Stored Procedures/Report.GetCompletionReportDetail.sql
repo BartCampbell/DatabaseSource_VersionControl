@@ -2,6 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
+
 -- =============================================
 -- Author:		Raasch, Mark
 -- Create date: 10/30/2014
@@ -44,7 +45,7 @@ BEGIN
 	IF @ChartStatusDetailID IS NOT NULL
 		SET @ChartStatusValueID = NULL
 
-    SELECT DISTINCT
+    SELECT DISTINCT top 2100
             mms.productline AS ProductLine,
             mms.Product AS Product,
             ms.HEDISMeasure,
@@ -109,41 +110,42 @@ BEGIN
 					SELECT Title
 					FROM ChartStatusValue WITH(NOLOCK)
 					WHERE ChartStatusValueID = cs.ParentID
-					) AS ChartStatus
-	WHERE   ((@ProductLine IS NULL) OR (m.ProductLine = @ProductLine) OR (m.ProductLine LIKE '%' + @ProductLine + '%')) 
-	AND     ((@Product IS NULL) OR (m.Product = @Product) OR (m.Product LIKE '%' + @Product + '%'))
-	AND     ((@MeasureID IS NULL) OR (pe.MeasureID = @MeasureID))
-	AND		((@AbstractionStatusID IS NULL) OR (ab.AbstractionStatusID = @AbstractionStatusID))
-	AND     ((@ChartAttached IS NULL) OR ((ci.PursuitEventChartImageID IS NULL AND @ChartAttached = 0) OR (ci.PursuitEventChartImageID IS NOT NULL AND @ChartAttached = 1)))
-	AND     ((@AbstractorID IS NULL) OR (p.AbstractorID = @AbstractorID) OR (p.AbstractorID IS NULL AND @AbstractorID = -1))
-	AND     ((@AbstractionDateStart IS NULL) OR (@AbstractionDateStart <= PVSL.LogDate))
-	AND     ((@AbstractionDateEnd IS NULL) OR (PVSL.LogDate < DATEADD(DAY, 1, @AbstractionDateEnd)))
-	AND     ((@ProviderSiteID IS NULL) OR (ps.ProviderSiteID = @ProviderSiteID))
-    AND     ((@ProviderSiteName IS NULL) OR (ps.ProviderSiteName = @ProviderSiteName) OR (ps.ProviderSiteName LIKE '%' + @ProviderSiteName + '%'))
-	AND     ((@ProviderSiteAddress IS NULL) OR (ps.Address1 + ' ' + ps.Address2 LIKE '%' + @ProviderSiteAddress + '%'))
-	AND     ((@ProviderID IS NULL) OR (pr.ProviderID = @ProviderID))
-	AND     ((@ProviderNPI IS NULL) OR (pr.NPI = @ProviderNPI))
-	AND     ((@ProviderTIN IS NULL) OR (pr.TaxID = @ProviderTIN))
-	AND     ((@ProviderName IS NULL) OR (pr.NameEntityFullName = @ProviderName) OR (pr.NameEntityFullName LIKE '%' +  @ProviderName + '%') OR (pr.NameLast = @ProviderName) OR (pr.NameLast LIKE '%' + @ProviderName + '%'))
-	AND     ((@ChartStatusValueID IS NULL) OR ((pe.ChartStatusValueID IN (SELECT ChartStatusValueID
-																		   FROM dbo.ChartStatusValue WITH(NOLOCK)
-																		  WHERE ParentID = @ChartStatusValueID)
-												OR pe.ChartStatusValueID = @ChartStatusValueID)))
-	AND     ((@ChartStatusDetailID IS NULL) OR (pe.ChartStatusValueID = @ChartStatusDetailID))
-	AND     ((@ProviderSiteNameID IS NULL) OR (ps.ProviderSiteID = @ProviderSiteNameID))
-	AND     ((@ProviderNameID IS NULL) OR (pr.ProviderID = @ProviderNameID))
-	AND		((@AbstractionComplete IS NULL) OR (@AbstractionComplete = 1 AND ab.IsCompleted = 1) OR (@AbstractionComplete = 0 AND ab.IsCompleted = 0))
-	AND     ((@PursuitNumber IS NULL) OR (LOWER(p.PursuitNumber) = LOWER(@PursuitNumber)))
-    ORDER BY productline,
-            product,
-            HEDISMeasure,
-			MemberName,
-			Gender,
-			DOB,
-            PursuitNumber
-	OPTION(OPTIMIZE FOR UNKNOWN); 
+					) AS ChartStatus;
+	--WHERE   ((@ProductLine IS NULL) OR (m.ProductLine = @ProductLine) OR (m.ProductLine LIKE '%' + @ProductLine + '%')) 
+	--AND     ((@Product IS NULL) OR (m.Product = @Product) OR (m.Product LIKE '%' + @Product + '%'))
+	--AND     ((@MeasureID IS NULL) OR (pe.MeasureID = @MeasureID))
+	--AND		((@AbstractionStatusID IS NULL) OR (ab.AbstractionStatusID = @AbstractionStatusID))
+	--AND     ((@ChartAttached IS NULL) OR ((ci.PursuitEventChartImageID IS NULL AND @ChartAttached = 0) OR (ci.PursuitEventChartImageID IS NOT NULL AND @ChartAttached = 1)))
+	--AND     ((@AbstractorID IS NULL) OR (p.AbstractorID = @AbstractorID) OR (p.AbstractorID IS NULL AND @AbstractorID = -1))
+	--AND     ((@AbstractionDateStart IS NULL) OR (@AbstractionDateStart <= PVSL.LogDate))
+	--AND     ((@AbstractionDateEnd IS NULL) OR (PVSL.LogDate < DATEADD(DAY, 1, @AbstractionDateEnd)))
+	--AND     ((@ProviderSiteID IS NULL) OR (ps.ProviderSiteID = @ProviderSiteID))
+ --   AND     ((@ProviderSiteName IS NULL) OR (ps.ProviderSiteName = @ProviderSiteName) OR (ps.ProviderSiteName LIKE '%' + @ProviderSiteName + '%'))
+	--AND     ((@ProviderSiteAddress IS NULL) OR (ps.Address1 + ' ' + ps.Address2 LIKE '%' + @ProviderSiteAddress + '%'))
+	--AND     ((@ProviderID IS NULL) OR (pr.ProviderID = @ProviderID))
+	--AND     ((@ProviderNPI IS NULL) OR (pr.NPI = @ProviderNPI))
+	--AND     ((@ProviderTIN IS NULL) OR (pr.TaxID = @ProviderTIN))
+	--AND     ((@ProviderName IS NULL) OR (pr.NameEntityFullName = @ProviderName) OR (pr.NameEntityFullName LIKE '%' +  @ProviderName + '%') OR (pr.NameLast = @ProviderName) OR (pr.NameLast LIKE '%' + @ProviderName + '%'))
+	--AND     ((@ChartStatusValueID IS NULL) OR ((pe.ChartStatusValueID IN (SELECT ChartStatusValueID
+	--																	   FROM dbo.ChartStatusValue WITH(NOLOCK)
+	--																	  WHERE ParentID = @ChartStatusValueID)
+	--											OR pe.ChartStatusValueID = @ChartStatusValueID)))
+	--AND     ((@ChartStatusDetailID IS NULL) OR (pe.ChartStatusValueID = @ChartStatusDetailID))
+	--AND     ((@ProviderSiteNameID IS NULL) OR (ps.ProviderSiteID = @ProviderSiteNameID))
+	--AND     ((@ProviderNameID IS NULL) OR (pr.ProviderID = @ProviderNameID))
+	--AND		((@AbstractionComplete IS NULL) OR (@AbstractionComplete = 1 AND ab.IsCompleted = 1) OR (@AbstractionComplete = 0 AND ab.IsCompleted = 0))
+	--AND     ((@PursuitNumber IS NULL) OR (LOWER(p.PursuitNumber) = LOWER(@PursuitNumber)))
+ --   ORDER BY productline,
+ --           product,
+ --           HEDISMeasure,
+	--		MemberName,
+	--		Gender,
+	--		DOB,
+ --           PursuitNumber
+	--OPTION(OPTIMIZE FOR UNKNOWN); 
 
 END
+
 GO
 GRANT EXECUTE ON  [Report].[GetCompletionReportDetail] TO [Reporting]
 GO

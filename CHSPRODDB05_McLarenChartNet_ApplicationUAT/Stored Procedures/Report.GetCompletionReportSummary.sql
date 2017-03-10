@@ -2,6 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
+
 -- =============================================
 -- Author:		Raasch, Mark
 -- Create date: 10/29/2014
@@ -19,7 +20,7 @@ BEGIN
 
     SET NOCOUNT ON
 
-    SELECT DISTINCT
+    SELECT DISTINCT TOP 2100
             mms.productline AS ProductLine,
             mms.Product AS Product,
             ms.HEDISMeasure AS Measure,
@@ -52,9 +53,9 @@ BEGIN
                                                  (tPVSL.LogDate < DATEADD(DAY, 1, @AbstractionDateEnd)))
                          ORDER BY LogDate DESC
                         ) AS PVSL
-		WHERE  ((@ProductLine IS NULL) OR (m.ProductLine = @ProductLine) OR (m.ProductLine LIKE '%' + @ProductLine + '%')) AND
-				((@Product IS NULL) OR (m.Product = @Product) OR (m.Product LIKE '%' + @Product + '%')) AND
-				((@MeasureID IS NULL) OR (pe.MeasureID = @MeasureID)) 
+		--WHERE  ((@ProductLine IS NULL) OR (m.ProductLine = @ProductLine) OR (m.ProductLine LIKE '%' + @ProductLine + '%')) AND
+		--		((@Product IS NULL) OR (m.Product = @Product) OR (m.Product LIKE '%' + @Product + '%')) AND
+		--		((@MeasureID IS NULL) OR (pe.MeasureID = @MeasureID)) 
     GROUP BY ms.HEDISMeasure,
             mms.ProductLine,
             mms.Product,
@@ -63,6 +64,7 @@ BEGIN
             mms.Product,
             ms.HEDISMeasure
 END
+
 GO
 GRANT EXECUTE ON  [Report].[GetCompletionReportSummary] TO [Reporting]
 GO

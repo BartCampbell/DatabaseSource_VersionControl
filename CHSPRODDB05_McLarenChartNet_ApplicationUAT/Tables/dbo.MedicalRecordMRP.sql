@@ -4,7 +4,7 @@ CREATE TABLE [dbo].[MedicalRecordMRP]
 [PursuitID] [int] NOT NULL,
 [PursuitEventID] [int] NOT NULL,
 [ServiceDate] [datetime] NOT NULL,
-[DocumentationType] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+[DocumentationType] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CreatedDate] [datetime] NOT NULL CONSTRAINT [DF_MedicalRecordMRP_CreationDate] DEFAULT (getdate()),
 [CreatedUser] [nvarchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [LastChangedDate] [datetime] NOT NULL CONSTRAINT [DF_MedicalRecordmrp_LastChangedDate] DEFAULT (getdate()),
