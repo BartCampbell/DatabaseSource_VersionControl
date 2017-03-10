@@ -54,6 +54,11 @@ BEGIN
 			O.FileObjectID, 
 			C.COLUMN_NAME;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[IdentifyInvalidFileFields] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[IdentifyInvalidFileFields] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[IdentifyInvalidFileFields] TO [Processor]
 GO

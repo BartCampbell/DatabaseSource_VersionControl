@@ -211,6 +211,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[SetActiveBatchEnrollmentKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[SetActiveBatchEnrollmentKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[SetActiveBatchEnrollmentKey] TO [Processor]
 GO

@@ -232,6 +232,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetBatchProgress] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetBatchProgress] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetBatchProgress] TO [Processor]
 GO

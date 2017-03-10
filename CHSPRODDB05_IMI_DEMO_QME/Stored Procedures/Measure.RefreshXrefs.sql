@@ -313,6 +313,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Measure].[RefreshXrefs] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Measure].[RefreshXrefs] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Measure].[RefreshXrefs] TO [Processor]
 GO

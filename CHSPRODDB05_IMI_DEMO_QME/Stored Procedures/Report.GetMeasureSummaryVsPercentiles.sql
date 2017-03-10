@@ -767,6 +767,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasureSummaryVsPercentiles] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasureSummaryVsPercentiles] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasureSummaryVsPercentiles] TO [Processor]
 GO

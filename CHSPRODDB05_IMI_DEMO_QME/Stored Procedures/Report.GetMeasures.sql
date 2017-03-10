@@ -96,6 +96,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasures] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasures] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasures] TO [Processor]
 GO

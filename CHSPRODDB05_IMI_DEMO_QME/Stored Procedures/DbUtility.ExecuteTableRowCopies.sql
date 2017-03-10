@@ -384,6 +384,11 @@ BEGIN
 			END;
 
 END
+
+GO
+GRANT VIEW DEFINITION ON  [DbUtility].[ExecuteTableRowCopies] TO [db_executer]
+GO
+GRANT EXECUTE ON  [DbUtility].[ExecuteTableRowCopies] TO [db_executer]
 GO
 GRANT EXECUTE ON  [DbUtility].[ExecuteTableRowCopies] TO [Processor]
 GO

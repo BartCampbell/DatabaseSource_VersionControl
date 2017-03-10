@@ -317,6 +317,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[RunDataSetProcedures] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[RunDataSetProcedures] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[RunDataSetProcedures] TO [Processor]
 GO

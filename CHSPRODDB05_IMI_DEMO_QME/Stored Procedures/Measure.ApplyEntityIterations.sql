@@ -193,6 +193,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Measure].[ApplyEntityIterations] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Measure].[ApplyEntityIterations] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Measure].[ApplyEntityIterations] TO [Processor]
 GO

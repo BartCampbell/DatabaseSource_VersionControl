@@ -227,6 +227,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeEntityByEntitySeedDate] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeEntityByEntitySeedDate] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeEntityByEntitySeedDate] TO [Processor]
 GO

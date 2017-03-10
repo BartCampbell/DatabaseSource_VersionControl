@@ -114,6 +114,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetNextDataRun] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetNextDataRun] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetNextDataRun] TO [Processor]
 GO

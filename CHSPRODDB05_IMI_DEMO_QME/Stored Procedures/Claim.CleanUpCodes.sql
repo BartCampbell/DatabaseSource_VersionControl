@@ -248,6 +248,11 @@ BEGIN
 	END CATCH;
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Claim].[CleanUpCodes] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Claim].[CleanUpCodes] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Claim].[CleanUpCodes] TO [Processor]
 GO

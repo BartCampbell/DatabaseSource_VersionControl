@@ -164,6 +164,11 @@ BEGIN
 		RAISERROR (@ErrorMessage, @ErrorSeverity, @ErrorState, @ErrorNumber, @ErrorLine);
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [DbUtility].[RefreshSplitDbObjects] TO [db_executer]
+GO
+GRANT EXECUTE ON  [DbUtility].[RefreshSplitDbObjects] TO [db_executer]
 GO
 GRANT EXECUTE ON  [DbUtility].[RefreshSplitDbObjects] TO [Processor]
 GO

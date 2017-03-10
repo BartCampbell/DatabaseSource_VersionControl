@@ -104,6 +104,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[AssignSubmitterPermissions] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[AssignSubmitterPermissions] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[AssignSubmitterPermissions] TO [Processor]
 GO

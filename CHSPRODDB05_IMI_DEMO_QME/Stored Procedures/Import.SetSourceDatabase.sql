@@ -209,6 +209,11 @@ BEGIN
 		RAISERROR ('Unable to set source.  The specified database is invalid.', 16, 1);
 		RETURN 1;    
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Import].[SetSourceDatabase] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Import].[SetSourceDatabase] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Import].[SetSourceDatabase] TO [Processor]
 GO

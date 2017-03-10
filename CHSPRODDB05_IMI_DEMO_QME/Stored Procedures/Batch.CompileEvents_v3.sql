@@ -563,6 +563,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[CompileEvents_v3] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[CompileEvents_v3] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[CompileEvents_v3] TO [Processor]
 GO

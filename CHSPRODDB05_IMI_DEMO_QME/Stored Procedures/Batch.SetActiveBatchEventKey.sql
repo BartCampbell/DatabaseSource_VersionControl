@@ -453,6 +453,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[SetActiveBatchEventKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[SetActiveBatchEventKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[SetActiveBatchEventKey] TO [Processor]
 GO

@@ -174,6 +174,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Import].[IdentifyDataSources] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Import].[IdentifyDataSources] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Import].[IdentifyDataSources] TO [Processor]
 GO

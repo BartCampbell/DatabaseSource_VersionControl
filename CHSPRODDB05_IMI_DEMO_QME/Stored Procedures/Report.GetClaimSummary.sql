@@ -59,6 +59,11 @@ AS
                 ClaimTypeDescr;
 
     END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetClaimSummary] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetClaimSummary] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetClaimSummary] TO [Processor]
 GO

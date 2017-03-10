@@ -285,6 +285,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[PDC_CalculateMeasureDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[PDC_CalculateMeasureDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[PDC_CalculateMeasureDetail] TO [Processor]
 GO

@@ -85,6 +85,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[ConfirmDataRunSubmission] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[ConfirmDataRunSubmission] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[ConfirmDataRunSubmission] TO [Processor]
 GO

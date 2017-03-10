@@ -276,6 +276,11 @@ BEGIN
 			RAISERROR(@ErrMsg, 16, 1);
 		END;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [DbUtility].[ExecuteDatabaseSplit] TO [db_executer]
+GO
+GRANT EXECUTE ON  [DbUtility].[ExecuteDatabaseSplit] TO [db_executer]
 GO
 GRANT EXECUTE ON  [DbUtility].[ExecuteDatabaseSplit] TO [Processor]
 GO

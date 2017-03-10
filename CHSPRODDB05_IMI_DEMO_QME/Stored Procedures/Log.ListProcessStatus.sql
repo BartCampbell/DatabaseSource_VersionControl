@@ -33,6 +33,11 @@ BEGIN
 					ON LSO.SrcObjectGuid = LPEX.SrcObjectGuid
 	ORDER BY LogID DESC;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Log].[ListProcessStatus] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Log].[ListProcessStatus] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Log].[ListProcessStatus] TO [Processor]
 GO

@@ -185,6 +185,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[FinalizeProcessing] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[FinalizeProcessing] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[FinalizeProcessing] TO [Processor]
 GO

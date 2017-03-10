@@ -528,6 +528,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[RRU_CalculateMeasureDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[RRU_CalculateMeasureDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[RRU_CalculateMeasureDetail] TO [Processor]
 GO

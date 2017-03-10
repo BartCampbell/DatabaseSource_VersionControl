@@ -291,6 +291,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[CalculateMemberMonthDetail_v1] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[CalculateMemberMonthDetail_v1] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[CalculateMemberMonthDetail_v1] TO [Processor]
 GO

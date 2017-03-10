@@ -68,6 +68,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetDataOwnerDefault] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetDataOwnerDefault] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetDataOwnerDefault] TO [Processor]
 GO

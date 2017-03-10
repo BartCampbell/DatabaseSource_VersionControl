@@ -217,6 +217,15 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GO
+GRANT VIEW DEFINITION ON  [Batch].[UpdateEventXml] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[UpdateEventXml] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[UpdateEventXml] TO [Processor]
+GO
+GO
+
 GO

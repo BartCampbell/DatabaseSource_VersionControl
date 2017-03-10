@@ -253,6 +253,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Import].[TransformProviders] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Import].[TransformProviders] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Import].[TransformProviders] TO [Processor]
 GO

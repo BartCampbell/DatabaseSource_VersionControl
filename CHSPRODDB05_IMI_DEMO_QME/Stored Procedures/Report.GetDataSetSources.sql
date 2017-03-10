@@ -80,6 +80,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetDataSetSources] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetDataSetSources] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetDataSetSources] TO [Processor]
 GO

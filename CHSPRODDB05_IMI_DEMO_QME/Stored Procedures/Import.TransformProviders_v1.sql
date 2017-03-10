@@ -202,6 +202,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Import].[TransformProviders_v1] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Import].[TransformProviders_v1] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Import].[TransformProviders_v1] TO [Processor]
 GO

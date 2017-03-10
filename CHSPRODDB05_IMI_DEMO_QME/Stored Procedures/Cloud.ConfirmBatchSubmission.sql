@@ -85,6 +85,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[ConfirmBatchSubmission] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[ConfirmBatchSubmission] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[ConfirmBatchSubmission] TO [Processor]
 GO

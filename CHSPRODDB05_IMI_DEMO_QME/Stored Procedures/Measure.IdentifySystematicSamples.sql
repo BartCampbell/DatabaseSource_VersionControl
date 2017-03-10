@@ -580,6 +580,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Measure].[IdentifySystematicSamples] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Measure].[IdentifySystematicSamples] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Measure].[IdentifySystematicSamples] TO [Processor]
 GO

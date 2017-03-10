@@ -71,6 +71,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasureSets] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasureSets] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasureSets] TO [Processor]
 GO

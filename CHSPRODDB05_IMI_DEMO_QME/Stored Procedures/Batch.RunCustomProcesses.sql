@@ -244,6 +244,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[RunCustomProcesses] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[RunCustomProcesses] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[RunCustomProcesses] TO [Processor]
 GO

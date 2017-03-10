@@ -314,6 +314,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[ApplyMissingLabResults] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[ApplyMissingLabResults] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[ApplyMissingLabResults] TO [Processor]
 GO

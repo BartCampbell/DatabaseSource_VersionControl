@@ -146,6 +146,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[PurgeLogTables] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[PurgeLogTables] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[PurgeLogTables] TO [Processor]
 GO

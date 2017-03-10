@@ -276,6 +276,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[RefreshXrefs] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[RefreshXrefs] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[RefreshXrefs] TO [Processor]
 GO

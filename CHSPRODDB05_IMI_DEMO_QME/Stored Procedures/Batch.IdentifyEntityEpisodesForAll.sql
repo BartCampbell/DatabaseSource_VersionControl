@@ -180,6 +180,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[IdentifyEntityEpisodesForAll] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[IdentifyEntityEpisodesForAll] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[IdentifyEntityEpisodesForAll] TO [Processor]
 GO

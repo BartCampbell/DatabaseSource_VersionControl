@@ -116,6 +116,11 @@ AS
 
     END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetDDENumeratorEvents] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetDDENumeratorEvents] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetDDENumeratorEvents] TO [Processor]
 GO

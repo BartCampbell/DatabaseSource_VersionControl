@@ -384,6 +384,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[SummarizeMeasureByAgeBand] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[SummarizeMeasureByAgeBand] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[SummarizeMeasureByAgeBand] TO [Processor]
 GO

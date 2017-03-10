@@ -1436,6 +1436,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[RRU_CalculateCostAndFrequency] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[RRU_CalculateCostAndFrequency] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[RRU_CalculateCostAndFrequency] TO [Processor]
 GO

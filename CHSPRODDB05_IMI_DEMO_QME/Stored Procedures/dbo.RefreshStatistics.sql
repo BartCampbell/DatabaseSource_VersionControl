@@ -37,6 +37,11 @@ BEGIN
     RETURN 0;
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [dbo].[RefreshStatistics] TO [db_executer]
+GO
+GRANT EXECUTE ON  [dbo].[RefreshStatistics] TO [db_executer]
 GO
 GRANT EXECUTE ON  [dbo].[RefreshStatistics] TO [Processor]
 GO

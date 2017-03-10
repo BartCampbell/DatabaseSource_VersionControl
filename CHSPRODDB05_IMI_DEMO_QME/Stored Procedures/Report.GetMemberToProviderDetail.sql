@@ -103,6 +103,11 @@ BEGIN
             [Provider ID];
 END;
 	
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMemberToProviderDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMemberToProviderDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMemberToProviderDetail] TO [Processor]
 GO

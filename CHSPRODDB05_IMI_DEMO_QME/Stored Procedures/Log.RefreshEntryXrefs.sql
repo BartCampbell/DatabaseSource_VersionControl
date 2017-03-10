@@ -160,6 +160,11 @@ BEGIN
 	ORDER BY t.EntryXrefID;
 
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Log].[RefreshEntryXrefs] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Log].[RefreshEntryXrefs] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Log].[RefreshEntryXrefs] TO [Processor]
 GO

@@ -297,6 +297,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[CleanUpMissingValues] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[CleanUpMissingValues] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[CleanUpMissingValues] TO [Processor]
 GO

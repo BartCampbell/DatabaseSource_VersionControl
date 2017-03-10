@@ -104,6 +104,11 @@ BEGIN
 
 END;
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetEntityEventDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetEntityEventDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetEntityEventDetail] TO [Processor]
 GO

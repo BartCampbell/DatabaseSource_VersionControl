@@ -71,6 +71,11 @@ BEGIN
 			END;
 
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Internal].[ReplaceSPIDs] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Internal].[ReplaceSPIDs] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Internal].[ReplaceSPIDs] TO [Processor]
 GO

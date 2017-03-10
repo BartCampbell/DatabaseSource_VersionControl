@@ -267,6 +267,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[ApplyEntityCriteriaByEventBeginDateToEndDate] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[ApplyEntityCriteriaByEventBeginDateToEndDate] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[ApplyEntityCriteriaByEventBeginDateToEndDate] TO [Processor]
 GO

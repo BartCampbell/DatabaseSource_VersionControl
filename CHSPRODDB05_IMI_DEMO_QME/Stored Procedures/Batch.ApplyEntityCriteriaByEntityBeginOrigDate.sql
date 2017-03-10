@@ -240,6 +240,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[ApplyEntityCriteriaByEntityBeginOrigDate] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[ApplyEntityCriteriaByEntityBeginOrigDate] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[ApplyEntityCriteriaByEntityBeginOrigDate] TO [Processor]
 GO

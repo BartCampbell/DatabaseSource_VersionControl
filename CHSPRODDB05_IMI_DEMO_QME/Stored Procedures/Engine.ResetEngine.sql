@@ -164,6 +164,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Engine].[ResetEngine] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Engine].[ResetEngine] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Engine].[ResetEngine] TO [Processor]
 GO

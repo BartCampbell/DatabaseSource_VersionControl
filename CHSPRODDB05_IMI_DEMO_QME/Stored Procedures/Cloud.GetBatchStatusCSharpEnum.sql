@@ -68,6 +68,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetBatchStatusCSharpEnum] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetBatchStatusCSharpEnum] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetBatchStatusCSharpEnum] TO [Processor]
 GO

@@ -191,6 +191,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[IdentifyEntityEpisodesForMostRecentByEndDate] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[IdentifyEntityEpisodesForMostRecentByEndDate] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[IdentifyEntityEpisodesForMostRecentByEndDate] TO [Processor]
 GO

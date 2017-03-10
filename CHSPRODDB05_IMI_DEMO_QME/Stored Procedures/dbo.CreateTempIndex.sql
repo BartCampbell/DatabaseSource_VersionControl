@@ -75,6 +75,11 @@ BEGIN
 			RETURN 1;
 		END;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [dbo].[CreateTempIndex] TO [db_executer]
+GO
+GRANT EXECUTE ON  [dbo].[CreateTempIndex] TO [db_executer]
 GO
 GRANT EXECUTE ON  [dbo].[CreateTempIndex] TO [Processor]
 GO

@@ -291,6 +291,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeEntityByMemberAttributes] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeEntityByMemberAttributes] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeEntityByMemberAttributes] TO [Processor]
 GO

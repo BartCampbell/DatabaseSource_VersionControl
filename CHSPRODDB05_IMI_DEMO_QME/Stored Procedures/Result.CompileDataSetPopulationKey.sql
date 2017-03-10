@@ -202,6 +202,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[CompileDataSetPopulationKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[CompileDataSetPopulationKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[CompileDataSetPopulationKey] TO [Processor]
 GO

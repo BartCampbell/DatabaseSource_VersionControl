@@ -248,6 +248,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasureEventDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasureEventDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasureEventDetail] TO [Processor]
 GO

@@ -217,6 +217,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[RefreshMeasureMetricXrefs] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[RefreshMeasureMetricXrefs] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[RefreshMeasureMetricXrefs] TO [Processor]
 GO

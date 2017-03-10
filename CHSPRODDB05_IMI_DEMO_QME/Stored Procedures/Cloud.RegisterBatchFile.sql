@@ -193,8 +193,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[RegisterBatchFile] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[RegisterBatchFile] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[RegisterBatchFile] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[RegisterBatchFile] TO [Processor]
 GO

@@ -217,6 +217,11 @@ BEGIN
 	END CATCH;
 END;
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[CreateDataRun] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[CreateDataRun] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[CreateDataRun] TO [Processor]
 GO

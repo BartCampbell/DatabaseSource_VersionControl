@@ -178,6 +178,11 @@ BEGIN
 	END CATCH;
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetSystematicSampleDataEntryValues] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetSystematicSampleDataEntryValues] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetSystematicSampleDataEntryValues] TO [Processor]
 GO

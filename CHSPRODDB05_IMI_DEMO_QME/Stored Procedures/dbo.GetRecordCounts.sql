@@ -29,6 +29,11 @@ BEGIN
 	EXEC (@cmd);
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [dbo].[GetRecordCounts] TO [db_executer]
+GO
+GRANT EXECUTE ON  [dbo].[GetRecordCounts] TO [db_executer]
 GO
 GRANT EXECUTE ON  [dbo].[GetRecordCounts] TO [Processor]
 GO

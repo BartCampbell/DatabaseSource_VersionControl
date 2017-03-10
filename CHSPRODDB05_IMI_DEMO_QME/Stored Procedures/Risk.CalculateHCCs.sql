@@ -569,6 +569,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Risk].[CalculateHCCs] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Risk].[CalculateHCCs] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Risk].[CalculateHCCs] TO [Processor]
 GO

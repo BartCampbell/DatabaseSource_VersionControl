@@ -307,6 +307,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Claim].[RefreshCodes] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Claim].[RefreshCodes] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Claim].[RefreshCodes] TO [Processor]
 GO

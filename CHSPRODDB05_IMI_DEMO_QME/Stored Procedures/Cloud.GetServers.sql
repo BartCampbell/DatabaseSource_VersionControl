@@ -98,6 +98,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetServers] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetServers] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetServers] TO [Processor]
 GO

@@ -287,6 +287,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetDataRunCompletion] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetDataRunCompletion] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetDataRunCompletion] TO [Processor]
 GO

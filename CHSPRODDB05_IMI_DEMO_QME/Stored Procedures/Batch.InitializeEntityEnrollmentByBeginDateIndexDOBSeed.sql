@@ -253,6 +253,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeEntityEnrollmentByBeginDateIndexDOBSeed] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeEntityEnrollmentByBeginDateIndexDOBSeed] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeEntityEnrollmentByBeginDateIndexDOBSeed] TO [Processor]
 GO

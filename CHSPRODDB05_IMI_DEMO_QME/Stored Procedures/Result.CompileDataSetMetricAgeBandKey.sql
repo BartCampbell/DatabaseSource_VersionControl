@@ -258,6 +258,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[CompileDataSetMetricAgeBandKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[CompileDataSetMetricAgeBandKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[CompileDataSetMetricAgeBandKey] TO [Processor]
 GO

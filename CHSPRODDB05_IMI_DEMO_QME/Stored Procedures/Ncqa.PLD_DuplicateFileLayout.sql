@@ -145,6 +145,11 @@ BEGIN
 		PRINT ERROR_MESSAGE();
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[PLD_DuplicateFileLayout] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[PLD_DuplicateFileLayout] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[PLD_DuplicateFileLayout] TO [Processor]
 GO

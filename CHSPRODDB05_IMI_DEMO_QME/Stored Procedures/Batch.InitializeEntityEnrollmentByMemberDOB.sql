@@ -257,6 +257,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeEntityEnrollmentByMemberDOB] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeEntityEnrollmentByMemberDOB] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeEntityEnrollmentByMemberDOB] TO [Processor]
 GO

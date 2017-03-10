@@ -156,6 +156,11 @@ BEGIN
 		RAISERROR(@ErrMsg, 16, 1);
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[VerifyBatchFileObjectRecordCounts] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[VerifyBatchFileObjectRecordCounts] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[VerifyBatchFileObjectRecordCounts] TO [Processor]
 GO

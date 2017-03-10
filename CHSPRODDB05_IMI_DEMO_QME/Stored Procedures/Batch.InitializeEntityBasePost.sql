@@ -75,6 +75,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeEntityBasePost] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeEntityBasePost] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeEntityBasePost] TO [Processor]
 GO

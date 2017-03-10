@@ -114,6 +114,11 @@ BEGIN
 
 	SELECT Abbrev AS Measure, Descr AS [Measure Description] FROM Measure.Measures WHERE (MeasureSetID IN (SELECT MeasureSetID FROM #MeasureSetList)) AND IsEnabled = 1 AND Abbrev NOT IN (SELECT Measure FROM #Available) ORDER BY Abbrev;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[GetCertificationStatus] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[GetCertificationStatus] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[GetCertificationStatus] TO [Processor]
 GO

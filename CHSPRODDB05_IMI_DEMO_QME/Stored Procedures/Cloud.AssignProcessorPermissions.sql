@@ -97,6 +97,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[AssignProcessorPermissions] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[AssignProcessorPermissions] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[AssignProcessorPermissions] TO [Processor]
 GO

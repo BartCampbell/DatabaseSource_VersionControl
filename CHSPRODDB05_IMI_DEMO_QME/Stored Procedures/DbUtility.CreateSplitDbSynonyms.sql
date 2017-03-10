@@ -136,6 +136,11 @@ BEGIN
 			RAISERROR(@ErrMsg, 16, 1);
 		END;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [DbUtility].[CreateSplitDbSynonyms] TO [db_executer]
+GO
+GRANT EXECUTE ON  [DbUtility].[CreateSplitDbSynonyms] TO [db_executer]
 GO
 GRANT EXECUTE ON  [DbUtility].[CreateSplitDbSynonyms] TO [Processor]
 GO

@@ -184,6 +184,11 @@ END;
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetSystematicSampleRoster] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetSystematicSampleRoster] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetSystematicSampleRoster] TO [Processor]
 GO

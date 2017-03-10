@@ -150,6 +150,11 @@ AS
 
 
     END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMemberLevelExtractWithMedicalGroups] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMemberLevelExtractWithMedicalGroups] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMemberLevelExtractWithMedicalGroups] TO [Processor]
 GO

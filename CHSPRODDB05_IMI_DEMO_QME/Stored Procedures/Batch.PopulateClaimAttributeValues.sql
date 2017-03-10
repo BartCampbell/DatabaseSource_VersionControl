@@ -208,6 +208,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[PopulateClaimAttributeValues] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[PopulateClaimAttributeValues] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[PopulateClaimAttributeValues] TO [Processor]
 GO

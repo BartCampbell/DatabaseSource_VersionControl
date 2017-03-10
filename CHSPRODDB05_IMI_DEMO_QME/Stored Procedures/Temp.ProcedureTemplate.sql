@@ -172,6 +172,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Temp].[ProcedureTemplate] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Temp].[ProcedureTemplate] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Temp].[ProcedureTemplate] TO [Processor]
 GO

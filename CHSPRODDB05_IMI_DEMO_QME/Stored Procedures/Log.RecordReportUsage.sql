@@ -135,6 +135,11 @@ BEGIN
 		END;
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Log].[RecordReportUsage] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Log].[RecordReportUsage] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Log].[RecordReportUsage] TO [Processor]
 GO

@@ -207,6 +207,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[SetActiveBatchEntityKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[SetActiveBatchEntityKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[SetActiveBatchEntityKey] TO [Processor]
 GO

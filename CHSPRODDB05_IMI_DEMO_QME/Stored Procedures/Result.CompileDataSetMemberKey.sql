@@ -241,6 +241,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[CompileDataSetMemberKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[CompileDataSetMemberKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[CompileDataSetMemberKey] TO [Processor]
 GO

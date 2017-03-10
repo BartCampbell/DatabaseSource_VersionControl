@@ -181,6 +181,11 @@ BEGIN
 ORDER BY        SortOrder;--, IsIndicator
 
 END;
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetPCRSummaryResults] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetPCRSummaryResults] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetPCRSummaryResults] TO [Processor]
 GO

@@ -79,6 +79,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetICDCodeTypes] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetICDCodeTypes] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetICDCodeTypes] TO [Processor]
 GO

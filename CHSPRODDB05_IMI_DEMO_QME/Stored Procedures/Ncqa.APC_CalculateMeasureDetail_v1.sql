@@ -341,6 +341,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[APC_CalculateMeasureDetail_v1] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[APC_CalculateMeasureDetail_v1] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[APC_CalculateMeasureDetail_v1] TO [Processor]
 GO

@@ -182,6 +182,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[CalculateMeasureEventDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[CalculateMeasureEventDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[CalculateMeasureEventDetail] TO [Processor]
 GO

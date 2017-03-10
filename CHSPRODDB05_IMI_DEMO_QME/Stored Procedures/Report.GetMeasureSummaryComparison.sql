@@ -710,6 +710,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasureSummaryComparison] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasureSummaryComparison] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasureSummaryComparison] TO [Processor]
 GO

@@ -99,6 +99,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Engine].[ResetIdentifier] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Engine].[ResetIdentifier] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Engine].[ResetIdentifier] TO [Processor]
 GO

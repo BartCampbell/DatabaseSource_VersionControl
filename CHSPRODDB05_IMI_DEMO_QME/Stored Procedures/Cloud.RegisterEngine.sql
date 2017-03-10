@@ -162,8 +162,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[RegisterEngine] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[RegisterEngine] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[RegisterEngine] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[RegisterEngine] TO [Processor]
 GO

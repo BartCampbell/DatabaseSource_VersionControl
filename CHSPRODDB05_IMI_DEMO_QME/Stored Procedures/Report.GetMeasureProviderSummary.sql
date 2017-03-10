@@ -407,6 +407,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasureProviderSummary] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasureProviderSummary] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasureProviderSummary] TO [Processor]
 GO

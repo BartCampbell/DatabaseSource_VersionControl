@@ -75,6 +75,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeansAndPercentilesYears] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeansAndPercentilesYears] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeansAndPercentilesYears] TO [Processor]
 GO

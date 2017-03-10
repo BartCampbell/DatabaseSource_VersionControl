@@ -260,6 +260,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[DuplicateFileFormat] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[DuplicateFileFormat] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[DuplicateFileFormat] TO [Processor]
 GO

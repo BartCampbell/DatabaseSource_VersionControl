@@ -26,6 +26,11 @@ AS
                     INNER JOIN Product.ProductTypes AS PPT ON PP.ProductTypeID = PPT.ProductTypeID
                     INNER JOIN Product.ProductClasses AS PPC ON PPT.ProductClassID = PPC.ProductClassID
     END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetPayerList] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetPayerList] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetPayerList] TO [Processor]
 GO

@@ -101,6 +101,11 @@ BEGIN
 	END CATCH;
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[CreateDataSet] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[CreateDataSet] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[CreateDataSet] TO [Processor]
 GO

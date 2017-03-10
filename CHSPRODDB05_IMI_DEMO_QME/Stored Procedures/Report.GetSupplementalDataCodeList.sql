@@ -91,6 +91,11 @@ BEGIN
 					ON c.Code = t.Code
 	ORDER BY [Metric], [Code Type], [Code], [Event Criteria]
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetSupplementalDataCodeList] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetSupplementalDataCodeList] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetSupplementalDataCodeList] TO [Processor]
 GO

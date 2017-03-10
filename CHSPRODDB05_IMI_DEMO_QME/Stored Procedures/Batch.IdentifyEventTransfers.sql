@@ -451,6 +451,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[IdentifyEventTransfers] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[IdentifyEventTransfers] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[IdentifyEventTransfers] TO [Processor]
 GO

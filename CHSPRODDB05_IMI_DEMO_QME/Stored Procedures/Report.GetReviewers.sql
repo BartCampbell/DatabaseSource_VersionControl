@@ -82,6 +82,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetReviewers] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetReviewers] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetReviewers] TO [Processor]
 GO

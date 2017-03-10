@@ -73,6 +73,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetBatchCountByStatus] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetBatchCountByStatus] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetBatchCountByStatus] TO [Processor]
 GO

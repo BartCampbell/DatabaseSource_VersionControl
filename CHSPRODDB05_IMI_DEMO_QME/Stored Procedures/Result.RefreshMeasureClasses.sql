@@ -233,6 +233,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[RefreshMeasureClasses] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[RefreshMeasureClasses] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[RefreshMeasureClasses] TO [Processor]
 GO

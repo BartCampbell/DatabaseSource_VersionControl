@@ -424,6 +424,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[ProcessBatchFileXml] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[ProcessBatchFileXml] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[ProcessBatchFileXml] TO [Processor]
 GO

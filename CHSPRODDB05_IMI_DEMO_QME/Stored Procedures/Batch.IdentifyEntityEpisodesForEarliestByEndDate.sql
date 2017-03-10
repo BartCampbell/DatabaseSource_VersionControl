@@ -190,6 +190,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[IdentifyEntityEpisodesForEarliestByEndDate] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[IdentifyEntityEpisodesForEarliestByEndDate] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[IdentifyEntityEpisodesForEarliestByEndDate] TO [Processor]
 GO

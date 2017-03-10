@@ -221,6 +221,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasureEventAuditList] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasureEventAuditList] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasureEventAuditList] TO [Processor]
 GO

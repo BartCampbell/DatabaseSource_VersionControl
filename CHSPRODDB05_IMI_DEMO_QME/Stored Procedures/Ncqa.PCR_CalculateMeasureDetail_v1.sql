@@ -538,6 +538,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[PCR_CalculateMeasureDetail_v1] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[PCR_CalculateMeasureDetail_v1] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[PCR_CalculateMeasureDetail_v1] TO [Processor]
 GO

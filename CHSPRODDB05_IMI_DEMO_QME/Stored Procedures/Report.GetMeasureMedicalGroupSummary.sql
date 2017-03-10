@@ -337,6 +337,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasureMedicalGroupSummary] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasureMedicalGroupSummary] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasureMedicalGroupSummary] TO [Processor]
 GO

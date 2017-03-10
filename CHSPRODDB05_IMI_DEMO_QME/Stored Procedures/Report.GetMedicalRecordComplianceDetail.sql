@@ -52,6 +52,11 @@ AS
 
     END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMedicalRecordComplianceDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMedicalRecordComplianceDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMedicalRecordComplianceDetail] TO [Processor]
 GO

@@ -46,3 +46,7 @@ CREATE TABLE [Result].[MeasureProviderSummary]
 GO
 ALTER TABLE [Result].[MeasureProviderSummary] ADD CONSTRAINT [PK_MeasureProviderSummary] PRIMARY KEY CLUSTERED  ([ResultRowID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_DataRunID] ON [Result].[MeasureProviderSummary] ([DataRunID]) INCLUDE ([CountEvents], [CountMembers], [CountRecords], [DataSetID], [Days], [IsDenominator], [IsExclusion], [IsNegative], [IsNumerator], [MeasureID], [MedGrpID], [MetricID], [PopulationID], [ProductLineID], [Qty], [ResultTypeID]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_DataRunID_2] ON [Result].[MeasureProviderSummary] ([DataRunID], [DataSetID], [MeasureID], [MetricID], [PopulationID], [ProductLineID]) INCLUDE ([CountEvents], [CountMembers], [CountRecords], [Days], [IsDenominator], [IsExclusion], [IsNegative], [IsNumerator], [MedGrpID], [Qty], [ResultTypeID]) ON [PRIMARY]
+GO

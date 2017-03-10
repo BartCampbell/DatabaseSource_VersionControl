@@ -675,6 +675,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[FPC_CalculateMeasureDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[FPC_CalculateMeasureDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[FPC_CalculateMeasureDetail] TO [Processor]
 GO

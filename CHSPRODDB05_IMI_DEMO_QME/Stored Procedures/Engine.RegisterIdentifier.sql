@@ -81,6 +81,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Engine].[RegisterIdentifier] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Engine].[RegisterIdentifier] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Engine].[RegisterIdentifier] TO [Processor]
 GO

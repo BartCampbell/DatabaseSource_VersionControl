@@ -82,6 +82,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetEnrollmentGroups] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetEnrollmentGroups] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetEnrollmentGroups] TO [Reports]
 GO

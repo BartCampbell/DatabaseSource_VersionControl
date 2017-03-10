@@ -148,6 +148,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[PurgeResultTables] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[PurgeResultTables] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[PurgeResultTables] TO [Processor]
 GO

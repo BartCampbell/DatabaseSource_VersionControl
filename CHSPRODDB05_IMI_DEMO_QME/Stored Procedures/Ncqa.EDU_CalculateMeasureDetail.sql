@@ -292,6 +292,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[EDU_CalculateMeasureDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[EDU_CalculateMeasureDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[EDU_CalculateMeasureDetail] TO [Processor]
 GO

@@ -392,6 +392,11 @@ AS
 				
 
     END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetRRUDetailResults] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetRRUDetailResults] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetRRUDetailResults] TO [Processor]
 GO

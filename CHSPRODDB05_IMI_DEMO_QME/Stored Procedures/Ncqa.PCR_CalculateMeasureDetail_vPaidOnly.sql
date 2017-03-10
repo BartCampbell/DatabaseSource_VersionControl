@@ -713,6 +713,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[PCR_CalculateMeasureDetail_vPaidOnly] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[PCR_CalculateMeasureDetail_vPaidOnly] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[PCR_CalculateMeasureDetail_vPaidOnly] TO [Processor]
 GO

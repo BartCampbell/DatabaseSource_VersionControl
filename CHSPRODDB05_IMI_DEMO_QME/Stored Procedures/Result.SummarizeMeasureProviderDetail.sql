@@ -301,6 +301,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[SummarizeMeasureProviderDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[SummarizeMeasureProviderDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[SummarizeMeasureProviderDetail] TO [Processor]
 GO

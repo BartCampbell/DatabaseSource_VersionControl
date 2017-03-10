@@ -256,6 +256,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[CompileDataSetProviderKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[CompileDataSetProviderKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[CompileDataSetProviderKey] TO [Processor]
 GO

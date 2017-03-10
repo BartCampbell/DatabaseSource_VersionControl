@@ -597,6 +597,15 @@ BEGIN;
 	END CATCH;
 
 END;
+
+GO
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[PLD_GenerateFilePerMember] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[PLD_GenerateFilePerMember] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[PLD_GenerateFilePerMember] TO [Processor]
+GO
+GO
+
 GO

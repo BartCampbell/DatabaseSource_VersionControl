@@ -837,6 +837,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[CombineClaims] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[CombineClaims] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[CombineClaims] TO [Processor]
 GO

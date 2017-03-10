@@ -88,6 +88,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetCurrentServerLoad] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetCurrentServerLoad] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetCurrentServerLoad] TO [Processor]
 GO

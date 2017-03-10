@@ -485,6 +485,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[ImportDataSet] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[ImportDataSet] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[ImportDataSet] TO [Processor]
 GO

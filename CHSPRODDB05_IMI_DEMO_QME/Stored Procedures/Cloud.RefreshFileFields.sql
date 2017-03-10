@@ -237,6 +237,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[RefreshFileFields] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[RefreshFileFields] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[RefreshFileFields] TO [Processor]
 GO

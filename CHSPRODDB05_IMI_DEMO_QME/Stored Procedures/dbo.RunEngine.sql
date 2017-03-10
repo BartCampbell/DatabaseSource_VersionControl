@@ -156,6 +156,11 @@ BEGIN
 		SELECT * FROM [Log].ProcessEntries WHERE DataSetID = @DataSetID; 
     
 END
+
+GO
+GRANT VIEW DEFINITION ON  [dbo].[RunEngine] TO [db_executer]
+GO
+GRANT EXECUTE ON  [dbo].[RunEngine] TO [db_executer]
 GO
 GRANT EXECUTE ON  [dbo].[RunEngine] TO [Processor]
 GO

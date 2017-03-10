@@ -278,10 +278,23 @@ END
 
 
 
+
+GO
 GO
 GRANT EXECUTE ON  [Cloud].[SubmitLog] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[SubmitLog] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[SubmitLog] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[SubmitLog] TO [Processor]
 GO
 GRANT EXECUTE ON  [Cloud].[SubmitLog] TO [Submitter]
+GO
+GO
+
+GO
+
+GO
+
 GO

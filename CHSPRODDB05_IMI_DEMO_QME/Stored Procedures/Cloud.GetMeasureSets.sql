@@ -72,8 +72,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[GetMeasureSets] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetMeasureSets] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetMeasureSets] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetMeasureSets] TO [Processor]
 GO

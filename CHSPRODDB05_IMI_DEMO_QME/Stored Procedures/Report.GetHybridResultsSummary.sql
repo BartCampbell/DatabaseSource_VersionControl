@@ -211,6 +211,11 @@ BEGIN
 
 END;
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetHybridResultsSummary] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetHybridResultsSummary] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetHybridResultsSummary] TO [Processor]
 GO

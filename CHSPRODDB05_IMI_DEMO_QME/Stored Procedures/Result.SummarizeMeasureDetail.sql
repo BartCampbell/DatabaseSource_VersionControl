@@ -295,6 +295,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[SummarizeMeasureDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[SummarizeMeasureDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[SummarizeMeasureDetail] TO [Processor]
 GO

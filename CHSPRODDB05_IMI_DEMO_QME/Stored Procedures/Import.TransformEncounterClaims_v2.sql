@@ -498,6 +498,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Import].[TransformEncounterClaims_v2] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Import].[TransformEncounterClaims_v2] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Import].[TransformEncounterClaims_v2] TO [Processor]
 GO

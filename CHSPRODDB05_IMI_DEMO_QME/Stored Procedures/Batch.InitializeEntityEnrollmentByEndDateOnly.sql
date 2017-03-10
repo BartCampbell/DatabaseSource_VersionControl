@@ -253,6 +253,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeEntityEnrollmentByEndDateOnly] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeEntityEnrollmentByEndDateOnly] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeEntityEnrollmentByEndDateOnly] TO [Processor]
 GO

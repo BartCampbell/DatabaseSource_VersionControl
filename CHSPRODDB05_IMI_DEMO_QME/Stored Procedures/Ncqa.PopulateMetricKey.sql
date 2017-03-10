@@ -63,6 +63,11 @@ BEGIN
 
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[PopulateMetricKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[PopulateMetricKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[PopulateMetricKey] TO [Processor]
 GO

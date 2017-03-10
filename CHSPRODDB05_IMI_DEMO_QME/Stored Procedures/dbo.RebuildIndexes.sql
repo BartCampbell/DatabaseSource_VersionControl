@@ -34,6 +34,11 @@ BEGIN
     
     RETURN 0;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [dbo].[RebuildIndexes] TO [db_executer]
+GO
+GRANT EXECUTE ON  [dbo].[RebuildIndexes] TO [db_executer]
 GO
 GRANT EXECUTE ON  [dbo].[RebuildIndexes] TO [Processor]
 GO

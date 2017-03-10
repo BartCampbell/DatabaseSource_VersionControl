@@ -547,4 +547,9 @@ BEGIN
 		END;
 
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[ApplyEligiblePopluationLocks] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[ApplyEligiblePopluationLocks] TO [db_executer]
 GO

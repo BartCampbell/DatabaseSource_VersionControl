@@ -271,6 +271,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetRRUSummaryResults] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetRRUSummaryResults] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetRRUSummaryResults] TO [Processor]
 GO

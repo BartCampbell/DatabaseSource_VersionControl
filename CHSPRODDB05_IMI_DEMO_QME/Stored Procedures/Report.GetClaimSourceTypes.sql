@@ -77,6 +77,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetClaimSourceTypes] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetClaimSourceTypes] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetClaimSourceTypes] TO [Processor]
 GO

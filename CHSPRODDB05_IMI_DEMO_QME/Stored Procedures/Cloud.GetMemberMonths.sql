@@ -74,8 +74,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[GetMemberMonths] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetMemberMonths] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetMemberMonths] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetMemberMonths] TO [NController]
 GO

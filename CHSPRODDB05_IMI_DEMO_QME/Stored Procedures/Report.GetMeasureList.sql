@@ -163,6 +163,11 @@ BEGIN
                 MM.Abbrev ASC
 
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasureList] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasureList] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasureList] TO [Processor]
 GO

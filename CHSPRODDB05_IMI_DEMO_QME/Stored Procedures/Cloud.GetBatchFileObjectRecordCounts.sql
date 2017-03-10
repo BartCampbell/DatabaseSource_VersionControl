@@ -101,6 +101,11 @@ BEGIN
 	
 	SELECT @BatchID AS BatchID, CountRecords, FileObjectID FROM @SqlCmds;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetBatchFileObjectRecordCounts] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetBatchFileObjectRecordCounts] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetBatchFileObjectRecordCounts] TO [Processor]
 GO

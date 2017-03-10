@@ -203,6 +203,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeEntityByMemberGenderAndAge] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeEntityByMemberGenderAndAge] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeEntityByMemberGenderAndAge] TO [Processor]
 GO

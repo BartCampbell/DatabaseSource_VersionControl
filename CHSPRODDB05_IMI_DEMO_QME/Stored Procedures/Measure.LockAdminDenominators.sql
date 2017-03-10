@@ -517,6 +517,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Measure].[LockAdminDenominators] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Measure].[LockAdminDenominators] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Measure].[LockAdminDenominators] TO [Processor]
 GO

@@ -568,6 +568,11 @@ BEGIN
 		END;
 	END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[IDSS_GenerateDataElementValues] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[IDSS_GenerateDataElementValues] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[IDSS_GenerateDataElementValues] TO [Processor]
 GO

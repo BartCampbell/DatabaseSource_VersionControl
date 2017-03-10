@@ -237,6 +237,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[CompileDataSetMetricKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[CompileDataSetMetricKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[CompileDataSetMetricKey] TO [Processor]
 GO

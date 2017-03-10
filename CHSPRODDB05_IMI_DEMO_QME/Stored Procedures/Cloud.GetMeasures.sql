@@ -102,8 +102,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[GetMeasures] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetMeasures] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetMeasures] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetMeasures] TO [NController]
 GO

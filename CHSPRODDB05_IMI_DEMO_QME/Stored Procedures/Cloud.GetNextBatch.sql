@@ -140,6 +140,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetNextBatch] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetNextBatch] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetNextBatch] TO [Processor]
 GO

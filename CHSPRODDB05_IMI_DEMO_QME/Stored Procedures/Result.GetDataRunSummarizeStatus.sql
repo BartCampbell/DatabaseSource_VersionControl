@@ -83,6 +83,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[GetDataRunSummarizeStatus] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[GetDataRunSummarizeStatus] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[GetDataRunSummarizeStatus] TO [Processor]
 GO

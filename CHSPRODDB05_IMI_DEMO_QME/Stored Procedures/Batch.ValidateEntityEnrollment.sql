@@ -755,6 +755,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[ValidateEntityEnrollment] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[ValidateEntityEnrollment] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[ValidateEntityEnrollment] TO [Processor]
 GO

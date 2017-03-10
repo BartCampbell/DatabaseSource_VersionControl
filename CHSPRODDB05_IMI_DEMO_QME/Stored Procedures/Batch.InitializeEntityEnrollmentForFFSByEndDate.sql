@@ -252,6 +252,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeEntityEnrollmentForFFSByEndDate] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeEntityEnrollmentForFFSByEndDate] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeEntityEnrollmentForFFSByEndDate] TO [Processor]
 GO

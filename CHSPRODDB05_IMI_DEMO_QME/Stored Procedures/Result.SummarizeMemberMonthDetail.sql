@@ -271,6 +271,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[SummarizeMemberMonthDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[SummarizeMemberMonthDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[SummarizeMemberMonthDetail] TO [Processor]
 GO

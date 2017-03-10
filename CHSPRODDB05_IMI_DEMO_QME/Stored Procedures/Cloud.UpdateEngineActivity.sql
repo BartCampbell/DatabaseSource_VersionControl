@@ -87,8 +87,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[UpdateEngineActivity] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[UpdateEngineActivity] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[UpdateEngineActivity] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[UpdateEngineActivity] TO [Processor]
 GO

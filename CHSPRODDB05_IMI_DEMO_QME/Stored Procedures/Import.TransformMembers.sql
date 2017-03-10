@@ -389,6 +389,11 @@ BEGIN
 	END CATCH;
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Import].[TransformMembers] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Import].[TransformMembers] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Import].[TransformMembers] TO [Processor]
 GO

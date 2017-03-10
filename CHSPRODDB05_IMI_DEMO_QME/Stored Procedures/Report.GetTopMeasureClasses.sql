@@ -79,6 +79,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetTopMeasureClasses] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetTopMeasureClasses] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetTopMeasureClasses] TO [Processor]
 GO

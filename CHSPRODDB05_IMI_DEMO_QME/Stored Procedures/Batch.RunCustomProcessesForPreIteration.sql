@@ -97,6 +97,11 @@ SET NOCOUNT ON;
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[RunCustomProcessesForPreIteration] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[RunCustomProcessesForPreIteration] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[RunCustomProcessesForPreIteration] TO [Processor]
 GO

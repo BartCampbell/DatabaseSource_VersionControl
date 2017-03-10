@@ -154,6 +154,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Measure].[DuplicateMeasureSet] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Measure].[DuplicateMeasureSet] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Measure].[DuplicateMeasureSet] TO [Processor]
 GO

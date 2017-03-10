@@ -197,6 +197,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[CancelProcessing] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[CancelProcessing] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[CancelProcessing] TO [Processor]
 GO

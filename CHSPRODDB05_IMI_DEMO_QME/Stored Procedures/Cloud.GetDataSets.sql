@@ -96,8 +96,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[GetDataSets] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetDataSets] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetDataSets] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetDataSets] TO [Processor]
 GO

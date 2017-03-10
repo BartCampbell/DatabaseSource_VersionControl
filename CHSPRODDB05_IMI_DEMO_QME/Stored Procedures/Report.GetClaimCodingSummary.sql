@@ -73,6 +73,11 @@ AS
 
 
     END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetClaimCodingSummary] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetClaimCodingSummary] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetClaimCodingSummary] TO [Processor]
 GO

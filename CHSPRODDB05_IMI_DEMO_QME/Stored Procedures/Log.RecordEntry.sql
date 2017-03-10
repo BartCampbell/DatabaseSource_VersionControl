@@ -164,6 +164,11 @@ BEGIN
 			END CATCH;
 		END;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Log].[RecordEntry] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Log].[RecordEntry] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Log].[RecordEntry] TO [Processor]
 GO

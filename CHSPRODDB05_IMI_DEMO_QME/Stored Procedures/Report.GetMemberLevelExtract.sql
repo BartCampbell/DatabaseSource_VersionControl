@@ -179,6 +179,11 @@ AS
                     DateOfBirth;
 
     END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMemberLevelExtract] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMemberLevelExtract] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMemberLevelExtract] TO [Processor]
 GO

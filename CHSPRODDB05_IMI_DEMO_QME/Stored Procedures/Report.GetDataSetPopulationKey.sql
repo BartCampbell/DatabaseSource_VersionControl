@@ -75,6 +75,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetDataSetPopulationKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetDataSetPopulationKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetDataSetPopulationKey] TO [Processor]
 GO

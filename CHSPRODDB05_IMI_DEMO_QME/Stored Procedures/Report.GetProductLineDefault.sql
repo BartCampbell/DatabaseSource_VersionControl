@@ -97,6 +97,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetProductLineDefault] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetProductLineDefault] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetProductLineDefault] TO [Processor]
 GO

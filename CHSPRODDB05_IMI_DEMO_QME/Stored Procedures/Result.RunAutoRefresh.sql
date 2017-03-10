@@ -51,6 +51,11 @@ BEGIN
 		END;
 		
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[RunAutoRefresh] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[RunAutoRefresh] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[RunAutoRefresh] TO [Processor]
 GO

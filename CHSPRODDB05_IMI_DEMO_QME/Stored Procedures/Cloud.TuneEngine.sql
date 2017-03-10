@@ -66,6 +66,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[TuneEngine] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[TuneEngine] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[TuneEngine] TO [Processor]
 GO

@@ -825,6 +825,11 @@ BEGIN
 	--Always returns zero now due to added indexes...
 	--PRINT 'Total Record Count: ' + CONVERT(varchar(32), @CountRecords);
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Export].[CopyResultsToDB] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Export].[CopyResultsToDB] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Export].[CopyResultsToDB] TO [Processor]
 GO

@@ -97,8 +97,13 @@ BEGIN
 END
 
 
+
 GO
 GRANT EXECUTE ON  [Log].[RecordError] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Log].[RecordError] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Log].[RecordError] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Log].[RecordError] TO [NController]
 GO

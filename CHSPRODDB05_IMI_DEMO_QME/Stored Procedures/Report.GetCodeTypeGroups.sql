@@ -77,6 +77,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetCodeTypeGroups] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetCodeTypeGroups] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetCodeTypeGroups] TO [Processor]
 GO

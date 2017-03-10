@@ -200,6 +200,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[PurgeDataRun] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[PurgeDataRun] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[PurgeDataRun] TO [Processor]
 GO

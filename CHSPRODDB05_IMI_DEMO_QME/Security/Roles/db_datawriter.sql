@@ -1,3 +1,5 @@
+
+EXEC sp_addrolemember N'db_datawriter', N'INTERNAL\Melody.Jones'
 EXEC sp_addrolemember N'db_datawriter', N'IMIHEALTH\IMI.SQL.Developers'
 GO
 EXEC sp_addrolemember N'db_datawriter', N'Insights_User'

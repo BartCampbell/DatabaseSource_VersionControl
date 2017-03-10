@@ -248,6 +248,11 @@ BEGIN
 		RAISERROR('Unable to convert all mean and percentile product lines, classes, measures and metrics.', 16, 1);
 
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[RefreshMeansAndPercentiles] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[RefreshMeansAndPercentiles] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[RefreshMeansAndPercentiles] TO [Processor]
 GO

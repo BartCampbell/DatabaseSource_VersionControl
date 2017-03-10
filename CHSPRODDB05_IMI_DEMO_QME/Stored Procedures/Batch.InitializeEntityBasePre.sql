@@ -252,6 +252,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeEntityBasePre] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeEntityBasePre] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeEntityBasePre] TO [Processor]
 GO

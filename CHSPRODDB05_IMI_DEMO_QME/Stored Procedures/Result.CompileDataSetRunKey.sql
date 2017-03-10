@@ -233,6 +233,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[CompileDataSetRunKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[CompileDataSetRunKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[CompileDataSetRunKey] TO [Processor]
 GO

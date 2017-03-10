@@ -97,8 +97,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[ConfirmBatchFileRetrieval] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[ConfirmBatchFileRetrieval] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[ConfirmBatchFileRetrieval] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[ConfirmBatchFileRetrieval] TO [Processor]
 GO

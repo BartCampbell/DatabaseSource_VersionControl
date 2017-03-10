@@ -604,6 +604,15 @@ BEGIN;
 	END CATCH;
 
 END;
+
+GO
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[PLD_GenerateFilePerResultRow] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[PLD_GenerateFilePerResultRow] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[PLD_GenerateFilePerResultRow] TO [Processor]
+GO
+GO
+
 GO

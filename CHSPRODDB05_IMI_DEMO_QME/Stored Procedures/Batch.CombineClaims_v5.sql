@@ -842,6 +842,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[CombineClaims_v5] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[CombineClaims_v5] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[CombineClaims_v5] TO [Processor]
 GO

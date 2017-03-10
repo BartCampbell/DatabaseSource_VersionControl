@@ -38,6 +38,11 @@ BEGIN
 	SET @CountRecords = ISNULL(@CountRecords, 0) + @@ROWCOUNT;
 
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[RefreshPopulationAssignment] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[RefreshPopulationAssignment] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[RefreshPopulationAssignment] TO [Processor]
 GO

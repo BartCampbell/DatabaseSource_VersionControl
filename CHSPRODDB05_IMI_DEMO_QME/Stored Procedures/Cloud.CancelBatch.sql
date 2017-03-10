@@ -112,6 +112,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[CancelBatch] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[CancelBatch] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[CancelBatch] TO [Processor]
 GO

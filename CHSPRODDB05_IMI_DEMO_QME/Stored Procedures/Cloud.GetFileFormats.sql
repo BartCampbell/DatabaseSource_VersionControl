@@ -87,8 +87,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[GetFileFormats] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetFileFormats] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetFileFormats] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetFileFormats] TO [Processor]
 GO

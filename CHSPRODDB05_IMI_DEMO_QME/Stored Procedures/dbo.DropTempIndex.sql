@@ -55,6 +55,11 @@ BEGIN
 			RETURN 1;
 		END;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [dbo].[DropTempIndex] TO [db_executer]
+GO
+GRANT EXECUTE ON  [dbo].[DropTempIndex] TO [db_executer]
 GO
 GRANT EXECUTE ON  [dbo].[DropTempIndex] TO [Processor]
 GO

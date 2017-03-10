@@ -256,6 +256,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[SummarizeMetricMonths] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[SummarizeMetricMonths] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[SummarizeMetricMonths] TO [Processor]
 GO

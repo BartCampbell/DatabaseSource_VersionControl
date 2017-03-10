@@ -186,6 +186,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeProcessing] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeProcessing] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeProcessing] TO [Processor]
 GO

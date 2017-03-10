@@ -115,6 +115,11 @@ BEGIN
 		RAISERROR('The parameter @IsEnabled cannot be NULL.', 16, 1);
 
 END
+
+GO
+GRANT VIEW DEFINITION ON  [dbo].[ChangeIndexState] TO [db_executer]
+GO
+GRANT EXECUTE ON  [dbo].[ChangeIndexState] TO [db_executer]
 GO
 GRANT EXECUTE ON  [dbo].[ChangeIndexState] TO [Processor]
 GO

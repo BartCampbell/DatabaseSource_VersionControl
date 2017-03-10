@@ -97,6 +97,11 @@ SET NOCOUNT ON;
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[RunCustomProcessesForPostEvents] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[RunCustomProcessesForPostEvents] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[RunCustomProcessesForPostEvents] TO [Processor]
 GO

@@ -803,6 +803,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[PCR_CalculateMeasureDetail_vAllowUnpaid] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[PCR_CalculateMeasureDetail_vAllowUnpaid] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[PCR_CalculateMeasureDetail_vAllowUnpaid] TO [Processor]
 GO

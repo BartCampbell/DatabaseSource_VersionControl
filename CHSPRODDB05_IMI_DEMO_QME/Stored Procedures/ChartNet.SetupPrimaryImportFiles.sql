@@ -1411,6 +1411,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [ChartNet].[SetupPrimaryImportFiles] TO [db_executer]
+GO
+GRANT EXECUTE ON  [ChartNet].[SetupPrimaryImportFiles] TO [db_executer]
 GO
 GRANT EXECUTE ON  [ChartNet].[SetupPrimaryImportFiles] TO [Processor]
 GO

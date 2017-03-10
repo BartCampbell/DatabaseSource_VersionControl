@@ -531,6 +531,11 @@ BEGIN
 	END CATCH;
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[SetActiveBatch] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[SetActiveBatch] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[SetActiveBatch] TO [Processor]
 GO

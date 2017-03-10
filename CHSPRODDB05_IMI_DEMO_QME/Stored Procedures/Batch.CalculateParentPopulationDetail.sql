@@ -182,6 +182,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[CalculateParentPopulationDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[CalculateParentPopulationDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[CalculateParentPopulationDetail] TO [Processor]
 GO

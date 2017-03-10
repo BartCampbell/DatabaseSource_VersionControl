@@ -72,6 +72,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetPopulationDefault] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetPopulationDefault] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetPopulationDefault] TO [Processor]
 GO

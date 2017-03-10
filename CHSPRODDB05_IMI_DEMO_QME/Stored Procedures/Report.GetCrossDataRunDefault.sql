@@ -106,6 +106,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetCrossDataRunDefault] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetCrossDataRunDefault] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetCrossDataRunDefault] TO [Processor]
 GO

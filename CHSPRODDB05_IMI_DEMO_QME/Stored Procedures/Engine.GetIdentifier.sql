@@ -68,6 +68,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Engine].[GetIdentifier] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Engine].[GetIdentifier] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Engine].[GetIdentifier] TO [Processor]
 GO

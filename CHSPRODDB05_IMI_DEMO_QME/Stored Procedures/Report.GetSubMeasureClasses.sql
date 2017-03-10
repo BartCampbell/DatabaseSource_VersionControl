@@ -83,6 +83,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetSubMeasureClasses] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetSubMeasureClasses] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetSubMeasureClasses] TO [Processor]
 GO

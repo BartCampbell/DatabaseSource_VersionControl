@@ -39,6 +39,11 @@ BEGIN
 			 SET @SrcObjectID = SCOPE_IDENTITY();
 		END;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Log].[RetrieveSourceObject] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Log].[RetrieveSourceObject] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Log].[RetrieveSourceObject] TO [Processor]
 GO

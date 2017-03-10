@@ -328,6 +328,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[IdentifyClaimAttributes] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[IdentifyClaimAttributes] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[IdentifyClaimAttributes] TO [Processor]
 GO

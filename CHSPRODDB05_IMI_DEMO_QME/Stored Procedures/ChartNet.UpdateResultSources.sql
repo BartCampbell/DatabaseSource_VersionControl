@@ -161,6 +161,11 @@ BEGIN
 				(RMD.SourceDenominator IS NULL OR RMD.SourceNumerator IS NULL);
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [ChartNet].[UpdateResultSources] TO [db_executer]
+GO
+GRANT EXECUTE ON  [ChartNet].[UpdateResultSources] TO [db_executer]
 GO
 GRANT EXECUTE ON  [ChartNet].[UpdateResultSources] TO [Processor]
 GO

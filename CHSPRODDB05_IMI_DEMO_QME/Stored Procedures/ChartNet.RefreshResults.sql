@@ -971,6 +971,11 @@ BEGIN
 
 	RETURN 0;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [ChartNet].[RefreshResults] TO [db_executer]
+GO
+GRANT EXECUTE ON  [ChartNet].[RefreshResults] TO [db_executer]
 GO
 GRANT EXECUTE ON  [ChartNet].[RefreshResults] TO [Processor]
 GO

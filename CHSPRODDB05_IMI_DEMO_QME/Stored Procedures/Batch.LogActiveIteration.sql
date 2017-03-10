@@ -293,6 +293,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[LogActiveIteration] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[LogActiveIteration] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[LogActiveIteration] TO [Processor]
 GO

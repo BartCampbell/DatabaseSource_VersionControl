@@ -777,6 +777,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[QuantifyEntityCriteria] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[QuantifyEntityCriteria] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[QuantifyEntityCriteria] TO [Processor]
 GO

@@ -64,6 +64,11 @@ AS
 
             END;
     END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetHybridResultsDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetHybridResultsDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetHybridResultsDetail] TO [Processor]
 GO

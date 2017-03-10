@@ -1,3 +1,7 @@
+
+EXEC sp_addrolemember N'db_datareader', N'INTERNAL\CHSSQLDevOps'
+
+EXEC sp_addrolemember N'db_datareader', N'INTERNAL\Melody.Jones'
 EXEC sp_addrolemember N'db_datareader', N'Analyst'
 GO
 EXEC sp_addrolemember N'db_datareader', N'IMIHEALTH\IMI.SQL.Developers'

@@ -89,6 +89,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasureFields] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasureFields] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasureFields] TO [Processor]
 GO

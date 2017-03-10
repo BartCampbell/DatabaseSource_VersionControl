@@ -71,6 +71,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetDataSetDefault] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetDataSetDefault] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetDataSetDefault] TO [Processor]
 GO

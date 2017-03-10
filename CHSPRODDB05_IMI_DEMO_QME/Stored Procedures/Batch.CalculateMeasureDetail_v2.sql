@@ -1172,6 +1172,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[CalculateMeasureDetail_v2] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[CalculateMeasureDetail_v2] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[CalculateMeasureDetail_v2] TO [Processor]
 GO

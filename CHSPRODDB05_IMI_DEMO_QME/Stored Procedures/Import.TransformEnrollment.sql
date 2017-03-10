@@ -300,6 +300,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Import].[TransformEnrollment] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Import].[TransformEnrollment] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Import].[TransformEnrollment] TO [Processor]
 GO

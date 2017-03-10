@@ -157,6 +157,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[PurgeInternalTables] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[PurgeInternalTables] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[PurgeInternalTables] TO [Processor]
 GO

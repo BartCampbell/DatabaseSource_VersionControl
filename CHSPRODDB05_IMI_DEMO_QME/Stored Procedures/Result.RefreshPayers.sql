@@ -213,6 +213,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[RefreshPayers] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[RefreshPayers] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[RefreshPayers] TO [Processor]
 GO

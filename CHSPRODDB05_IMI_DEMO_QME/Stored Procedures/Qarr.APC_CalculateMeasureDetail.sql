@@ -345,6 +345,11 @@ BEGIN
 		RAISERROR('The measure could not be found.  Verify that the specified run exists and the run points to a HEDIS measure set.', 16, 1);
 
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Qarr].[APC_CalculateMeasureDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Qarr].[APC_CalculateMeasureDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Qarr].[APC_CalculateMeasureDetail] TO [Processor]
 GO

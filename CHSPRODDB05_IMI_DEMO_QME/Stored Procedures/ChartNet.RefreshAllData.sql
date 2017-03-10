@@ -38,6 +38,11 @@ BEGIN
     RETURN 0;
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [ChartNet].[RefreshAllData] TO [db_executer]
+GO
+GRANT EXECUTE ON  [ChartNet].[RefreshAllData] TO [db_executer]
 GO
 GRANT EXECUTE ON  [ChartNet].[RefreshAllData] TO [Processor]
 GO

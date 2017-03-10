@@ -75,6 +75,11 @@ BEGIN
 	PRINT 'Applied IDSS configuration data for ' + CONVERT(varchar(256), @CountRecords) + ' data element(s) out of ' + CONVERT(varchar(256), ISNULL(@CountElements, 0)) + '.';
     
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[IDSS_ApplyDataElementInfo] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[IDSS_ApplyDataElementInfo] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[IDSS_ApplyDataElementInfo] TO [Processor]
 GO

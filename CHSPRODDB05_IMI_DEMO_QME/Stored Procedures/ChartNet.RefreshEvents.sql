@@ -343,6 +343,11 @@ BEGIN
 
 	RETURN 0;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [ChartNet].[RefreshEvents] TO [db_executer]
+GO
+GRANT EXECUTE ON  [ChartNet].[RefreshEvents] TO [db_executer]
 GO
 GRANT EXECUTE ON  [ChartNet].[RefreshEvents] TO [Processor]
 GO

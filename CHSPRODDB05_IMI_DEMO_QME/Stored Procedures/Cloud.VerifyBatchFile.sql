@@ -107,8 +107,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[VerifyBatchFile] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[VerifyBatchFile] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[VerifyBatchFile] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[VerifyBatchFile] TO [Processor]
 GO

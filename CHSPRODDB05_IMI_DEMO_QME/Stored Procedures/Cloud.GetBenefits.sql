@@ -78,8 +78,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[GetBenefits] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetBenefits] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetBenefits] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetBenefits] TO [NController]
 GO

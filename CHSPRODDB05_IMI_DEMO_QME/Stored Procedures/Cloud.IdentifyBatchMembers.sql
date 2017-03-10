@@ -230,6 +230,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[IdentifyBatchMembers] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[IdentifyBatchMembers] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[IdentifyBatchMembers] TO [Processor]
 GO

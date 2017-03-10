@@ -155,8 +155,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[GetDataRunInfo] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetDataRunInfo] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetDataRunInfo] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetDataRunInfo] TO [Processor]
 GO

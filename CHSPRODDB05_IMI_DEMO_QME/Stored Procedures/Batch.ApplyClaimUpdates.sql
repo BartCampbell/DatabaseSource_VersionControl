@@ -290,6 +290,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[ApplyClaimUpdates] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[ApplyClaimUpdates] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[ApplyClaimUpdates] TO [Processor]
 GO

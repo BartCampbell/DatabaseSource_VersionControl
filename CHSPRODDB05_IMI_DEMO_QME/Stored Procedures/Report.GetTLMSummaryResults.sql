@@ -129,6 +129,11 @@ ORDER BY ProductLineID ,
         PopulationID;
 
     END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetTLMSummaryResults] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetTLMSummaryResults] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetTLMSummaryResults] TO [Processor]
 GO

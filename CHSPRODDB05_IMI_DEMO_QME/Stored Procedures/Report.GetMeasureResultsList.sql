@@ -3,6 +3,8 @@ GO
 SET ANSI_NULLS ON
 GO
 
+
+
 CREATE PROCEDURE [Report].[GetMeasureResultsList]
 (
  @DataRunID int,				--The data run to retrieve
@@ -53,7 +55,7 @@ BEGIN
     INTO    #MeasureDefaultResultType
     FROM    Result.GetDefaultMeasureResultTypes(@DataRunID, DEFAULT);
 
-    CREATE UNIQUE CLUSTERED INDEX IX_#MeasureDefaultResultType ON #MeasureDefaultResultType (MeasureID, PopulationID);
+    --CREATE UNIQUE CLUSTERED INDEX IX_#MeasureDefaultResultType ON #MeasureDefaultResultType (MeasureID, PopulationID);
 
     SELECT  MIN(RDSPK.PopulationNum) AS PopulationNum,
             MIN(RDSPK.Descr) AS PopulationDescr,
@@ -150,6 +152,14 @@ BEGIN
 
 END
 
+
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasureResultsList] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasureResultsList] TO [db_executer]
+GO
+GRANT ALTER ON  [Report].[GetMeasureResultsList] TO [INTERNAL\brandon.rodman]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasureResultsList] TO [Processor]
 GO

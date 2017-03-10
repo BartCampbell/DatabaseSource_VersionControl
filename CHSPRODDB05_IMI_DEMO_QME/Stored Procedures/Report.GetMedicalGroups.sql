@@ -86,6 +86,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMedicalGroups] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMedicalGroups] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMedicalGroups] TO [Processor]
 GO

@@ -140,6 +140,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[SubmitBatchFileXml] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[SubmitBatchFileXml] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[SubmitBatchFileXml] TO [Processor]
 GO

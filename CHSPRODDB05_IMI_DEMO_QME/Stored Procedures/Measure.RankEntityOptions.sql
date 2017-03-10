@@ -182,6 +182,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Measure].[RankEntityOptions] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Measure].[RankEntityOptions] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Measure].[RankEntityOptions] TO [Processor]
 GO

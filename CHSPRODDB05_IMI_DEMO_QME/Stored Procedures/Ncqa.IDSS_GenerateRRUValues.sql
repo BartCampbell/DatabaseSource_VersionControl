@@ -631,4 +631,9 @@ BEGIN
 
 	SELECT @Result AS [IDSS RRU];
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[IDSS_GenerateRRUValues] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[IDSS_GenerateRRUValues] TO [db_executer]
 GO

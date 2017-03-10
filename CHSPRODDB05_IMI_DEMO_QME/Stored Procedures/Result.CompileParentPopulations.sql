@@ -463,6 +463,11 @@ BEGIN
 	ELSE
 		PRINT 'Unable to insert parent populations.  The specified data run is invalid or has already had parent populations compiled.';
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[CompileParentPopulations] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[CompileParentPopulations] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[CompileParentPopulations] TO [Processor]
 GO

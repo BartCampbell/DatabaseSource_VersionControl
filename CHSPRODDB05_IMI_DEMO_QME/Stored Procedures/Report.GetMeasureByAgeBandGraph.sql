@@ -294,6 +294,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetMeasureByAgeBandGraph] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetMeasureByAgeBandGraph] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetMeasureByAgeBandGraph] TO [Processor]
 GO

@@ -380,6 +380,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[LogActiveBatch] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[LogActiveBatch] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[LogActiveBatch] TO [Processor]
 GO

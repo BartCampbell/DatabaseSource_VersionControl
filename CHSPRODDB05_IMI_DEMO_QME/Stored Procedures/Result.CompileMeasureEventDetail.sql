@@ -946,6 +946,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[CompileMeasureEventDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[CompileMeasureEventDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[CompileMeasureEventDetail] TO [Processor]
 GO

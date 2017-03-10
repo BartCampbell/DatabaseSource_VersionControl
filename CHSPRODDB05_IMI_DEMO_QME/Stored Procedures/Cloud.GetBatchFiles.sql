@@ -127,8 +127,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[GetBatchFiles] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetBatchFiles] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetBatchFiles] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetBatchFiles] TO [Processor]
 GO

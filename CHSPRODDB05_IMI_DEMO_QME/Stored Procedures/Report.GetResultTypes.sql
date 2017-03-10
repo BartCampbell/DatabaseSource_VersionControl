@@ -99,6 +99,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetResultTypes] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetResultTypes] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetResultTypes] TO [Processor]
 GO

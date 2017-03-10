@@ -268,6 +268,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeEntityByEventLinkedServDateToLastSegEndDate] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeEntityByEventLinkedServDateToLastSegEndDate] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeEntityByEventLinkedServDateToLastSegEndDate] TO [Processor]
 GO

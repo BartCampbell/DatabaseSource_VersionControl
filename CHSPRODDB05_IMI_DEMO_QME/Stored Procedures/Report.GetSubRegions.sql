@@ -81,6 +81,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetSubRegions] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetSubRegions] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetSubRegions] TO [Processor]
 GO

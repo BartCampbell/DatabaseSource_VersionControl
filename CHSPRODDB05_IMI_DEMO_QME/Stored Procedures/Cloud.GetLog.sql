@@ -182,8 +182,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[GetLog] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetLog] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetLog] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetLog] TO [Processor]
 GO

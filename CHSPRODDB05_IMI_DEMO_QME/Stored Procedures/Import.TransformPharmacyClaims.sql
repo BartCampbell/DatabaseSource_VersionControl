@@ -312,6 +312,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Import].[TransformPharmacyClaims] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Import].[TransformPharmacyClaims] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Import].[TransformPharmacyClaims] TO [Processor]
 GO

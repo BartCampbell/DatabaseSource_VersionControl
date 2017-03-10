@@ -634,6 +634,11 @@ BEGIN
 	END CATCH;
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[ProcessEntities] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[ProcessEntities] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[ProcessEntities] TO [Processor]
 GO

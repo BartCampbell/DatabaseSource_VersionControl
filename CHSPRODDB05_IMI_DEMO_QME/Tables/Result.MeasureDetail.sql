@@ -66,5 +66,7 @@ CREATE NONCLUSTERED INDEX [IX_MeasureDetail_AgeBands] ON [Result].[MeasureDetail
 GO
 CREATE NONCLUSTERED INDEX [IX_MeasureDetail] ON [Result].[MeasureDetail] ([DataRunID], [DSMemberID], [PopulationID], [BitProductLines], [ResultTypeID], [MetricID], [MeasureID]) INCLUDE ([DataSetID], [Days], [IsDenominator], [Qty]) WITH (ALLOW_PAGE_LOCKS=OFF) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [<Name of Missing Index, sysname,>] ON [Result].[MeasureDetail] ([DataRunID], [MeasureID], [ResultTypeID]) INCLUDE ([Age], [AgeBandID], [AgeBandSegID], [AgeMonths], [BatchID], [BeginDate], [BitProductLines], [ClinCondID], [DataSetID], [DataSourceID], [Days], [DSEntityID], [DSMemberID], [DSProviderID], [EndDate], [EnrollGroupID], [EntityID], [ExclusionTypeID], [Gender], [IsDenominator], [IsExclusion], [IsIndicator], [IsNumerator], [IsNumeratorAdmin], [IsNumeratorMedRcd], [IsSupplementalDenominator], [IsSupplementalExclusion], [IsSupplementalIndicator], [IsSupplementalNumerator], [KeyDate], [MeasureXrefID], [MetricID], [MetricXrefID], [PayerID], [PopulationID], [ProductLineID], [Qty], [Qty2], [Qty3], [Qty4], [ResultInfo], [ResultRowGuid], [ResultRowID], [SourceDenominator], [SourceDenominatorSrc], [SourceExclusion], [SourceExclusionSrc], [SourceIndicator], [SourceIndicatorSrc], [SourceNumerator], [SourceNumeratorSrc], [SysSampleRefID], [Weight]) ON [PRIMARY]
+GO
 CREATE UNIQUE NONCLUSTERED INDEX [IX_MeasureDetail_ResultRowGuid] ON [Result].[MeasureDetail] ([ResultRowGuid]) WITH (ALLOW_PAGE_LOCKS=OFF) ON [PRIMARY]
 GO

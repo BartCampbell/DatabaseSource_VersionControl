@@ -81,6 +81,11 @@ BEGIN
             [Metric Description]
     ORDER BY [Sort Order], [Numerator Data Source], Metric;
 END;
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetSupplementalDataNumeratorSummary] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetSupplementalDataNumeratorSummary] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetSupplementalDataNumeratorSummary] TO [Processor]
 GO

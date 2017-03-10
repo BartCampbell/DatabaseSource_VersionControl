@@ -439,6 +439,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[InitializeEventBase_v1] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[InitializeEventBase_v1] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[InitializeEventBase_v1] TO [Processor]
 GO

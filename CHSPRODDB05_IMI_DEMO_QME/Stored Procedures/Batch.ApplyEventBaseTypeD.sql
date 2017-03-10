@@ -577,6 +577,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[ApplyEventBaseTypeD] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[ApplyEventBaseTypeD] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[ApplyEventBaseTypeD] TO [Processor]
 GO

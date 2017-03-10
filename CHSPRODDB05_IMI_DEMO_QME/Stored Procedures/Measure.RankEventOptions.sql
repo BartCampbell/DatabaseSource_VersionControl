@@ -268,6 +268,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Measure].[RankEventOptions] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Measure].[RankEventOptions] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Measure].[RankEventOptions] TO [Processor]
 GO

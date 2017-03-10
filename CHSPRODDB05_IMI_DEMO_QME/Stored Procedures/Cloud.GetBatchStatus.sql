@@ -85,8 +85,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[GetBatchStatus] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetBatchStatus] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetBatchStatus] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetBatchStatus] TO [Processor]
 GO

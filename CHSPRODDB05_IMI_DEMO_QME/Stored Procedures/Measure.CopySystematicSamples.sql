@@ -504,6 +504,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Measure].[CopySystematicSamples] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Measure].[CopySystematicSamples] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Measure].[CopySystematicSamples] TO [Processor]
 GO

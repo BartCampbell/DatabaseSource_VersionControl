@@ -366,6 +366,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[ApplyEventRequirements] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[ApplyEventRequirements] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[ApplyEventRequirements] TO [Processor]
 GO

@@ -285,6 +285,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[SummarizeClaims] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[SummarizeClaims] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[SummarizeClaims] TO [Processor]
 GO

@@ -90,6 +90,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetProductLines] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetProductLines] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetProductLines] TO [Processor]
 GO

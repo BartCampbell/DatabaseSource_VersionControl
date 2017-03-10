@@ -51,6 +51,11 @@ BEGIN
 	
 	RETURN 1;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [dbo].[SetDbRecoveryOption] TO [db_executer]
+GO
+GRANT EXECUTE ON  [dbo].[SetDbRecoveryOption] TO [db_executer]
 GO
 GRANT EXECUTE ON  [dbo].[SetDbRecoveryOption] TO [Processor]
 GO

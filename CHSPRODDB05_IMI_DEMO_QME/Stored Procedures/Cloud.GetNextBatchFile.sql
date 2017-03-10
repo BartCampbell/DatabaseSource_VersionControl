@@ -153,8 +153,13 @@ END
 
 
 
+
 GO
 GRANT EXECUTE ON  [Cloud].[GetNextBatchFile] TO [Controller]
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetNextBatchFile] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetNextBatchFile] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetNextBatchFile] TO [Processor]
 GO

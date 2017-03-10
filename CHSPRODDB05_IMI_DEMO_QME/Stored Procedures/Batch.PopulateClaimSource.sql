@@ -344,6 +344,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[PopulateClaimSource] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[PopulateClaimSource] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[PopulateClaimSource] TO [Processor]
 GO

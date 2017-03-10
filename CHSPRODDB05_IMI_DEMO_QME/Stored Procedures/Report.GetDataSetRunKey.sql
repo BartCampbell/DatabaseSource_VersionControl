@@ -72,6 +72,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetDataSetRunKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetDataSetRunKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetDataSetRunKey] TO [Processor]
 GO

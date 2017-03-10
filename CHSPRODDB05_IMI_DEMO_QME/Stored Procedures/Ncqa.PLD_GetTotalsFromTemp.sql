@@ -50,4 +50,9 @@ BEGIN
 
 	EXEC (@SqlCmd);
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[PLD_GetTotalsFromTemp] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[PLD_GetTotalsFromTemp] TO [db_executer]
 GO

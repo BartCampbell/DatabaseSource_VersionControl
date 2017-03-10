@@ -198,6 +198,11 @@ BEGIN
 
 END;
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetPCRDetailResults] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetPCRDetailResults] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetPCRDetailResults] TO [Processor]
 GO

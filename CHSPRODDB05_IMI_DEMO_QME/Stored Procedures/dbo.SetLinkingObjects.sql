@@ -112,6 +112,11 @@ BEGIN
     
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [dbo].[SetLinkingObjects] TO [db_executer]
+GO
+GRANT EXECUTE ON  [dbo].[SetLinkingObjects] TO [db_executer]
 GO
 GRANT EXECUTE ON  [dbo].[SetLinkingObjects] TO [Processor]
 GO

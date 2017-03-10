@@ -61,6 +61,11 @@ BEGIN
 	END CATCH;
 
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Dictionary].[AddNewObjects] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Dictionary].[AddNewObjects] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Dictionary].[AddNewObjects] TO [Processor]
 GO

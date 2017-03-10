@@ -149,6 +149,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[GetBatchProgressLog] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[GetBatchProgressLog] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[GetBatchProgressLog] TO [Processor]
 GO

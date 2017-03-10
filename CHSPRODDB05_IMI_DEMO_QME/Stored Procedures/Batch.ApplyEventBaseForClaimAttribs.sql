@@ -19,6 +19,11 @@ BEGIN
 	EXEC Batch.ApplyEventBaseTypeL @BatchID = @BatchID, @IsClaimAttrib = 1
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[ApplyEventBaseForClaimAttribs] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[ApplyEventBaseForClaimAttribs] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[ApplyEventBaseForClaimAttribs] TO [Processor]
 GO

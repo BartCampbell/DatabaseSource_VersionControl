@@ -44,6 +44,11 @@ BEGIN;
 	
 END;
 
+
+GO
+GRANT VIEW DEFINITION ON  [Ncqa].[PLD_GenerateFile] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Ncqa].[PLD_GenerateFile] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Ncqa].[PLD_GenerateFile] TO [Processor]
 GO

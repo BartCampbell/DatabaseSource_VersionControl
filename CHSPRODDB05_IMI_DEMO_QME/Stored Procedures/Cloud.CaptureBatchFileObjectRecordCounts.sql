@@ -54,6 +54,11 @@ BEGIN
 	ORDER BY t.BatchID, t.FileObjectID;
 
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[CaptureBatchFileObjectRecordCounts] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[CaptureBatchFileObjectRecordCounts] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[CaptureBatchFileObjectRecordCounts] TO [Processor]
 GO

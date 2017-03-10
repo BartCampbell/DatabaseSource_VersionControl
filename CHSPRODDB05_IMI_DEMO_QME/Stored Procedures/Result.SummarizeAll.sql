@@ -236,6 +236,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[SummarizeAll] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[SummarizeAll] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[SummarizeAll] TO [Processor]
 GO

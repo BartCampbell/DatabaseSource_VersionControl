@@ -109,6 +109,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetProviders] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetProviders] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetProviders] TO [Processor]
 GO

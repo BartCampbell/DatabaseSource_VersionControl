@@ -100,6 +100,11 @@ BEGIN
 	END CATCH;
 END
 
+
+GO
+GRANT VIEW DEFINITION ON  [Log].[GenerateTestError] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Log].[GenerateTestError] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Log].[GenerateTestError] TO [Processor]
 GO

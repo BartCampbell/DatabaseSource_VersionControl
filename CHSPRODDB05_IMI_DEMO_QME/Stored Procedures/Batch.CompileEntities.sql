@@ -321,6 +321,15 @@ END
 
 
 
+
+GO
+GO
+GRANT VIEW DEFINITION ON  [Batch].[CompileEntities] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[CompileEntities] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[CompileEntities] TO [Processor]
+GO
+GO
+
 GO

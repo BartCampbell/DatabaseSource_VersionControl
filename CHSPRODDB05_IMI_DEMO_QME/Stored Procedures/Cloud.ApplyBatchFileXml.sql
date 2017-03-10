@@ -393,6 +393,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[ApplyBatchFileXml] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[ApplyBatchFileXml] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[ApplyBatchFileXml] TO [Processor]
 GO

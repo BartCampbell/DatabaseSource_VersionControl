@@ -322,8 +322,19 @@ END
 
 
 
+
+GO
+GO
+GRANT VIEW DEFINITION ON  [Cloud].[SubmitDataRunInfo_v1] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Cloud].[SubmitDataRunInfo_v1] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Cloud].[SubmitDataRunInfo_v1] TO [Processor]
 GO
 GRANT EXECUTE ON  [Cloud].[SubmitDataRunInfo_v1] TO [Submitter]
+GO
+GO
+
+GO
+
 GO

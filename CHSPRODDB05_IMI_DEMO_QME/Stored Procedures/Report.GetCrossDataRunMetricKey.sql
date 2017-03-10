@@ -178,6 +178,11 @@ END
 
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetCrossDataRunMetricKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetCrossDataRunMetricKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetCrossDataRunMetricKey] TO [Processor]
 GO

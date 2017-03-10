@@ -69,6 +69,11 @@ BEGIN
     ORDER BY [Row ID];
 
 END;
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetSupplementalDataNumeratorDetail] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetSupplementalDataNumeratorDetail] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetSupplementalDataNumeratorDetail] TO [Processor]
 GO

@@ -269,6 +269,11 @@ BEGIN
 END
 
 
+
+GO
+GRANT VIEW DEFINITION ON  [Batch].[ProcessEntityEnrollment] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Batch].[ProcessEntityEnrollment] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Batch].[ProcessEntityEnrollment] TO [Processor]
 GO

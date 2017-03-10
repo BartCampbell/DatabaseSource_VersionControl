@@ -79,6 +79,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Report].[GetEntities] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Report].[GetEntities] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Report].[GetEntities] TO [Processor]
 GO

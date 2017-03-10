@@ -534,6 +534,11 @@ BEGIN
 		RETURN @ErrNumber;
 	END CATCH;
 END
+
+GO
+GRANT VIEW DEFINITION ON  [Result].[CompileDataSetMeasureProviderKey] TO [db_executer]
+GO
+GRANT EXECUTE ON  [Result].[CompileDataSetMeasureProviderKey] TO [db_executer]
 GO
 GRANT EXECUTE ON  [Result].[CompileDataSetMeasureProviderKey] TO [Processor]
 GO
