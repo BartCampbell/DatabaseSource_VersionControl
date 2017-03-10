@@ -1,0 +1,2 @@
+CREATE USER [hsag_ssrs] WITHOUT LOGIN
+GO

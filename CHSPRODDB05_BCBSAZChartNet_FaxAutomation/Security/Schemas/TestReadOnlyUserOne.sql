@@ -1,0 +1,3 @@
+CREATE SCHEMA [TestReadOnlyUserOne]
+AUTHORIZATION [dbo]
+GO
