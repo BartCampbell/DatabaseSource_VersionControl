@@ -1,0 +1,2 @@
+CREATE USER [cnetdbo] WITHOUT LOGIN
+GO
