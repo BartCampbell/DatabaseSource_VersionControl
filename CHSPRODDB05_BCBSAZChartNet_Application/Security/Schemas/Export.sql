@@ -1,0 +1,3 @@
+CREATE SCHEMA [Export]
+AUTHORIZATION [dbo]
+GO
