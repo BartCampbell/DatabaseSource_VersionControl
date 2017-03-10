@@ -17,9 +17,15 @@ CREATE TABLE [dbo].[Pursuit]
 GO
 ALTER TABLE [dbo].[Pursuit] ADD CONSTRAINT [PK_Pursuit] PRIMARY KEY CLUSTERED  ([PursuitID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_AbstractorID] ON [dbo].[Pursuit] ([AbstractorID]) INCLUDE ([PursuitCategory], [PursuitID]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IX_Pursuit_MemberID] ON [dbo].[Pursuit] ([MemberID]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_Pursuit_ProviderID] ON [dbo].[Pursuit] ([ProviderID]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [idx_ProviderSiteID_2] ON [dbo].[Pursuit] ([ProviderSiteID]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [indexName] ON [dbo].[Pursuit] ([ProviderSiteID]) INCLUDE ([AbstractorID], [MemberID], [ProviderID], [PursuitID], [PursuitNumber]) WITH (FILLFACTOR=90) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[Pursuit] ADD CONSTRAINT [FK_Pursuit_Abstractor] FOREIGN KEY ([AbstractorID]) REFERENCES [dbo].[Abstractor] ([AbstractorID])
 GO

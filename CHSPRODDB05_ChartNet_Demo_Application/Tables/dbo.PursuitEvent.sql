@@ -62,6 +62,8 @@ END
 GO
 ALTER TABLE [dbo].[PursuitEvent] ADD CONSTRAINT [PK_PursuitEvent] PRIMARY KEY CLUSTERED  ([PursuitEventID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_ChartStatusValueID] ON [dbo].[PursuitEvent] ([ChartStatusValueID]) INCLUDE ([AbstractionStatusID], [EventDate], [MeasureID], [MemberMeasureSampleID], [PursuitEventID], [PursuitID]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IX_PursuitEvent_MeasureID] ON [dbo].[PursuitEvent] ([MeasureID], [EventDate]) INCLUDE ([AbstractionStatusID], [PursuitID]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_PursuitEvent_MemberMeasureSampleID] ON [dbo].[PursuitEvent] ([MemberMeasureSampleID]) ON [PRIMARY]

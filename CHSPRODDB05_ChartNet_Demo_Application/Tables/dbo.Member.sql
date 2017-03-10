@@ -34,5 +34,7 @@ ALTER TABLE [dbo].[Member] ADD CONSTRAINT [PK_Member] PRIMARY KEY CLUSTERED  ([M
 GO
 CREATE UNIQUE NONCLUSTERED INDEX [IX_Member] ON [dbo].[Member] ([CustomerMemberID], [ProductLine], [Product]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [idx_LastChangedDate] ON [dbo].[Member] ([LastChangedDate]) INCLUDE ([CustomerMemberID], [DateOfBirth], [Gender], [LastChangedUser], [MemberID], [NameFirst], [NameLast], [NameMiddleInitial], [OriginalDateOfBirth], [OriginalGender], [Product], [ProductLine]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IX_Member_NameLast] ON [dbo].[Member] ([NameLast]) ON [PRIMARY]
 GO

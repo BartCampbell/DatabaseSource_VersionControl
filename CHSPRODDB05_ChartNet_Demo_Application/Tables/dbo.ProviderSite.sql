@@ -31,3 +31,7 @@ CREATE TABLE [dbo].[ProviderSite]
 GO
 ALTER TABLE [dbo].[ProviderSite] ADD CONSTRAINT [PK_ProviderSite_1] PRIMARY KEY CLUSTERED  ([ProviderSiteID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [idx_ProviderSiteName_BC] ON [dbo].[ProviderSite] ([ProviderSiteName]) INCLUDE ([ProviderSiteID]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [idx_ProviderSiteName] ON [dbo].[ProviderSite] ([ProviderSiteName]) INCLUDE ([CustomerProviderSiteID], [ProviderSiteID]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO

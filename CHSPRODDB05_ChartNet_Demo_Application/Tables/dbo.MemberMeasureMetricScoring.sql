@@ -28,6 +28,8 @@ CREATE TABLE [dbo].[MemberMeasureMetricScoring]
 GO
 ALTER TABLE [dbo].[MemberMeasureMetricScoring] ADD CONSTRAINT [PK_MemberMeasureMetricScoring] PRIMARY KEY CLUSTERED  ([MemberMeasureMetricScoringID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [idx_Exclusion] ON [dbo].[MemberMeasureMetricScoring] ([Exclusion], [ReqExclusion], [SampleVoid]) INCLUDE ([AdministrativeHit], [AdministrativeHitCount], [Denominator], [HEDISSubMetricID], [HybridHit], [HybridHitCount], [MedicalRecordHit], [MedicalRecordHitCount], [MemberMeasureSampleID]) WITH (FILLFACTOR=90) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IX_MemberMeasureMetricScoring_HEDISSubMetricID] ON [dbo].[MemberMeasureMetricScoring] ([HEDISSubMetricID]) ON [PRIMARY]
 GO
 CREATE UNIQUE NONCLUSTERED INDEX [IX_MemberMeasureMetricScoring_MemberMeasureSampleID] ON [dbo].[MemberMeasureMetricScoring] ([MemberMeasureSampleID], [HEDISSubMetricID]) INCLUDE ([AdministrativeHitCount], [ExclusionCount], [HybridHitCount], [MedicalRecordHitCount], [ReqExclCount], [SampleVoidCount]) ON [PRIMARY]
