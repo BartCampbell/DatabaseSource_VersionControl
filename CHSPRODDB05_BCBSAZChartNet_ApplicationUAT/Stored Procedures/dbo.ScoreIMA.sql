@@ -14,7 +14,7 @@ GO
 --**************************************************************************************
 --sample execution:
 --exec ScoreIMA '561296'
-
+--prRescoreMeasure 'ScoreIMA'
 CREATE PROCEDURE [dbo].[ScoreIMA] @MemberID int
 AS 
 	SET NOCOUNT ON;
@@ -29,18 +29,13 @@ AS
 	 HEDISSubMetricCode varchar(50)
 	)
 
-	INSERT  INTO #HEDISSubMetricComponent
-	VALUES  ('TDAP', 'Diphtheria, Tetanus, and Acellular pertussis', 'IMATD')
-	INSERT  INTO #HEDISSubMetricComponent
-	VALUES  ('DIPTH', 'Diphtheria', 'IMATD')
-	INSERT  INTO #HEDISSubMetricComponent
-	VALUES  ('TET', 'Tetanus', 'IMATD')
-	INSERT  INTO #HEDISSubMetricComponent
-	VALUES  ('AP', 'Acellular pertussis', 'IMATD')
-	INSERT  INTO #HEDISSubMetricComponent
-	VALUES  ('MEN', 'Meningococcal', 'IMAMEN')
-	INSERT  INTO #HEDISSubMetricComponent
-	VALUES  ('HPV', 'HPV', 'IMAHPV')
+	INSERT  INTO #HEDISSubMetricComponent VALUES  
+	('TDAP', 'Diphtheria, Tetanus, and Acellular pertussis', 'IMATD')
+	,('DIPTH', 'Diphtheria', 'IMATD')
+	,('TET', 'Tetanus', 'IMATD')
+	,('AP', 'Acellular pertussis', 'IMATD')
+	,('MEN', 'Meningococcal', 'IMAMEN')
+	,('HPV', 'HPV', 'IMAHPV')
 
 
 
@@ -53,20 +48,13 @@ AS
 	 HEDISSubMetricComponentCode varchar(50)
 	)
 
-	INSERT  INTO #HEDISSubMetricComponent_ProcCode_xref
-	VALUES  ('90715', 'TDAP')
-	INSERT  INTO #HEDISSubMetricComponent_ProcCode_xref
-	VALUES  ('90714', 'TD')
-	INSERT  INTO #HEDISSubMetricComponent_ProcCode_xref
-	VALUES  ('90718', 'TD')
-	INSERT  INTO #HEDISSubMetricComponent_ProcCode_xref
-	VALUES  ('90703', 'TET')
-	INSERT  INTO #HEDISSubMetricComponent_ProcCode_xref
-	VALUES  ('90719', 'DIPTH')
-	INSERT  INTO #HEDISSubMetricComponent_ProcCode_xref
-	VALUES  ('90733', 'MEN')
-	INSERT  INTO #HEDISSubMetricComponent_ProcCode_xref
-	VALUES  ('90734', 'MEN')
+	INSERT  INTO #HEDISSubMetricComponent_ProcCode_xref VALUES  
+	('90649', 'HPV')
+	,('90650', 'HPV')
+	,('90651', 'HPV')
+	,('90644', 'Men')
+	,('90734', 'Men')
+	,('90715', 'Tdap')
 
 
 	IF OBJECT_ID('tempdb..#HEDISSubMetricComponent_ICD9Proc_xref') IS NOT NULL 
@@ -504,7 +492,6 @@ AS
 			LEFT OUTER JOIN #Exclusions AS x ON a.MemberMeasureMetricScoringID = x.MemberMeasureMetricScoringID;
 
 
-	EXEC dbo.RunPostScoringSteps @HedisMeasure = 'IMA', @MemberID = @MemberID;
 
 	----**********************************************************************************************
 	----**********************************************************************************************
@@ -580,6 +567,10 @@ AS
 			FROM MedicalRecordIMA D INNER JOIN PursuitEvent PE ON PE.PursuitID = D.PursuitID 
 			WHERE PE.MemberMeasureSampleID = @MemberMeasureSampleID AND PE.MeasureID=27 AND IMAEvidenceID IN (1, 9)
 				AND D.ServiceDate>=@Date1 AND D.ServiceDate<=@Date2
+			UNION
+			SELECT DISTINCT ServiceDate FROM AdministrativeEvent 
+				WHERE HEDISSubMetricID = @HEDISSubMetricID_IMAMEN AND MemberID=@MemberID
+				 AND ServiceDate>=@Date1 AND ServiceDate<=@Date2
 		)
 	BEGIN
 		Update MemberMeasureMetricScoring SET MedicalRecordHit=1,MedicalRecordHitCount=1,HybridHit=1,HybridHitCount=1
@@ -593,10 +584,14 @@ AS
 
 	--Tdap
 	SELECT @Date1 = DateAdd(Year,10,@DOB),@Date2 = DateAdd(Year,13,@DOB)
-	IF EXISTS (SELECT MedicalRecordKey 
+	IF EXISTS (SELECT DISTINCT D.ServiceDate 
 			FROM MedicalRecordIMA D INNER JOIN PursuitEvent PE ON PE.PursuitID = D.PursuitID 
 			WHERE PE.MemberMeasureSampleID = @MemberMeasureSampleID AND PE.MeasureID=27 AND IMAEvidenceID IN (2, 3, 4, 6, 7, 10, 11, 12, 13)
 				AND D.ServiceDate>=@Date1 AND D.ServiceDate<=@Date2
+			UNION
+			SELECT DISTINCT ServiceDate FROM AdministrativeEvent 
+				WHERE HEDISSubMetricID = @HEDISSubMetricID_IMATdap AND MemberID=@MemberID
+				 AND ServiceDate>=@Date1 AND ServiceDate<=@Date2
 		)
 	BEGIN
 		Update MemberMeasureMetricScoring SET MedicalRecordHit=1,MedicalRecordHitCount=1,HybridHit=1,HybridHitCount=1
@@ -614,19 +609,35 @@ AS
 
 	--HPV
 	SELECT @Date1 = DateAdd(Year,9,@DOB),@Date2 = DateAdd(Year,13,@DOB)
-	IF (SELECT COUNT(DISTINCT MedicalRecordKey) 
-			FROM MedicalRecordIMA D INNER JOIN PursuitEvent PE ON PE.PursuitID = D.PursuitID 
-			WHERE PE.MemberMeasureSampleID = @MemberMeasureSampleID AND PE.MeasureID=27 AND IMAEvidenceID IN (14,15)
-				AND D.ServiceDate>=@Date1 AND D.ServiceDate<=@Date2
+	IF (SELECT COUNT(*) FROM (
+			SELECT DISTINCT D.ServiceDate
+				FROM MedicalRecordIMA D INNER JOIN PursuitEvent PE ON PE.PursuitID = D.PursuitID 
+				WHERE PE.MemberMeasureSampleID = @MemberMeasureSampleID AND PE.MeasureID=27 AND IMAEvidenceID IN (14,15)
+					AND D.ServiceDate>=@Date1 AND D.ServiceDate<=@Date2
+			UNION
+			SELECT DISTINCT ServiceDate FROM AdministrativeEvent 
+				WHERE HEDISSubMetricID = @HEDISSubMetricID_IMAHPV AND MemberID=@MemberID
+				 AND ServiceDate>=@Date1 AND ServiceDate<=@Date2
+		) T
 		)>=3
 	BEGIN
 		Update MemberMeasureMetricScoring SET MedicalRecordHit=1,MedicalRecordHitCount=1,HybridHit=1,HybridHitCount=1
 			WHERE HEDISSubMetricID = @HEDISSubMetricID_IMAHPV AND MemberMeasureSampleID = @MemberMeasureSampleID
 
 		IF EXISTS(SELECT * FROM MemberMeasureMetricScoring WHERE MedicalRecordHit=1 AND HEDISSubMetricID = @HEDISSubMetricID_IMAMEN AND MemberMeasureSampleID = @MemberMeasureSampleID)
+			AND
+			EXISTS(SELECT * FROM MemberMeasureMetricScoring WHERE MedicalRecordHit=1 AND HEDISSubMetricID = @HEDISSubMetricID_IMATdap AND MemberMeasureSampleID = @MemberMeasureSampleID)
+
 			Update MemberMeasureMetricScoring SET MedicalRecordHit=1,MedicalRecordHitCount=1,HybridHit=1,HybridHitCount=1
 				WHERE HEDISSubMetricID = @HEDISSubMetricID_IMACMB2 AND MemberMeasureSampleID = @MemberMeasureSampleID			
 	END
+	ELSE
+	BEGIN
+		Update MemberMeasureMetricScoring SET MedicalRecordHit=0,MedicalRecordHitCount=0,HybridHit=0,HybridHitCount=0
+			WHERE HEDISSubMetricID IN (@HEDISSubMetricID_IMAHPV,@HEDISSubMetricID_IMACMB2) AND MemberMeasureSampleID = @MemberMeasureSampleID	
+	END
+
+		EXEC dbo.RunPostScoringSteps @HedisMeasure = 'IMA', @MemberID = @MemberID;
 GO
 GRANT EXECUTE ON  [dbo].[ScoreIMA] TO [Support]
 GO

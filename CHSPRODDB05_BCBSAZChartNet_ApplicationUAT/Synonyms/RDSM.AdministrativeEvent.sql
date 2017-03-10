@@ -1,2 +1,2 @@
-CREATE SYNONYM [RDSM].[AdministrativeEvent] FOR [CHSTAGING].[RDSM].[AdministrativeEvent]
+CREATE SYNONYM [RDSM].[AdministrativeEvent] FOR [ChartNet_BCBSAZ_RDSM].[dbo].[AdministrativeEvent]
 GO
