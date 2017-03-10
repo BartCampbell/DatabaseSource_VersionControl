@@ -1,0 +1,18 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+CREATE FUNCTION [dbo].[ConvertBit]
+(
+	@Value char(1)
+)
+RETURNS bit
+WITH SCHEMABINDING
+AS
+BEGIN
+	RETURN (SELECT CASE WHEN @Value = '1' OR @Value = 'Y' OR @Value = 'T'
+						THEN 1
+						ELSE 0 
+						END);
+END
+GO
