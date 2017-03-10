@@ -22,7 +22,7 @@ BEGIN
 	
 	SET @CrLf = CHAR(13) + CHAR(10);
 
-	--Generate CREATE SYNONYM statements, as well as DROP statements if needed
+	--Generate ALTER SYNONYM statements, as well as DROP statements if needed
 	WITH SynObjects AS
 	(
 		SELECT	'PortalUser' AS ObjectName
@@ -48,7 +48,7 @@ BEGIN
 				 ELSE '' 
 				 END +
 			CASE WHEN ObjectExists = 1 
-				 THEN 'CREATE SYNONYM ' + QUOTENAME(@AppSchema) + '.' + QUOTENAME(ObjectName) + ' FOR ' + QUOTENAME(@TargetDatabase) + '.' + QUOTENAME(@FrameworkSchema) + '.' + QUOTENAME(ObjectName) + '; ' 
+				 THEN 'ALTER SYNONYM ' + QUOTENAME(@AppSchema) + '.' + QUOTENAME(ObjectName) + ' FOR ' + QUOTENAME(@TargetDatabase) + '.' + QUOTENAME(@FrameworkSchema) + '.' + QUOTENAME(ObjectName) + '; ' 
 				 ELSE '' 
 				 END
     FROM	SynStatus;
@@ -65,6 +65,7 @@ BEGIN
 		END;
     
 END
+
 
 GO
 GRANT EXECUTE ON  [dbo].[LinkFrameworkDatabase] TO [Support]

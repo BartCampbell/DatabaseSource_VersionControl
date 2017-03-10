@@ -11,7 +11,7 @@ BEGIN;
 	IF OBJECT_ID('tempdb..#DynamicColumns') IS NOT NULL
 		DROP TABLE #DynamicColumns;
 
-	CREATE TABLE #DynamicColumns
+	CREATE Table  #DynamicColumns
 	(
 		MeasureComponentID int NOT NULL,
 		ColumnList nvarchar(max) NULL,
@@ -82,11 +82,12 @@ BEGIN;
 		EXISTS (SELECT TOP 1 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'VIEW' AND TABLE_NAME = 'MedicalRecordComposite' AND TABLE_SCHEMA = 'dbo')
 		DROP VIEW dbo.MedicalRecordComposite;
 
-	SET @SqlCmd = 'CREATE VIEW [dbo].[MedicalRecordComposite] AS ' + @CrLf + @SqlCmd;
+	SET @SqlCmd = 'ALTER VIEW [dbo].[MedicalRecordComposite] AS ' + @CrLf + @SqlCmd;
 
 	--PRINT @SqlCmd;
 	EXEC (@SqlCmd);
 
 	PRINT 'Composite View Refreshed Successfully.'
 END;
+
 GO

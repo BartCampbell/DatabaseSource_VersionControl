@@ -21,7 +21,7 @@ BEGIN
 	
 	SET @CrLf = CHAR(13) + CHAR(10);
 
-	--Generate CREATE SYNONYM statements, as well as DROP statements if needed
+	--Generate ALTER SYNONYM statements, as well as DROP statements if needed
 	WITH SynObjects AS
 	(
 		SELECT 'AdministrativeEvent' AS ObjectName
@@ -63,7 +63,7 @@ BEGIN
 				 ELSE '' 
 				 END +
 			CASE WHEN ObjectExists = 1 
-				 THEN 'CREATE SYNONYM ' + QUOTENAME(@AppSchema) + '.' + QUOTENAME(ObjectName) + ' FOR ' + QUOTENAME(@TargetDatabase) + '.' + QUOTENAME(@RdsmSchema) + '.' + QUOTENAME(ObjectName) + '; ' 
+				 THEN 'ALTER SYNONYM ' + QUOTENAME(@AppSchema) + '.' + QUOTENAME(ObjectName) + ' FOR ' + QUOTENAME(@TargetDatabase) + '.' + QUOTENAME(@RdsmSchema) + '.' + QUOTENAME(ObjectName) + '; ' 
 				 ELSE '' 
 				 END
     FROM	SynStatus;
@@ -80,6 +80,7 @@ BEGIN
 		END;
     
 END
+
 GO
 GRANT EXECUTE ON  [dbo].[LinkRdsmDatabase] TO [Support]
 GO
