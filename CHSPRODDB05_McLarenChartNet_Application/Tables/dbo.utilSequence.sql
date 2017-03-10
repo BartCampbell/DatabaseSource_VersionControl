@@ -1,0 +1,7 @@
+CREATE TABLE [dbo].[utilSequence]
+(
+[ID] [int] NOT NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[utilSequence] ADD CONSTRAINT [PK__utilSequence__0BC6C43E] PRIMARY KEY CLUSTERED  ([ID]) ON [PRIMARY]
+GO

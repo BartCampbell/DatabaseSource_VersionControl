@@ -1,0 +1,14 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+
+
+
+CREATE VIEW [dbo].[MedicalRecordCISExcl] AS
+
+SELECT	*
+FROM	dbo.MedicalRecordCIS
+WHERE   CIS_ExclContrFlag = 1
+
+GO
