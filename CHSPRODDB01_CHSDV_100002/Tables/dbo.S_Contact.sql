@@ -3,7 +3,7 @@ CREATE TABLE [dbo].[S_Contact]
 [S_Contact_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [LoadDate] [datetime] NOT NULL,
 [H_Contact_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Phone] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Phone] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Mobile] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Fax] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Email] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
