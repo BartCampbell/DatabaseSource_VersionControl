@@ -8,6 +8,7 @@ GO
 -- Author:		Paul Johnson
 -- Create date: 09/19/2016
 -- Update 09/26/2016 Adding RecordEndDate filter PJ
+--Update adding/dropping new columns for Advance updates 02282017 PDJ
 -- Description:	Gets provider office detail from DV
 -- =============================================
 CREATE PROCEDURE [dbo].[spGetProviderOfficeDetail]
@@ -32,6 +33,8 @@ AS
                 Pool_PK ,
                 AssignedUser_PK ,
                 AssignedDate ,
+				 [hasPriorityNote],
+				  [ProviderOfficeSubBucket_PK],
                 @CCI AS ClientID ,
                 m.LoadDate AS LoadDate ,
                 m.RecordSource AS RecordSource
@@ -40,4 +43,5 @@ AS
         WHERE   s.LoadDate > @LoadDate;
 
     END;
+
 GO

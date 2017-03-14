@@ -38,7 +38,8 @@ CREATE TABLE [dbo].[S_UserDetails]
 [H_User_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [HashDiff] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[RecordEndDate] [datetime] NULL
+[RecordEndDate] [datetime] NULL,
+[IsCoderOnsite] [bit] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[S_UserDetails] ADD CONSTRAINT [PK_S_UserDetails] PRIMARY KEY CLUSTERED  ([S_UserDetails_RK]) ON [PRIMARY]

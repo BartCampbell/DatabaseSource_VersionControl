@@ -8,6 +8,7 @@ GO
 -- Author:		Paul Johnson
 -- Create date: 08/29/2016
 --Update 09/27/2016 Adding LoadDate to Primary Key PJ
+--Update adding/dropping new columns for Advance updates 02282017 PDJ
 -- Description:	Data Vault ContactNotesOffice Load 
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_ContactNote_LoadSats]
@@ -31,7 +32,7 @@ AS
                   [followup] ,
                   [IsResponded] ,
                   [IsViewedByScheduler] ,
-                  [HashDiff] ,
+			      [HashDiff] ,
                   [RecordSource]
                 )
                 SELECT  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
@@ -49,17 +50,18 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsViewedByScheduler],
                                                               ''))), ':',
+															    
                                                               RTRIM(LTRIM(COALESCE(rw.[LoadDate],
                                                               '')))))), 2)) ,
                         LoadDate ,
                         ContactNotesOfficeHashKey ,
-                        LTRIM(RTRIM([ContactNoteText])) ,
+                        [ContactNoteText] ,
                         [LastUpdated_Date] ,
                         [contact_num] ,
                         [followup] ,
                         [IsResponded] ,
                         [IsViewedByScheduler] ,
-                        UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+			                     UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[ContactNoteText],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[LastUpdated_Date],
@@ -71,7 +73,8 @@ AS
                                                               RTRIM(LTRIM(COALESCE(rw.[IsResponded],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsViewedByScheduler],
-                                                              '')))))), 2)) ,
+                                                              '')))
+															  ))), 2)) ,
                         RecordSource
                 FROM    CHSStaging.adv.tblContactNotesOfficeStage rw WITH ( NOLOCK )
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
@@ -86,14 +89,15 @@ AS
                                                               RTRIM(LTRIM(COALESCE(rw.[IsResponded],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsViewedByScheduler],
-                                                              '')))))), 2)) NOT IN (
+                                                              '')))
+															  ))), 2)) NOT IN (
                         SELECT  HashDiff
                         FROM    S_ContactNotesOfficeDetail
                         WHERE   H_ContactNotesOffice_RK = rw.ContactNotesOfficeHashKey
                                 AND RecordEndDate IS NULL )
                         AND rw.CCI = @CCI
                 GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.CNI,
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.CNI,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[ContactNoteText],
                                                               ''))), ':',
@@ -107,6 +111,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsViewedByScheduler],
                                                               ''))), ':',
+															    
                                                               RTRIM(LTRIM(COALESCE(rw.[LoadDate],
                                                               '')))))), 2)) ,
                         LoadDate ,
@@ -117,7 +122,7 @@ AS
                         [followup] ,
                         [IsResponded] ,
                         [IsViewedByScheduler] ,
-                        UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+			                     UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[ContactNoteText],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[LastUpdated_Date],
@@ -129,7 +134,8 @@ AS
                                                               RTRIM(LTRIM(COALESCE(rw.[IsResponded],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsViewedByScheduler],
-                                                              '')))))), 2)) ,
+                                                              '')))
+															  ))), 2)) ,
                         RecordSource;
 
 	--RECORD END DATE CLEANUP
@@ -162,6 +168,11 @@ AS
                   [IsProspective] ,
                   [IsDataIssue] ,
                   [AllowedAttempts] ,
+				  [ChaseStatus_PK],
+				  [IsContact],
+				  [ContactNoteID],
+				  [IsIssueLogResponse],
+				  [ProviderOfficeSubBucket_PK],
                   [HashDiff] ,
                   [RecordSource]
                 )
@@ -194,6 +205,16 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[AllowedAttempts],
                                                               ''))), ':',
+															   RTRIM(LTRIM(COALESCE(rw.[ChaseStatus_PK],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[IsContact],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[ContactNoteID],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[IsIssueLogResponse],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[ProviderOfficeSubBucket_PK],
+                                                              ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[LoadDate],
                                                               '')))))), 2)) ,
                         LoadDate ,
@@ -211,6 +232,11 @@ AS
                         [IsProspective] ,
                         [IsDataIssue] ,
                         [AllowedAttempts] ,
+						 [ChaseStatus_PK],
+				  [IsContact],
+				  [ContactNoteID],
+				  [IsIssueLogResponse],
+				  [ProviderOfficeSubBucket_PK],
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[ContactNote_Text],
                                                               ''))), ':',
@@ -237,10 +263,21 @@ AS
                                                               RTRIM(LTRIM(COALESCE(rw.[IsDataIssue],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[AllowedAttempts],
-                                                              '')))))), 2)) ,
+                                                              ''))), ':',
+															   RTRIM(LTRIM(COALESCE(rw.[ChaseStatus_PK],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[IsContact],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[ContactNoteID],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[IsIssueLogResponse],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[ProviderOfficeSubBucket_PK],
+                                                              '')))
+															  ))), 2)) ,
                         RecordSource
                 FROM    CHSStaging.adv.tblContactNoteStage rw WITH ( NOLOCK )
-                WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                WHERE    UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[ContactNote_Text],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[IsSystem],
@@ -266,14 +303,25 @@ AS
                                                               RTRIM(LTRIM(COALESCE(rw.[IsDataIssue],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[AllowedAttempts],
-                                                              '')))))), 2)) NOT IN (
+                                                              ''))), ':',
+															   RTRIM(LTRIM(COALESCE(rw.[ChaseStatus_PK],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[IsContact],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[ContactNoteID],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[IsIssueLogResponse],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[ProviderOfficeSubBucket_PK],
+                                                              '')))
+															  ))), 2)) NOT IN (
                         SELECT  HashDiff
                         FROM    S_ContactNoteDetail
                         WHERE   H_ContactNote_RK = rw.ContactNoteHashKey
                                 AND RecordEndDate IS NULL )
                         AND rw.CCI = @CCI
                 GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.CNI,
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.CNI,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[ContactNote_Text],
                                                               ''))), ':',
@@ -301,6 +349,16 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[AllowedAttempts],
                                                               ''))), ':',
+															   RTRIM(LTRIM(COALESCE(rw.[ChaseStatus_PK],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[IsContact],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[ContactNoteID],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[IsIssueLogResponse],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[ProviderOfficeSubBucket_PK],
+                                                              ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[LoadDate],
                                                               '')))))), 2)) ,
                         LoadDate ,
@@ -318,6 +376,11 @@ AS
                         [IsProspective] ,
                         [IsDataIssue] ,
                         [AllowedAttempts] ,
+						 [ChaseStatus_PK],
+				  [IsContact],
+				  [ContactNoteID],
+				  [IsIssueLogResponse],
+				  [ProviderOfficeSubBucket_PK],
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[ContactNote_Text],
                                                               ''))), ':',
@@ -344,7 +407,18 @@ AS
                                                               RTRIM(LTRIM(COALESCE(rw.[IsDataIssue],
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(rw.[AllowedAttempts],
-                                                              '')))))), 2)) ,
+                                                              ''))), ':',
+															   RTRIM(LTRIM(COALESCE(rw.[ChaseStatus_PK],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[IsContact],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[ContactNoteID],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[IsIssueLogResponse],
+                                                              ''))), ':',
+															     RTRIM(LTRIM(COALESCE(rw.[ProviderOfficeSubBucket_PK],
+                                                              '')))
+															  ))), 2)) ,
                         RecordSource; 
 
 
@@ -361,6 +435,4 @@ AS
 
     END;
     
-	
-
 GO
