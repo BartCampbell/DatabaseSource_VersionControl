@@ -13,7 +13,9 @@ CREATE TABLE [dbo].[S_ProviderOfficeDetail]
 [AssignedDate] [smalldatetime] NULL,
 [HashDiff] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[RecordEndDate] [datetime] NULL
+[RecordEndDate] [datetime] NULL,
+[hasPriorityNote] [bit] NULL,
+[ProviderOfficeSubBucket_PK] [tinyint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[S_ProviderOfficeDetail] ADD CONSTRAINT [PK_S_ProviderOfficeDetail] PRIMARY KEY CLUSTERED  ([S_ProviderOfficeDetail_RK]) ON [PRIMARY]

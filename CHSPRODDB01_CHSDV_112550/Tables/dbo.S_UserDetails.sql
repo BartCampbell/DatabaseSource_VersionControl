@@ -38,7 +38,8 @@ CREATE TABLE [dbo].[S_UserDetails]
 [RecordEndDate] [datetime] NULL,
 [IsInvoiceAccountant] [bit] NULL,
 [IsBillingAccountant] [bit] NULL,
-[IsManagementUser] [bit] NULL
+[IsManagementUser] [bit] NULL,
+[IsCoderOnsite] [bit] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[S_UserDetails] ADD CONSTRAINT [PK_S_UserDetails] PRIMARY KEY CLUSTERED  ([S_UserDetails_RK]) ON [PRIMARY]
