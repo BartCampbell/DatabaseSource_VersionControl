@@ -8,6 +8,7 @@ GO
 -- Author:		Paul Johnson
 -- Create date: 09/06/2016
 -- Update 09/26/2016 Adding RecordEndDate filter PJ
+--Update adding/dropping new columns for Advance updates 02282017 PDJ
 -- Description:	Gets ContactNote details from DV
 -- =============================================
 
@@ -37,6 +38,11 @@ AS
                 s.[IsProspective] ,
                 s.[IsDataIssue] ,
                 s.[AllowedAttempts] ,
+				s.[ChaseStatus_PK],
+				s.[IsContact],
+				s.[ContactNoteID],
+				s.[IsIssueLogResponse],
+				s.[ProviderOfficeSubBucket_PK],
                 @CCI AS [ClientID] ,
                 s.[RecordSource] ,
                 s.[LoadDate]
@@ -45,7 +51,5 @@ AS
         WHERE   s.LoadDate > @LoadDate;
 
     END;
-
---GO
 
 GO
