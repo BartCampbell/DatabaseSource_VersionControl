@@ -11,7 +11,3 @@ CREATE TABLE [dbo].[tblNoteText]
 GO
 ALTER TABLE [dbo].[tblNoteText] ADD CONSTRAINT [PK_tblNoteText] PRIMARY KEY CLUSTERED  ([NoteText_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
-CREATE NONCLUSTERED INDEX [IDX_IsChartNote] ON [dbo].[tblNoteText] ([IsChartNote]) INCLUDE ([NoteText], [NoteText_PK]) ON [PRIMARY]
-GO
-CREATE NONCLUSTERED INDEX [IX_IsDiagNote] ON [dbo].[tblNoteText] ([IsDiagnosisNote]) INCLUDE ([NoteText], [NoteText_PK], [NoteType_PK]) ON [PRIMARY]
-GO
