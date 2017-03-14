@@ -9,6 +9,7 @@ GO
 -- Create date: 09/19/2016 
 --Update 09/27/2016 Adding LoadDate to Primary Key PJ 
 --Update 09/29/2018 Adding Channel_PK and EDGEMemberID  PJ 
+--Update adding/dropping new columns for Advance updates 02282017 PDJ
 -- Description:	Data Vault Suspect Load Satelites 
 -- ============================================= 
 CREATE PROCEDURE [dbo].[spDV_Suspect_LoadSats] 
@@ -60,6 +61,8 @@ AS
                   [InvoiceExt_Date] , 
 				  [Channel_PK] , 
 				  [EDGEMemberID], 
+				  [LastContacted],
+				  [FollowUp],
                   [HashDiff] , 
                   [RecordSource], 
 				  Provider_PK 
@@ -137,6 +140,10 @@ AS
                                                               ''))), ':', 
                                                               RTRIM(LTRIM(COALESCE(rw.[EDGEMemberID], 
                                                               ''))), ':', 
+															        RTRIM(LTRIM(COALESCE(rw.[LastContacted], 
+                                                              ''))), ':', 
+															        RTRIM(LTRIM(COALESCE(rw.[FollowUp], 
+                                                              ''))), ':', 
                                                               RTRIM(LTRIM(COALESCE(rw.[LoadDate], 
                                                               '')))))), 2)) , 
                         LoadDate , 
@@ -175,6 +182,8 @@ AS
                         [InvoiceExt_Date] , 
 						 [Channel_PK] , 
 				  [EDGEMemberID], 
+				   [LastContacted],
+				  [FollowUp],
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5', 
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[IsScanned], 
                                                               ''))), ':', 
@@ -245,6 +254,10 @@ AS
                                                               RTRIM(LTRIM(COALESCE(rw.[Channel_PK] , 
                                                               ''))), ':', 
                                                               RTRIM(LTRIM(COALESCE(rw.[EDGEMemberID], 
+                                                              ''))), ':', 
+															        RTRIM(LTRIM(COALESCE(rw.[LastContacted], 
+                                                              ''))), ':', 
+															        RTRIM(LTRIM(COALESCE(rw.[FollowUp], 
                                                               '')))))), 2)) , 
                         RecordSource, 
 						rw.Provider_PK 
@@ -319,6 +332,10 @@ AS
                                                               RTRIM(LTRIM(COALESCE(rw.[Channel_PK] , 
                                                               ''))), ':', 
                                                               RTRIM(LTRIM(COALESCE(rw.[EDGEMemberID], 
+                                                              ''))), ':', 
+															        RTRIM(LTRIM(COALESCE(rw.[LastContacted], 
+                                                              ''))), ':', 
+															        RTRIM(LTRIM(COALESCE(rw.[FollowUp], 
                                                               '')))))), 2)) NOT IN ( 
                         SELECT  HashDiff 
                         FROM    S_SuspectDetail 
@@ -398,6 +415,10 @@ AS
                                                               ''))), ':', 
                                                               RTRIM(LTRIM(COALESCE(rw.[EDGEMemberID], 
                                                               ''))), ':', 
+															        RTRIM(LTRIM(COALESCE(rw.[LastContacted], 
+                                                              ''))), ':', 
+															        RTRIM(LTRIM(COALESCE(rw.[FollowUp], 
+                                                              ''))), ':', 
                                                               RTRIM(LTRIM(COALESCE(rw.[LoadDate], 
                                                               '')))))), 2)) , 
                         LoadDate , 
@@ -436,6 +457,8 @@ AS
                         [InvoiceExt_Date] , 
 						 [Channel_PK] , 
 				  [EDGEMemberID], 
+				   [LastContacted],
+				  [FollowUp],
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5', 
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.[IsScanned], 
                                                               ''))), ':', 
@@ -506,9 +529,13 @@ AS
                                                               RTRIM(LTRIM(COALESCE(rw.[Channel_PK] , 
                                                               ''))), ':', 
                                                               RTRIM(LTRIM(COALESCE(rw.[EDGEMemberID], 
+                                                              ''))), ':', 
+															        RTRIM(LTRIM(COALESCE(rw.[LastContacted], 
+                                                              ''))), ':', 
+															        RTRIM(LTRIM(COALESCE(rw.[FollowUp], 
                                                               '')))))), 2)) , 
                         RecordSource, 
-						rw.Provider_PK; 
+						rw.Provider_PK ; 
  
 	--RECORD END DATE CLEANUP 
         UPDATE  dbo.S_SuspectDetail 
@@ -699,9 +726,5 @@ AS
  
  
     END; 
- 
- 
- 
- 
  
 GO

@@ -18,7 +18,12 @@ CREATE TABLE [dbo].[S_ContactNoteDetail]
 [AllowedAttempts] [tinyint] NULL,
 [HashDiff] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[RecordEndDate] [datetime] NULL
+[RecordEndDate] [datetime] NULL,
+[ChaseStatus_PK] [int] NULL,
+[IsContact] [bit] NULL,
+[ContactNoteID] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[IsIssueLogResponse] [bit] NULL,
+[ProviderOfficeSubBucket_PK] [tinyint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[S_ContactNoteDetail] ADD CONSTRAINT [PK_S_ContactNoteDetail] PRIMARY KEY CLUSTERED  ([S_ContactNoteDetail_RK]) WITH (FILLFACTOR=80) ON [PRIMARY]

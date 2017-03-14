@@ -40,7 +40,9 @@ CREATE TABLE [dbo].[S_SuspectDetail]
 [RecordEndDate] [datetime] NULL,
 [Channel_PK] [int] NULL,
 [EDGEMemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Provider_PK] [int] NULL
+[Provider_PK] [int] NULL,
+[LastContacted] [smalldatetime] NULL,
+[FollowUp] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[S_SuspectDetail] ADD CONSTRAINT [PK_S_SuspectDetail] PRIMARY KEY CLUSTERED  ([S_SuspectDetail_RK]) WITH (FILLFACTOR=80) ON [PRIMARY]
