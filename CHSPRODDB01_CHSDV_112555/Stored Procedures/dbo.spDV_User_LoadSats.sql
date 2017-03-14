@@ -9,6 +9,7 @@ GO
 -- Create date: 09/21/2016
 --Update 09/27/2016 Adding LoadDate to Primary Key PJ
 --Update 09/29/2016 Adding 3 fields to User PJ
+--Update adding/dropping new columns for Advance updates 02282017 PDJ
 -- Description:	Data Vault User Load 
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_User_LoadSats]
@@ -198,6 +199,7 @@ AS
                   [IsInvoiceAccountant] ,
                   [IsBillingAccountant] ,
                   [IsManagementUser] ,
+				  [IsCoderOnsite],
                   [HashDiff] ,
                   [RecordSource]
                 )
@@ -233,6 +235,7 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsInvoiceAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsBillingAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOnsite], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[LoadDate], '')))))), 2)) ,
                         LoadDate ,
                         UserHashKey ,
@@ -267,6 +270,7 @@ AS
                         [IsInvoiceAccountant] ,
                         [IsBillingAccountant] ,
                         [IsManagementUser] ,
+						[IsCoderOnsite],
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.Password, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsAdmin AS VARCHAR), ''))), ':',
@@ -298,10 +302,11 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.[IsSchedulerManager] AS VARCHAR), ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsInvoiceAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsBillingAccountant], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOnsite], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], '')))))), 2)) ,
                         RecordSource
                 FROM    CHSStaging.adv.tblUserWCStage rw WITH ( NOLOCK )
-                WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                WHERE    UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.Password, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsAdmin AS VARCHAR), ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsScanTech AS VARCHAR), ''))), ':',
@@ -332,45 +337,47 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.[IsSchedulerManager] AS VARCHAR), ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsInvoiceAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsBillingAccountant], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOnsite], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], '')))))), 2)) NOT IN (
                         SELECT  HashDiff
                         FROM    S_UserDetails
                         WHERE   H_User_RK = rw.UserHashKey
                                 AND RecordEndDate IS NULL )
                         AND rw.CCI = @CCI
-                GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.CUI, ''))), ':', RTRIM(LTRIM(COALESCE(rw.Password, ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsAdmin AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsScanTech AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsScheduler AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsReviewer AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsQA AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsHRA AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsActive AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.only_work_selected_hours AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.only_work_selected_zipcodes AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.deactivate_after AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(rw.linked_provider_id, ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.linked_provider_pk AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsClient AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsSchedulerSV AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsScanTechSV AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsChangePasswordOnFirstLogin AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.Location_PK AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.isQCC AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.willing2travell AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.Latitude AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.Longitude AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.linked_scheduler_user_pk AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.EmploymentStatus AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.EmploymentAgency AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.isAllowDownload AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(rw.[CoderLevel], ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.[IsSchedulerManager] AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(rw.[IsInvoiceAccountant], ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(rw.[IsBillingAccountant], ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(rw.[LoadDate], '')))))), 2)) ,
+                GROUP BY  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.CUI, ''))), ':', RTRIM(LTRIM(COALESCE(rw.Password, ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.IsAdmin AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.IsScanTech AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.IsScheduler AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.IsReviewer AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.IsQA AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.IsHRA AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.IsActive AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.only_work_selected_hours AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.only_work_selected_zipcodes AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.deactivate_after AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(rw.linked_provider_id, ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.linked_provider_pk AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.IsClient AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.IsSchedulerSV AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.IsScanTechSV AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.IsChangePasswordOnFirstLogin AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.Location_PK AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.isQCC AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.willing2travell AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.Latitude AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.Longitude AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.linked_scheduler_user_pk AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.EmploymentStatus AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.EmploymentAgency AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.isAllowDownload AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(rw.[CoderLevel], ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(rw.[IsSchedulerManager] AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(rw.[IsInvoiceAccountant], ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(rw.[IsBillingAccountant], ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOnsite], ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(rw.[LoadDate], '')))))), 2)) ,
                         LoadDate ,
                         UserHashKey ,
                         [Password] ,
@@ -404,6 +411,7 @@ AS
                         [IsInvoiceAccountant] ,
                         [IsBillingAccountant] ,
                         [IsManagementUser] ,
+						[IsCoderOnsite],
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.Password, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsAdmin AS VARCHAR), ''))), ':',
@@ -435,6 +443,7 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.[IsSchedulerManager] AS VARCHAR), ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsInvoiceAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsBillingAccountant], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOnsite], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], '')))))), 2)) ,
                         RecordSource;
 
@@ -740,6 +749,4 @@ AS
 
     END;
     
-	
-
 GO
