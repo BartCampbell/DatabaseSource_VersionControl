@@ -11,6 +11,7 @@ GO
 --Update 09/29/2018 Adding Channel_PK and EDGEMemberID  PJ
 --Update 10/04/2016 Replace RecordEndDate/LoadDate with Link Satellite PJ
 --Update 10/25/2016 Adding ProviderOffice PJ
+--Update adding/dropping new columns for Advance updates 02282017 PDJ
 -- Description:	Gets Suspects details from DV
 -- =============================================
 CREATE PROCEDURE [dbo].[spGetSuspect]
@@ -65,6 +66,8 @@ AS
                 s.[InvoiceExt_Date] ,
                 s.[Channel_PK] ,
                 s.[EDGEMemberID] ,
+				s.[LastContacted],
+				s.[FollowUp],
                 @CCI AS [ClientID] ,
                 s.[RecordSource] ,
                 s.[LoadDate]
@@ -132,8 +135,5 @@ AS
         WHERE   s.LoadDate > @LoadDate OR lsp.LoadDate>@LoadDate OR lcm.LoadDate>@LoadDate OR ljp.LoadDate>@LoadDate;
 
     END;
-
---GO
-
 
 GO

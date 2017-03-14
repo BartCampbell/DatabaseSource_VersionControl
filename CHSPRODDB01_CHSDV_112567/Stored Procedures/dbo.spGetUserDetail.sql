@@ -10,6 +10,7 @@ GO
 -- Update 09/26/2016 Adding RecordEndDate filter PJ
 --Update 09/27/2016 Cast linked_provider_pk as varchar PJ
 --Update 10/11/2016 Using LS_ProviderMasterOffice PJ
+--Update adding/dropping new columns for Advance updates 02282017 PDJ
 -- Description:	Gets User details from DV
 -- =============================================
 CREATE PROCEDURE [dbo].[spGetUserDetail]
@@ -48,6 +49,9 @@ AS
 	s.[EmploymentStatus] ,
 	s.[EmploymentAgency] ,
 	s.[isAllowDownload] ,
+	s.[IsBillingAccountant] ,
+    s.[IsManagementUser] ,
+	s.[IsCoderOnsite],
 	s.CoderLevel,
 	s.IsSchedulerManager,
            @CCI AS [ClientID] ,
@@ -63,7 +67,5 @@ AS
          WHERE s.LoadDate > @LoadDate;
 
     END;
-
-	
 
 GO
