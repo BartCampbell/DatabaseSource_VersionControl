@@ -45,7 +45,9 @@ CREATE TABLE [adv].[tblSuspectWCStage]
 [SuspectHashKey] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ClientHashKey] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CSI] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[DataBaseName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[DataBaseName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[LastContacted] [smalldatetime] NULL,
+[FollowUp] [smalldatetime] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [adv].[tblSuspectWCStage] ADD CONSTRAINT [PK_tblSuspectWCStage] PRIMARY KEY CLUSTERED  ([Suspect_PK]) ON [PRIMARY]

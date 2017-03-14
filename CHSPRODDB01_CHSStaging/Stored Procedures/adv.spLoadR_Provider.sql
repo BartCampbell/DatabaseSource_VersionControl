@@ -13,6 +13,7 @@ GO
 -- 11/03/2016 Changed 11248 to be based on NPI (Not PIN) PJ
 --01/17/2017 Added GuildNet 112567 PJ
 --02/16/2017 Added BCBSWNY 112555 PJ
+--03/02/2017 Adding WPS and CCAI PJ
 -- Description:	Load the R_Provider reference table and pull back the hashmemberkey
 -- =============================================
 CREATE PROCEDURE [adv].[spLoadR_Provider] 
@@ -140,6 +141,8 @@ AS
         --        INNER JOIN CHSDV.dbo.R_ProviderMaster b ON a.ProviderMaster_PK = b.ClientProviderMasterID
         --                                                   AND a.CCI = b.ClientID;
 
+			DELETE FROM CHSStaging.adv.tblProviderMasterStage WHERE ISNULL(Provider_ID,'')='' AND ISNULL(NPI,'')='' AND ISNULL(TIN,'')='' AND ISNULL(PIN,'')='' 
+
         IF @CCI IN ( 112542, 112547 ,112567) AND (SELECT recordsource FROM adv.AdvanceVariables WHERE avkey =( SELECT VariableLoadKey FROM adv.AdvanceVariableLoad )) <> 'ADV_112542_003'
 
             BEGIN							
@@ -230,7 +233,7 @@ AS
 
 			
 
-        IF @CCI IN ( 112549, 112550, 112546 ,112555) OR  (SELECT recordsource FROM adv.AdvanceVariables WHERE avkey =( SELECT VariableLoadKey FROM adv.AdvanceVariableLoad )) = 'ADV_112542_003'
+        IF @CCI IN ( 112549, 112550, 112546 ,112555,112561) OR  (SELECT recordsource FROM adv.AdvanceVariables WHERE avkey =( SELECT VariableLoadKey FROM adv.AdvanceVariableLoad )) = 'ADV_112542_003'
             BEGIN
                 INSERT  INTO CHSDV.[dbo].[R_Provider]
                         ( [ClientID] ,
@@ -273,7 +276,7 @@ AS
             END;
 
 
-			IF @CCI IN ( 112548)
+			IF @CCI IN ( 112548,100002)
             BEGIN
                 INSERT  INTO CHSDV.[dbo].[R_Provider]
                         ( [ClientID] ,
@@ -391,5 +394,4 @@ AS
 
     END;
 
-	
 GO

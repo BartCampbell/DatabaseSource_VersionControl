@@ -20,7 +20,12 @@ CREATE TABLE [adv].[tblContactNoteStage]
 [CCI] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ContactNoteHashKey] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ClientHashKey] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CNI] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[CNI] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ChaseStatus_PK] [int] NULL,
+[IsContact] [bit] NULL,
+[ContactNoteID] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[IsIssueLogResponse] [bit] NULL,
+[ProviderOfficeSubBucket_PK] [tinyint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [adv].[tblContactNoteStage] ADD CONSTRAINT [PK_tblContactNote] PRIMARY KEY CLUSTERED  ([ContactNote_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]

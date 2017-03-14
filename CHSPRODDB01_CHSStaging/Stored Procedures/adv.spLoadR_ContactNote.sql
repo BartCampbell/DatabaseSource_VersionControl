@@ -64,7 +64,7 @@ INSERT INTO CHSDV.[dbo].[R_AdvanceContactNotesOffice]
                 a.[RecordSource]
         FROM    CHSStaging.adv.tblContactNotesOfficeStage a
 		LEFT OUTER JOIN CHSDV.dbo.R_AdvanceContactNotesOffice b 
-		ON a.ContactNotesOffice_PK = b.ClientContactNotesOfficeID AND a.CCI = b.ClientID
+		ON a.ContactNotesOffice_PK = b.ClientContactNotesOfficeID AND a.CCI = b.ClientID  AND b.RecordSource = a.RecordSource
 		WHERE a.CCI = @CCI AND b.ClientContactNotesOfficeID IS NULL;
 
 UPDATE  CHSStaging.adv.tblContactNotesOfficeStage

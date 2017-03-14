@@ -48,7 +48,8 @@ CREATE TABLE [adv].[tblUserWCStage]
 [CCI] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [UserHashKey] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ClientHashKey] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CUI] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[CUI] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[IsCoderOnsite] [bit] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [adv].[tblUserWCStage] ADD CONSTRAINT [PK_tblUserWCStage] PRIMARY KEY CLUSTERED  ([User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]

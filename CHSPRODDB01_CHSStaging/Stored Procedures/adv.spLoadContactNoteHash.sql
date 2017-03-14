@@ -5,6 +5,7 @@ GO
 -- =============================================
 -- Author:		Paul Johnson
 -- Create date: 09/13/2016
+--Update adding new columns for Advance updates 02282017 PDJ
 -- Description:	Loads the ContactNote staging data to StagingHash with the hashdiff key
 -- Usage		EXECUTE adv.spLoadContactNoteHash
 -- =============================================
@@ -58,14 +59,25 @@ AS
                                                               RTRIM(LTRIM(COALESCE(a.IsDataIssue,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.AllowedAttempts,
-                                                              '')))))), 2)) ,
+                 --                                             ''))), ':',
+															  --RTRIM(LTRIM(COALESCE(a.ChaseStatus_PK,
+                 --                                             ''))), ':',
+															  --RTRIM(LTRIM(COALESCE(a.IsContact,
+                 --                                             ''))), ':',
+															  --RTRIM(LTRIM(COALESCE(a.ContactNoteID ,
+                 --                                             ''))), ':',
+															  --RTRIM(LTRIM(COALESCE(a.IsIssueLogResponse,
+                 --                                             ''))), ':',
+															  --RTRIM(LTRIM(COALESCE(a.ProviderOfficeSubBucket_PK,
+                                                              '')))
+															  ))), 2)) ,
                         @CCI ,
                         'tblContactNote' ,
                         @Date,
 						@recordsource
                 FROM    adv.tblContactNoteStage a
                         LEFT OUTER JOIN adv.StagingHash b ON UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                              UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.ContactNote_PK,
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.ContactNote_PK,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.ContactNote_Text,
                                                               ''))), ':',
@@ -92,7 +104,18 @@ AS
                                                               RTRIM(LTRIM(COALESCE(a.IsDataIssue,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.AllowedAttempts,
-                                                              '')))))), 2)) = b.HashDiff
+                 --                                             ''))), ':',
+															  --RTRIM(LTRIM(COALESCE(a.ChaseStatus_PK,
+                 --                                             ''))), ':',
+															  --RTRIM(LTRIM(COALESCE(a.IsContact,
+                 --                                             ''))), ':',
+															  --RTRIM(LTRIM(COALESCE(a.ContactNoteID ,
+                 --                                             ''))), ':',
+															  --RTRIM(LTRIM(COALESCE(a.IsIssueLogResponse,
+                 --                                             ''))), ':',
+															  --RTRIM(LTRIM(COALESCE(a.ProviderOfficeSubBucket_PK,
+                                                              '')))
+															  ))), 2))  = b.HashDiff
                                                              AND b.ClientID = @CCI
                                                              AND b.TableName = 'tblContactNote'
 															 AND b.RecordSource =  @recordsource
@@ -100,4 +123,6 @@ AS
 
 
     END;
+
+
 GO

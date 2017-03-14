@@ -21,7 +21,9 @@ CREATE TABLE [adv].[tblProviderOfficeWCStage]
 [CCI] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProviderOfficeHashKey] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ClientHashKey] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CPI] [int] NULL
+[CPI] [int] NULL,
+[hasPriorityNote] [bit] NULL,
+[ProviderOfficeSubBucket_PK] [tinyint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [adv].[tblProviderOfficeWCStage] ADD CONSTRAINT [PK_tblProviderOfficeWCStage] PRIMARY KEY CLUSTERED  ([ProviderOffice_PK]) ON [PRIMARY]

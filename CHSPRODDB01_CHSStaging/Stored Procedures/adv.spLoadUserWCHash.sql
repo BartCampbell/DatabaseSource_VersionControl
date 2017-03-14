@@ -2,10 +2,12 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
+
 -- =============================================
 -- Author:		Paul Johnson
 -- Create date: 09/28/2016
 --Update making BC and WC the same PJ
+--Update adding new columns for Advance updates 02282017 PDJ
 -- Description:	Loads the StagingHash with the hashdiff key
 -- Usage		EXECUTE adv.spLoadUserWCHash @CCI INT @Date DateTime
 -- =============================================
@@ -60,7 +62,10 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(a.IsSchedulerManager, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.[IsInvoiceAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.[IsBillingAccountant], ''))), ':',
-                                                                       RTRIM(LTRIM(COALESCE(a.[IsManagementUser], '')))))), 2)) ,
+                                                                       RTRIM(LTRIM(COALESCE(a.[IsManagementUser], '')))
+																	   --, ':',
+																	   --RTRIM(LTRIM(COALESCE(a.IsCoderOnsite, '')))
+																	   ))), 2)) ,
                         @CCI ,
                         'tblUser' ,
                         @Date,
@@ -115,7 +120,10 @@ AS
                                                                                                             ':',
                                                                                                             RTRIM(LTRIM(COALESCE(a.[IsBillingAccountant], ''))),
                                                                                                             ':',
-                                                                                                            RTRIM(LTRIM(COALESCE(a.[IsManagementUser], '')))))), 2)) = b.HashDiff
+                                                                                                            RTRIM(LTRIM(COALESCE(a.[IsManagementUser], '')))
+																											--, ':',
+																											--RTRIM(LTRIM(COALESCE(a.IsCoderOnsite, '')))
+																											))), 2)) = b.HashDiff
                                                              AND b.ClientID = @CCI
                                                              AND b.TableName = 'tblUser'
 															 AND b.RecordSource = @recordsource
@@ -124,4 +132,5 @@ AS
 
 
     END;
+
 GO

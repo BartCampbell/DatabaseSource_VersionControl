@@ -6,6 +6,7 @@ GO
 -- Author:		Paul Johnson
 -- Create date: 09/14/2016
 --Update 09/29/2014 adding EdgeMemberID PJ
+--Update adding new columns for Advance updates 02282017 PDJ
 -- Description:	Loads the StagingHash with the hashdiff key
 -- Usage		EXECUTE adv.spLoadSuspectWCHash @CCI INT
 -- =============================================
@@ -59,7 +60,12 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(a.ChartRec_Date, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.InvoiceExt_Date, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.[Channel_PK], ''))), ':',
-                                                                       RTRIM(LTRIM(COALESCE(a.EDGEMemberID, '')))))), 2)) ,
+                                                                       RTRIM(LTRIM(COALESCE(a.EDGEMemberID, '')))
+																	   --, ':',
+                    --                                                   RTRIM(LTRIM(COALESCE(a.LastContacted, ''))), ':',
+                    --                                                   RTRIM(LTRIM(COALESCE(a.FollowUp, '')))
+																	   
+																	   ))), 2)) ,
                         @CCI ,
                         'tblSuspect' ,
                         @Date,
@@ -106,7 +112,11 @@ AS
                                                                                                             ':', RTRIM(LTRIM(COALESCE(a.ChartRec_Date, ''))),
                                                                                                             ':', RTRIM(LTRIM(COALESCE(a.InvoiceExt_Date, ''))),
                                                                                                             ':', RTRIM(LTRIM(COALESCE(a.[Channel_PK], ''))), ':',
-                                                                                                            RTRIM(LTRIM(COALESCE(a.EDGEMemberID, '')))))), 2)) = b.HashDiff
+                                                                                                            RTRIM(LTRIM(COALESCE(a.EDGEMemberID, '')))
+																											--, ':',
+                           --                                            RTRIM(LTRIM(COALESCE(a.LastContacted, ''))), ':',
+                           --                                            RTRIM(LTRIM(COALESCE(a.FollowUp, '')))
+						   ))), 2)) = b.HashDiff
                                                              AND b.ClientID = @CCI
                                                              AND b.TableName = 'tblSuspect'
 															 AND b.RecordSource = @recordsource

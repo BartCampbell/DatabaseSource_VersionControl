@@ -2,9 +2,11 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
+
 -- =============================================
 -- Author:		Paul Johnson
 -- Create date: 09/13/2016
+--Update adding/dropping new columns for Advance updates 02282017 PDJ
 -- Description:	Loads the StagingHash with the hashdiff key
 -- Usage		EXECUTE adv.spLoadProviderOfficeHash @CCI INT
 -- =============================================
@@ -51,21 +53,26 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.LocationID,
                                                               ''))), ':',
-                                                              RTRIM(LTRIM(COALESCE(a.ProviderOfficeBucket_PK,
+															  RTRIM(LTRIM(COALESCE(a.ProviderOfficeBucket_PK,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.Pool_PK,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.AssignedUser_PK,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.AssignedDate,
-                                                              '')))))), 2)) ,
+                                                              --''))), ':',
+                                                              --RTRIM(LTRIM(COALESCE(a.hasPriorityNote,
+                                                              --''))), ':',
+                                                              --RTRIM(LTRIM(COALESCE(a.ProviderOfficeSubBucket_PK,
+                                                              '')))
+															  ))), 2)) ,
                         @CCI ,
                         'tblProviderOffice' ,
                         @Date,
 						@recordsource
                 FROM    adv.tblProviderOfficeWCStage a
                         LEFT OUTER JOIN adv.StagingHash b ON UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                              UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.ProviderOffice_PK,
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.ProviderOffice_PK,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.Address,
                                                               ''))), ':',
@@ -87,14 +94,19 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.LocationID,
                                                               ''))), ':',
-                                                              RTRIM(LTRIM(COALESCE(a.ProviderOfficeBucket_PK,
+															    RTRIM(LTRIM(COALESCE(a.ProviderOfficeBucket_PK,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.Pool_PK,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.AssignedUser_PK,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.AssignedDate,
-                                                              '')))))), 2)) = b.HashDiff
+                                                              --''))), ':',
+                                                              --RTRIM(LTRIM(COALESCE(a.hasPriorityNote,
+                                                              --''))), ':',
+                                                              --RTRIM(LTRIM(COALESCE(a.ProviderOfficeSubBucket_PK,
+                                                              '')))
+															  ))), 2)) = b.HashDiff
                                                              AND b.ClientID = @CCI
                                                              AND b.TableName = 'tblProviderOffice'
 															 AND b.RecordSource = @recordsource
@@ -105,4 +117,5 @@ AS
 
 
     END;
+
 GO
