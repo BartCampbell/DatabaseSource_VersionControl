@@ -11,12 +11,6 @@ AS
 BEGIN
 	if (@type=1)
 	BEGIN
-		Update tblExtractionQueue SET OfficeFaxOrID=SUBSTRING(PDFname,1,10) 
-			WHERE SUBSTRING(PDFname,11,1)='_' AND OfficeFaxOrID IS NULL AND ExtractionQueueSource_PK IN (1,7) AND UploadDate>'2016-8-8'
-
-		Update tblExtractionQueueAttachLog SET IsProcessed=1 
-			WHERE IsProcessed=0 AND PageFrom=0 AND PageTo=0
-
 		if (@invoice = 0)
 		BEGIN
 			SELECT DISTINCT S.Suspect_PK,S.Project_PK,S.Provider_PK,EQAL.User_PK,CAST(EQAL.ExtractionQueue_PK AS varchar) FileId,EQ.PDFname,EQAL.pageFrom,EQAL.pageTo  
