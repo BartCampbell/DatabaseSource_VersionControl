@@ -23,6 +23,8 @@ CREATE TABLE [internal].[object_parameters]
 GO
 ALTER TABLE [internal].[object_parameters] ADD CONSTRAINT [PK_Object_Parameters] PRIMARY KEY CLUSTERED  ([parameter_id]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IX_internal_object_parameters_inc] ON [internal].[object_parameters] ([project_id], [project_version_lsn]) ON [PRIMARY]
+GO
 ALTER TABLE [internal].[object_parameters] ADD CONSTRAINT [FK_ObjectParameters_ProjectId_Projects] FOREIGN KEY ([project_id]) REFERENCES [internal].[projects] ([project_id]) ON DELETE CASCADE
 GO
 ALTER TABLE [internal].[object_parameters] ADD CONSTRAINT [FK_ObjectParameters_ProjectVersionLsn_ObjectVersions] FOREIGN KEY ([project_version_lsn]) REFERENCES [internal].[object_versions] ([object_version_lsn]) ON DELETE CASCADE

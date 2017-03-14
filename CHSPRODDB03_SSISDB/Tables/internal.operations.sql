@@ -21,6 +21,8 @@ CREATE TABLE [internal].[operations]
 GO
 ALTER TABLE [internal].[operations] ADD CONSTRAINT [PK_Operations] PRIMARY KEY CLUSTERED  ([operation_id]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IX_Operations_object_id] ON [internal].[operations] ([object_id]) ON [PRIMARY]
+GO
 GRANT SELECT ON  [internal].[operations] TO [ModuleSigner]
 GO
 GRANT UPDATE ON  [internal].[operations] TO [ModuleSigner]
