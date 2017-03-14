@@ -3,7 +3,7 @@ CREATE TABLE [dbo].[S_Location]
 [S_Location_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [LoadDate] [datetime] NOT NULL,
 [H_Location_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Address1] [varchar] (200) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
+[Address1] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Address2] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [City] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [State] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,

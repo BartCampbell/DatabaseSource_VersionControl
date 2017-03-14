@@ -8,6 +8,7 @@ GO
 -- Author:		Paul Johnson
 -- Create date: 09/16/2016
 --Update 09/27/2016 Adding ContactPerson/loaddate PJ
+--Update adding/dropping new columns for Advance updates 02282017 PDJ
 -- Description:	Data Vault Provider Load - based on CHSDV.[dbo].[prDV_Provider_LoadSats]
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_Provider_LoadSats]
@@ -125,6 +126,8 @@ INSERT INTO [dbo].[S_ProviderMasterDemo]
                   [Pool_PK] ,
                   [AssignedUser_PK] ,
                   [AssignedDate] ,
+				  [hasPriorityNote],
+				  [ProviderOfficeSubBucket_PK],
                   [HashDiff] ,
                   [RecordSource]
                 )
@@ -135,7 +138,11 @@ INSERT INTO [dbo].[S_ProviderMasterDemo]
                                                                        RTRIM(LTRIM(COALESCE(a.GroupName, ''))), ':', RTRIM(LTRIM(COALESCE(a.LocationID, ''))),
                                                                        ':', RTRIM(LTRIM(COALESCE(a.ProviderOfficeBucket_PK, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.Pool_PK, ''))), ':', RTRIM(LTRIM(COALESCE(a.AssignedUser_PK, ''))),
-                                                                       ':', RTRIM(LTRIM(COALESCE(a.AssignedDate, '')))))), 2)) ,
+                                                                       ':', RTRIM(LTRIM(COALESCE(a.AssignedDate, ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(a.[hasPriorityNote], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(a.[ProviderOfficeSubBucket_PK], '')))
+																	   
+																	   ))), 2)) ,
                         a.LoadDate ,
                         a.ProviderOfficeHashKey ,
                         RTRIM(LTRIM(COALESCE(a.EMR_Type, ''))) AS [EMR_Type] ,
@@ -146,13 +153,18 @@ INSERT INTO [dbo].[S_ProviderMasterDemo]
                         [Pool_PK] ,
                         [AssignedUser_PK] ,
                         [AssignedDate] ,
+						[hasPriorityNote],
+				  [ProviderOfficeSubBucket_PK],
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.EMR_Type, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(CAST(a.EMR_Type_PK AS VARCHAR), ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.GroupName, ''))), ':', RTRIM(LTRIM(COALESCE(a.LocationID, ''))),
                                                                        ':', RTRIM(LTRIM(COALESCE(a.ProviderOfficeBucket_PK, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.Pool_PK, ''))), ':', RTRIM(LTRIM(COALESCE(a.AssignedUser_PK, ''))),
-                                                                       ':', RTRIM(LTRIM(COALESCE(a.AssignedDate, '')))))), 2)) ,
+                                                                       ':', RTRIM(LTRIM(COALESCE(a.AssignedDate, ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(a.[hasPriorityNote], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(a.[ProviderOfficeSubBucket_PK], '')))
+																	   ))), 2)) ,
                         a.RecordSource
                 FROM    [CHSStaging].[adv].[tblProviderOfficeWCStage] a WITH ( NOLOCK )
                 WHERE   UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
@@ -161,21 +173,27 @@ INSERT INTO [dbo].[S_ProviderMasterDemo]
                                                                        RTRIM(LTRIM(COALESCE(a.GroupName, ''))), ':', RTRIM(LTRIM(COALESCE(a.LocationID, ''))),
                                                                        ':', RTRIM(LTRIM(COALESCE(a.ProviderOfficeBucket_PK, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.Pool_PK, ''))), ':', RTRIM(LTRIM(COALESCE(a.AssignedUser_PK, ''))),
-                                                                       ':', RTRIM(LTRIM(COALESCE(a.AssignedDate, '')))))), 2)) NOT IN (
+                                                                       ':', RTRIM(LTRIM(COALESCE(a.AssignedDate, ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(a.[hasPriorityNote], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(a.[ProviderOfficeSubBucket_PK], '')))
+																	   ))), 2)) NOT IN (
                         SELECT  HashDiff
                         FROM    S_ProviderOfficeDetail
                         WHERE   H_ProviderOffice_RK = a.ProviderOfficeHashKey
                                 AND RecordEndDate IS NULL )
                         AND a.CCI = @CCI
                 GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CPI, ''))), ':', RTRIM(LTRIM(COALESCE(a.LoadDate, ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(a.EMR_Type, ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(CAST(a.EMR_Type_PK AS VARCHAR), ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(a.GroupName, ''))), ':', RTRIM(LTRIM(COALESCE(a.LocationID, ''))),
-                                                                        ':', RTRIM(LTRIM(COALESCE(a.ProviderOfficeBucket_PK, ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(a.Pool_PK, ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(a.AssignedUser_PK, ''))), ':',
-                                                                        RTRIM(LTRIM(COALESCE(a.AssignedDate, '')))))), 2)) ,
+                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.CPI, ''))), ':', RTRIM(LTRIM(COALESCE(a.LoadDate, ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(a.EMR_Type, ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(CAST(a.EMR_Type_PK AS VARCHAR), ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(a.GroupName, ''))), ':', RTRIM(LTRIM(COALESCE(a.LocationID, ''))),
+                                                                       ':', RTRIM(LTRIM(COALESCE(a.ProviderOfficeBucket_PK, ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(a.Pool_PK, ''))), ':', RTRIM(LTRIM(COALESCE(a.AssignedUser_PK, ''))),
+                                                                       ':', RTRIM(LTRIM(COALESCE(a.AssignedDate, ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(a.[hasPriorityNote], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(a.[ProviderOfficeSubBucket_PK], '')))
+																	   
+																	   ))), 2)) ,
                         a.LoadDate ,
                         a.ProviderOfficeHashKey ,
                         RTRIM(LTRIM(COALESCE(a.EMR_Type, ''))) ,
@@ -186,13 +204,18 @@ INSERT INTO [dbo].[S_ProviderMasterDemo]
                         [Pool_PK] ,
                         [AssignedUser_PK] ,
                         [AssignedDate] ,
+						[hasPriorityNote],
+				  [ProviderOfficeSubBucket_PK],
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(a.EMR_Type, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(CAST(a.EMR_Type_PK AS VARCHAR), ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.GroupName, ''))), ':', RTRIM(LTRIM(COALESCE(a.LocationID, ''))),
                                                                        ':', RTRIM(LTRIM(COALESCE(a.ProviderOfficeBucket_PK, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.Pool_PK, ''))), ':', RTRIM(LTRIM(COALESCE(a.AssignedUser_PK, ''))),
-                                                                       ':', RTRIM(LTRIM(COALESCE(a.AssignedDate, '')))))), 2)) ,
+                                                                       ':', RTRIM(LTRIM(COALESCE(a.AssignedDate, ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(a.[hasPriorityNote], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(a.[ProviderOfficeSubBucket_PK], '')))
+																	   ))), 2)) ,
                         a.RecordSource;
 	
 	--RECORD END DATE CLEANUP
@@ -427,9 +450,6 @@ INSERT INTO [dbo].[S_ProviderMasterDemo]
         WHERE   a.RecordEndDate IS NULL;
 
     END;
-
-
-
 
 
 GO

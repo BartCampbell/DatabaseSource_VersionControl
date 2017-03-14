@@ -3,7 +3,6 @@ GO
 SET ANSI_NULLS ON
 GO
 
-
 -- =============================================
 -- Author:		Paul Johnson
 -- Create date: 08/18/2016
@@ -76,8 +75,8 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(NULL,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM(rw.Contact_Number)), LTRIM(RTRIM(rw.Cell_Number)),
-                               LTRIM(RTRIM(rw.Email_Address))) ,
+                        CONCAT(rw.Contact_Number, rw.Cell_Number,
+                               rw.Email_Address) ,
                         RecordSource ,
                         LoadDate
                 FROM    CHSStaging.adv.tblMemberWCStage rw
@@ -93,8 +92,8 @@ AS
                         SELECT  H_Contact_RK
                         FROM    H_Contact )
                         AND CCI = @CCI
-                GROUP BY  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
-                                                          UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Contact_Number,
+                GROUP BY UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(Contact_Number,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(Cell_Number,
                                                               ''))), ':',
@@ -102,10 +101,10 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(NULL,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM(rw.Contact_Number)), LTRIM(RTRIM(rw.Cell_Number)),
-                               LTRIM(RTRIM(rw.Email_Address))) ,
-                        RecordSource ,
-                        LoadDate;
+                        CONCAT(rw.Contact_Number, rw.Cell_Number,
+                               rw.Email_Address) ,
+                        LoadDate ,
+                        RecordSource;
 
 		
 --_Home
@@ -122,7 +121,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(NULL,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM(rw.Home_Contact_Number)),LTRIM(RTRIM( rw.Home_Email_Address))) ,
+                        CONCAT(rw.Home_Contact_Number, rw.Home_Email_Address) ,
                         RecordSource ,
                         LoadDate
                 FROM    CHSStaging.adv.tblMemberWCStage rw
@@ -143,7 +142,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(NULL,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM(rw.Home_Contact_Number)), LTRIM(RTRIM(rw.Home_Email_Address))) ,
+                        CONCAT(rw.Home_Contact_Number, rw.Home_Email_Address) ,
                         LoadDate ,
                         RecordSource;
 
@@ -162,7 +161,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(NULL,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM(rw.Orig_Contact_Number)), LTRIM(RTRIM(rw.Orig_Email_Address))) ,
+                        CONCAT(rw.Orig_Contact_Number, rw.Orig_Email_Address) ,
                         RecordSource ,
                         LoadDate
                 FROM    CHSStaging.adv.tblMemberWCStage rw
@@ -183,7 +182,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(NULL,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM(rw.Orig_Contact_Number)), LTRIM(RTRIM(rw.Orig_Email_Address))) ,
+                        CONCAT(rw.Orig_Contact_Number, rw.Orig_Email_Address) ,
                         LoadDate ,
                         RecordSource;
 
@@ -203,7 +202,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(NULL,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM(rw.POA_Contact_Number)), LTRIM(RTRIM(rw.POA_Email_Address))) ,
+                        CONCAT(rw.POA_Contact_Number, rw.POA_Email_Address) ,
                         RecordSource ,
                         LoadDate
                 FROM    CHSStaging.adv.tblMemberWCStage rw
@@ -224,7 +223,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(NULL,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM(rw.POA_Contact_Number)), LTRIM(RTRIM(rw.POA_Email_Address))) ,
+                        CONCAT(rw.POA_Contact_Number, rw.POA_Email_Address) ,
                         LoadDate ,
                         RecordSource;
 
@@ -235,7 +234,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(ZipCode_PK,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM([Address])), LTRIM(RTRIM(ZipCode_PK))) ,
+                        CONCAT([Address], ZipCode_PK) ,
                         LoadDate ,
                         RecordSource
                 FROM    CHSStaging.adv.tblMemberWCStage
@@ -252,7 +251,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(ZipCode_PK,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM([Address])),LTRIM(RTRIM( ZipCode_PK))) ,
+                        CONCAT([Address], ZipCode_PK) ,
                         LoadDate ,
                         RecordSource;
 
@@ -265,7 +264,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(Home_ZipCode_PK,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM([Home_Address])),LTRIM(RTRIM( Home_ZipCode_PK))) ,
+                        CONCAT([Home_Address], Home_ZipCode_PK) ,
                         LoadDate ,
                         RecordSource
                 FROM    CHSStaging.adv.tblMemberWCStage
@@ -282,7 +281,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(Home_ZipCode_PK,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM([Home_Address])), LTRIM(RTRIM(Home_ZipCode_PK))) ,
+                        CONCAT([Home_Address], Home_ZipCode_PK) ,
                         LoadDate ,
                         RecordSource;
 
@@ -294,7 +293,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(Orig_ZipCode_PK,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM([Orig_Address])), LTRIM(RTRIM(Orig_ZipCode_PK))) ,
+                        CONCAT([Orig_Address], Orig_ZipCode_PK) ,
                         LoadDate ,
                         RecordSource
                 FROM    CHSStaging.adv.tblMemberWCStage
@@ -311,7 +310,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(Orig_ZipCode_PK,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM([Orig_Address])), LTRIM(RTRIM(Orig_ZipCode_PK))) ,
+                        CONCAT([Orig_Address], Orig_ZipCode_PK) ,
                         LoadDate ,
                         RecordSource;
 
@@ -323,7 +322,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(POA_ZipCode_PK,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM([POA_Address])), LTRIM(RTRIM(POA_ZipCode_PK))) ,
+                        CONCAT([POA_Address], POA_ZipCode_PK) ,
                         LoadDate ,
                         RecordSource
                 FROM    CHSStaging.adv.tblMemberWCStage
@@ -340,7 +339,7 @@ AS
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(POA_ZipCode_PK,
                                                               '')))))), 2)) ,
-                        CONCAT(LTRIM(RTRIM([POA_Address])), LTRIM(RTRIM(POA_ZipCode_PK))) ,
+                        CONCAT([POA_Address], POA_ZipCode_PK) ,
                         LoadDate ,
                         RecordSource;
 
