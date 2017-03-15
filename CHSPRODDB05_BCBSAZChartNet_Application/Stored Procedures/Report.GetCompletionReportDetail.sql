@@ -6,6 +6,7 @@ GO
 -- =============================================
 -- Author:		Raasch, Mark
 -- Create date: 10/30/2014
+--Update 03/11/2017 Paul Johnson chaning join to Pursuit to reflect 1-2-1 relationship with PursuitEvent
 -- Description:	Returns the detail for completion report detail
 -- =============================================
 CREATE PROCEDURE [Report].[GetCompletionReportDetail]
@@ -83,11 +84,13 @@ BEGIN
 			m.Gender,
             PVSL.LogDate AS AbstractionDate,
             ISNULL(a.AbstractorName, '') AS Abstractor
-    FROM    MemberMeasureMetricScoring mmms WITH(NOLOCK)
-            INNER JOIN MemberMeasureSample mms WITH(NOLOCK) ON mmms.MemberMeasureSampleID = mms.MemberMeasureSampleID
-            INNER JOIN Pursuit p WITH(NOLOCK) ON p.MemberID = mms.MemberID
-            INNER JOIN PursuitEvent pe WITH(NOLOCK) ON (pe.PursuitID = p.PursuitID AND pe.EventDate = mms.EventDate AND pe.MeasureID = mms.MeasureID) OR pe.MemberMeasureSampleID = mms.MemberMeasureSampleID
-            INNER JOIN Measure ms WITH(NOLOCK) ON ms.MeasureID = mms.MeasureID
+	 FROM    MemberMeasureMetricScoring mmms WITH(NOLOCK)
+            LEFT JOIN MemberMeasureSample mms WITH(NOLOCK) ON mmms.MemberMeasureSampleID = mms.MemberMeasureSampleID
+            -- INNER JOIN Pursuit p WITH(NOLOCK) ON p.MemberID = mms.MemberID
+            INNER JOIN PursuitEvent pe WITH(NOLOCK) ON --(pe.PursuitID = p.PursuitID AND pe.EventDate = mms.EventDate AND pe.MeasureID = mms.MeasureID) OR 
+											pe.MemberMeasureSampleID = mms.MemberMeasureSampleID
+            INNER JOIN Pursuit p WITH(NOLOCK) ON p.PursuitID = pe.PursuitID
+			INNER JOIN Measure ms WITH(NOLOCK) ON ms.MeasureID = mms.MeasureID
             INNER JOIN AbstractionStatus ab WITH(NOLOCK) ON ab.AbstractionStatusID = pe.AbstractionStatusID
             INNER JOIN providersite ps WITH(NOLOCK) ON ps.ProviderSiteID = p.ProviderSiteID
             INNER JOIN Providers pr WITH(NOLOCK) ON pr.ProviderID = p.ProviderID
