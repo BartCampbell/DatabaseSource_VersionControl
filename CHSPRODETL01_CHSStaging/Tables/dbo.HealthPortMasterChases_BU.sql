@@ -1,0 +1,33 @@
+CREATE TABLE [dbo].[HealthPortMasterChases_BU]
+(
+[RecordID] [int] NOT NULL IDENTITY(1, 1),
+[MemberID] [varchar] (25) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[SuspectPK] [int] NULL,
+[MemberLastName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MemberFirstName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MemberDOB] [date] NULL,
+[ProviderID] [varchar] (25) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderLastName] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderFirstName] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderNPI] [varchar] (25) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderAddress] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderCity] [varchar] (25) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderState] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ProviderZip] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[IsScanned] [int] NULL,
+[IsCoded] [int] NULL,
+[ScannedDate] [date] NULL,
+[CodedDate] [date] NULL,
+[IsInvoiced] [int] NULL,
+[InvoicedDate] [date] NULL,
+[MemberMatchInternalInvoiceFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[MemberMatchHealthPortInvoiceFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[HPInvoiceDataMatch] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PaidFlag] [int] NULL,
+[PaidDate] [date] NULL,
+[InvoicePaidFlag] [int] NULL,
+[InvoiceNumber] [varchar] (25) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[InhouseNotPaidFlag] [int] NULL,
+[NotInhouseFlag] [int] NULL
+) ON [PRIMARY]
+GO

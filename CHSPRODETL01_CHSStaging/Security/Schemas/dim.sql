@@ -1,0 +1,3 @@
+CREATE SCHEMA [dim]
+AUTHORIZATION [INTERNAL\brent.doolittle]
+GO

@@ -1,0 +1,9 @@
+CREATE TABLE [dbo].[UserVendors]
+(
+[RecID] [int] NOT NULL IDENTITY(1, 1),
+[UserID] [int] NULL,
+[VendorGroup] [varchar] (25) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[UserVendors] ADD CONSTRAINT [UQ__UserVend__360414FE47FCA613] UNIQUE NONCLUSTERED  ([RecID]) ON [PRIMARY]
+GO

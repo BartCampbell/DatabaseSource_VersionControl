@@ -1,0 +1,8 @@
+CREATE TABLE [x12].[RefEntityLoop]
+(
+[X12RefEntityLoopID] [int] NOT NULL IDENTITY(1, 1),
+[LoopID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [x12].[RefEntityLoop] ADD CONSTRAINT [PK_X12RefEntityLoop] PRIMARY KEY CLUSTERED  ([X12RefEntityLoopID]) ON [PRIMARY]
+GO

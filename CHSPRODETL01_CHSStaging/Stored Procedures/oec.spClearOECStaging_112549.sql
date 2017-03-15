@@ -1,0 +1,19 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+
+
+
+
+
+
+CREATE PROC [oec].[spClearOECStaging_112549]
+AS
+     SET NOCOUNT ON;
+
+     TRUNCATE TABLE oec.AdvanceOECRaw_112549
+
+
+
+GO

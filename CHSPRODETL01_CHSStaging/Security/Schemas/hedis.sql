@@ -1,0 +1,3 @@
+CREATE SCHEMA [hedis]
+AUTHORIZATION [dbo]
+GO

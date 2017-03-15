@@ -1,0 +1,3 @@
+CREATE SCHEMA [raps]
+AUTHORIZATION [dbo]
+GO
