@@ -6,6 +6,7 @@ GO
 -- =============================================
 -- Author:		Kriz, Mike
 -- Create date: 9/10/2012
+-- adding Adstraction status change 3/11/2017 Paul Johnson
 -- Description:	Imports chart images from RDSM.
 -- =============================================
 CREATE PROCEDURE [dbo].[ImportChartImagesFromRDSM]
@@ -15,6 +16,23 @@ BEGIN
 
     EXEC RDSM.ImportChartImagesFromFTPS;
     EXEC RDSM.UpdateChartImagesXref;
+
+	--Added 03/11/2017
+	SELECT DISTINCT RV.PursuitEventID INTO #pur
+		FROM	RDSM.ChartImageFileImport AS CIFI
+			INNER JOIN dbo.Pursuit AS R
+					ON CIFI.Xref = R.PursuitNumber
+			INNER JOIN dbo.PursuitEvent AS RV
+					ON R.PursuitID = RV.PursuitID
+			LEFT OUTER JOIN dbo.PursuitEventChartImage AS RVCI
+					ON RV.PursuitEventID = RVCI.PursuitEventID AND
+					CIFI.Name = RVCI.ImageName AND
+					BINARY_CHECKSUM(CIFI.FileData) = BINARY_CHECKSUM(RVCI.ImageData) AND
+					DATALENGTH(CIFI.FileData) = DATALENGTH(RVCI.ImageData)   
+	WHERE	(CIFI.Xref IS NOT NULL) AND
+			(RVCI.PursuitEventChartImageID IS NULL) AND
+			(CIFI.Ignore = 0);
+
     
     INSERT INTO dbo.PursuitEventChartImage
 			(PursuitEventID,
@@ -48,7 +66,16 @@ BEGIN
 	WHERE	(CIFI.Xref IS NOT NULL) AND
 			(RVCI.PursuitEventChartImageID IS NULL) AND
 			(CIFI.Ignore = 0);
-    
+   
+   --Added 03/11/2017
+		UPDATE	RV
+		SET		AbstractionStatusID = 30
+		FROM	dbo.PursuitEvent AS RV
+				INNER JOIN  #pur CI ON CI.PursuitEventID = RV.PursuitEventID
+		WHERE 	RV.AbstractionStatusID <30   
+	
+
+
 END
 
 GO
