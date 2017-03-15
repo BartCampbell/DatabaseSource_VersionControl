@@ -1,3 +1,5 @@
+
+EXEC sp_addrolemember N'db_datareader', N'INTERNAL\brandon.rodman'
 EXEC sp_addrolemember N'db_datareader', N'ChartNet_AppUser'
 GO
 EXEC sp_addrolemember N'db_datareader', N'coaccess_ssrs'
