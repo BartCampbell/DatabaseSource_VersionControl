@@ -10,7 +10,8 @@ CREATE TABLE [dbo].[ChartImageFileImport]
 [Path] [nvarchar] (2048) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [Size] [bigint] NULL,
 [Xref] [nvarchar] (64) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Ignore] [bit] NOT NULL CONSTRAINT [DF_ChartImageFileImport_Ignore] DEFAULT ((0))
+[Ignore] [bit] NOT NULL CONSTRAINT [DF_ChartImageFileImport_Ignore] DEFAULT ((0)),
+[ErrorEmailSent] [bit] NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[ChartImageFileImport] ADD CONSTRAINT [PK_dbo_ChartImageFileImport] PRIMARY KEY CLUSTERED  ([FileID]) ON [PRIMARY]
