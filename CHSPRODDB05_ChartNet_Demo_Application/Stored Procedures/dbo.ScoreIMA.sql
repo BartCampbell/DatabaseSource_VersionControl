@@ -192,7 +192,6 @@ AS
 								c.HEDISSubMetricComponentID = a2.HEDISSubMetricComponentID AND
 								a.ServiceDate BETWEEN DATEADD(dd, -14, a2.ServiceDate) AND DATEADD(dd, 14, a2.ServiceDate) )
 
-
 	IF OBJECT_ID('tempdb..#SubMetricRuleComponentMetricsMedicalRecordDetail') IS NOT NULL 
 		DROP TABLE #SubMetricRuleComponentMetricsMedicalRecordDetail
 
@@ -489,7 +488,8 @@ AS
 	FROM    MemberMeasureMetricScoring a
 			INNER JOIN MemberMeasureSample b ON a.MemberMeasureSampleID = b.MemberMeasureSampleID
 			INNER JOIN #SubMetricRuleComponents c ON a.MemberMeasureMetricScoringID = c.MemberMeasureMetricScoringID
-			LEFT OUTER JOIN #Exclusions AS x ON a.MemberMeasureMetricScoringID = x.MemberMeasureMetricScoringID;
+			LEFT OUTER JOIN #Exclusions AS x ON a.MemberMeasureMetricScoringID = x.MemberMeasureMetricScoringID
+	WHERE b.MemberID=@MemberID
 
 
 
@@ -565,7 +565,8 @@ AS
 	SELECT @Date1 = DateAdd(Year,11,@DOB),@Date2 = DateAdd(Year,13,@DOB)
 	IF EXISTS (SELECT MedicalRecordKey 
 			FROM MedicalRecordIMA D INNER JOIN PursuitEvent PE ON PE.PursuitID = D.PursuitID 
-			WHERE PE.MemberMeasureSampleID = @MemberMeasureSampleID AND PE.MeasureID=27 AND IMAEvidenceID IN (1, 9)
+				INNER JOIN DropDownValues_IMAEvidence IE ON D.IMAEvidenceID = IE.IMAEvidenceID AND IMAEventID<>3
+			WHERE PE.MemberMeasureSampleID = @MemberMeasureSampleID AND PE.MeasureID=27 AND D.IMAEvidenceID IN (1, 9)
 				AND D.ServiceDate>=@Date1 AND D.ServiceDate<=@Date2
 			UNION
 			SELECT DISTINCT ServiceDate FROM AdministrativeEvent 
@@ -586,7 +587,8 @@ AS
 	SELECT @Date1 = DateAdd(Year,10,@DOB),@Date2 = DateAdd(Year,13,@DOB)
 	IF EXISTS (SELECT DISTINCT D.ServiceDate 
 			FROM MedicalRecordIMA D INNER JOIN PursuitEvent PE ON PE.PursuitID = D.PursuitID 
-			WHERE PE.MemberMeasureSampleID = @MemberMeasureSampleID AND PE.MeasureID=27 AND IMAEvidenceID IN (2, 3, 4, 6, 7, 10, 11, 12, 13)
+				INNER JOIN DropDownValues_IMAEvidence IE ON D.IMAEvidenceID = IE.IMAEvidenceID AND IMAEventID<>3
+			WHERE PE.MemberMeasureSampleID = @MemberMeasureSampleID AND PE.MeasureID=27 AND D.IMAEvidenceID IN (2, 3, 4, 6, 7, 10, 11, 12, 13)
 				AND D.ServiceDate>=@Date1 AND D.ServiceDate<=@Date2
 			UNION
 			SELECT DISTINCT ServiceDate FROM AdministrativeEvent 
@@ -612,7 +614,8 @@ AS
 	IF (SELECT COUNT(*) FROM (
 			SELECT DISTINCT D.ServiceDate
 				FROM MedicalRecordIMA D INNER JOIN PursuitEvent PE ON PE.PursuitID = D.PursuitID 
-				WHERE PE.MemberMeasureSampleID = @MemberMeasureSampleID AND PE.MeasureID=27 AND IMAEvidenceID IN (14,15)
+					INNER JOIN DropDownValues_IMAEvidence IE ON D.IMAEvidenceID = IE.IMAEvidenceID AND IMAEventID<>3
+				WHERE PE.MemberMeasureSampleID = @MemberMeasureSampleID AND PE.MeasureID=27 AND D.IMAEvidenceID IN (14,15)
 					AND D.ServiceDate>=@Date1 AND D.ServiceDate<=@Date2
 			UNION
 			SELECT DISTINCT ServiceDate FROM AdministrativeEvent 
@@ -638,6 +641,4 @@ AS
 	END
 
 		EXEC dbo.RunPostScoringSteps @HedisMeasure = 'IMA', @MemberID = @MemberID;
-GO
-GRANT EXECUTE ON  [dbo].[ScoreIMA] TO [Support]
 GO
