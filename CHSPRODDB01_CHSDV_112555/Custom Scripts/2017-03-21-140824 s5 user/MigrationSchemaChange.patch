@@ -1,0 +1,361 @@
+diff --git a/Security/Roles/db_owner.sql b/Security/Roles/db_owner.sql
+index a4b5318..f74e482 100644
+--- a/Security/Roles/db_owner.sql
++++ b/Security/Roles/db_owner.sql
+@@ -1,3 +1,5 @@
++
++EXEC sp_addrolemember N'db_owner', N'INTERNAL\travis.parker'
+ EXEC sp_addrolemember N'db_owner', N'INTERNAL\CHSTESTDB02$'
+ GO
+ EXEC sp_addrolemember N'db_owner', N'INTERNAL\Paul.Johnson'
+diff --git a/Security/Users/INTERNAL_travis.parker.sql b/Security/Users/INTERNAL_travis.parker.sql
+new file mode 100644
+index 0000000..b0705ac
+--- /dev/null
++++ b/Security/Users/INTERNAL_travis.parker.sql
+@@ -0,0 +1,5 @@
++IF NOT EXISTS (SELECT * FROM master.dbo.syslogins WHERE loginname = N'INTERNAL\travis.parker')
++CREATE LOGIN [INTERNAL\travis.parker] FROM WINDOWS
++GO
++CREATE USER [INTERNAL\travis.parker] FOR LOGIN [INTERNAL\travis.parker]
++GO
+diff --git a/Stored Procedures/dbo.prDV_RAPS_IsFileProcessed.sql b/Stored Procedures/dbo.prDV_RAPS_IsFileProcessed.sql
+new file mode 100644
+index 0000000..f318815
+--- /dev/null
++++ b/Stored Procedures/dbo.prDV_RAPS_IsFileProcessed.sql
+@@ -0,0 +1,46 @@
++SET QUOTED_IDENTIFIER ON
++GO
++SET ANSI_NULLS ON
++GO
++
++
++
++---- =============================================
++---- Author:		Travis Parker
++---- Create date:	07/06/2016
++---- Description:	Returns 1 or 0 as indicator if file has been processed
++---- Usage:			
++----		  EXECUTE dbo.prDV_RAPS_IsFileProcessed @IsFileProcessed 
++---- =============================================
++
++CREATE PROCEDURE [dbo].[prDV_RAPS_IsFileProcessed]
++    @IsFileProcessed INT OUTPUT
++AS
++    BEGIN
++
++        SET NOCOUNT ON;
++
++        BEGIN TRY
++
++
++            SELECT TOP 1
++                    @IsFileProcessed = t.FileProcessed
++            FROM    ( SELECT    1 AS FileProcessed
++                      FROM      CHSStaging.raps.RAPS_RESPONSE_AAA
++                      WHERE     RecordSource IN ( SELECT    RecordSource
++                                                  FROM      dbo.H_RAPS_Response )
++                      UNION
++                      SELECT    0 AS FileProcessed
++                    ) t
++            ORDER BY t.FileProcessed DESC;
++
++        END TRY
++        BEGIN CATCH
++             --IF @@TRANCOUNT > 0
++             --    ROLLBACK TRANSACTION;
++            THROW;
++        END CATCH;
++    END;
++
++
++GO
+diff --git a/Stored Procedures/dbo.prDV_RAPS_LoadSats.sql b/Stored Procedures/dbo.prDV_RAPS_LoadSats.sql
+index fc17a11..3ccde93 100644
+--- a/Stored Procedures/dbo.prDV_RAPS_LoadSats.sql
++++ b/Stored Procedures/dbo.prDV_RAPS_LoadSats.sql
+@@ -50,20 +50,21 @@
+                             r.RecordSource
+                     FROM    CHSStaging.raps.vwRAPS_RESPONSE_AAA r
+                             LEFT JOIN dbo.S_RAPS_Response_AAA a ON a.H_RAPS_Response_RK = r.H_RAPS_Response_RK
+-                                                              AND a.RecordEndDate IS NULL
+-                                                              AND a.HashDiff = r.HashDiff
+-                    WHERE   a.S_RAPS_Response_AAA_RK IS NULL; 
++                                                                   AND a.RecordEndDate IS NULL
++                                                                   AND a.HashDiff = r.HashDiff
++                    WHERE   a.S_RAPS_Response_AAA_RK IS NULL
++            OPTION  ( MAXDOP 2 ); 
+ 		  
+ 		  --RECORD END DATE CLEANUP
+             UPDATE  dbo.S_RAPS_Response_AAA
+-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1,
+-                                                        MIN(z.LoadDate))
++            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                       FROM      dbo.S_RAPS_Response_AAA AS z
+                                       WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+                                                 AND z.LoadDate > a.LoadDate
+                                     )
+             FROM    dbo.S_RAPS_Response_AAA a
+-            WHERE   a.RecordEndDate IS NULL;
++            WHERE   a.RecordEndDate IS NULL
++            OPTION  ( MAXDOP 2 );
+ 		  
+ 
+ 		  --LOAD RAPS BBB
+@@ -95,21 +96,22 @@
+                             r.RecordSource
+                     FROM    CHSStaging.raps.vwRAPS_RESPONSE_BBB r
+                             LEFT JOIN dbo.S_RAPS_Response_BBB b ON b.H_RAPS_Response_RK = r.H_RAPS_Response_RK
+-                                                              AND b.RecordEndDate IS NULL
+-                                                              AND b.HashDiff = r.HashDiff
+-                    WHERE   b.S_RAPS_Response_BBB_RK IS NULL; 
++                                                                   AND b.RecordEndDate IS NULL
++                                                                   AND b.HashDiff = r.HashDiff
++                    WHERE   b.S_RAPS_Response_BBB_RK IS NULL
++            OPTION  ( MAXDOP 2 ); 
+ 
+ 
+ 		  --RECORD END DATE CLEANUP
+             UPDATE  dbo.S_RAPS_Response_BBB
+-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1,
+-                                                        MIN(z.LoadDate))
++            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                       FROM      dbo.S_RAPS_Response_BBB AS z
+                                       WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+                                                 AND z.LoadDate > a.LoadDate
+                                     )
+             FROM    dbo.S_RAPS_Response_BBB a
+-            WHERE   a.RecordEndDate IS NULL;
++            WHERE   a.RecordEndDate IS NULL
++            OPTION  ( MAXDOP 2 );
+ 
+ 
+ 		  --LOAD RAPS CCC
+@@ -325,21 +327,22 @@
+                             r.RecordSource
+                     FROM    CHSStaging.raps.RAPS_RESPONSE_CCC r
+                             LEFT JOIN dbo.S_RAPS_Response_CCC c ON c.H_RAPS_Response_RK = r.H_RAPS_Response_RK
+-                                                              AND c.RecordEndDate IS NULL
+-                                                              AND c.HashDiff = r.HashDiff
+-                    WHERE   c.S_RAPS_Response_CCC_RK IS NULL; 
++                                                                   AND c.RecordEndDate IS NULL
++                                                                   AND c.HashDiff = r.HashDiff
++                    WHERE   c.S_RAPS_Response_CCC_RK IS NULL
++            OPTION  ( MAXDOP 2 ); 
+ 		  
+ 		  
+ 		  --RECORD END DATE CLEANUP
+             UPDATE  dbo.S_RAPS_Response_CCC
+-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1,
+-                                                        MIN(z.LoadDate))
++            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                       FROM      dbo.S_RAPS_Response_CCC AS z
+                                       WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+                                                 AND z.LoadDate > a.LoadDate
+                                     )
+             FROM    dbo.S_RAPS_Response_CCC a
+-            WHERE   a.RecordEndDate IS NULL;
++            WHERE   a.RecordEndDate IS NULL
++            OPTION  ( MAXDOP 2 );
+ 		  
+ 		  
+ 		  --LOAD RAPS YYY
+@@ -365,20 +368,21 @@
+                             r.RecordSource
+                     FROM    CHSStaging.raps.vwRAPS_RESPONSE_YYY r
+                             LEFT JOIN dbo.S_RAPS_Response_YYY y ON y.H_RAPS_Response_RK = r.H_RAPS_Response_RK
+-                                                              AND y.HashDiff = r.HashDiff
+-                                                              AND y.RecordEndDate IS NULL
+-                    WHERE   y.S_RAPS_Response_YYY_RK IS NULL; 
++                                                                   AND y.HashDiff = r.HashDiff
++                                                                   AND y.RecordEndDate IS NULL
++                    WHERE   y.S_RAPS_Response_YYY_RK IS NULL
++            OPTION  ( MAXDOP 2 ); 
+ 		  
+ 		  --RECORD END DATE CLEANUP
+             UPDATE  dbo.S_RAPS_Response_YYY
+-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1,
+-                                                        MIN(z.LoadDate))
++            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                       FROM      dbo.S_RAPS_Response_YYY AS z
+                                       WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+                                                 AND z.LoadDate > a.LoadDate
+                                     )
+             FROM    dbo.S_RAPS_Response_YYY a
+-            WHERE   a.RecordEndDate IS NULL;
++            WHERE   a.RecordEndDate IS NULL
++            OPTION  ( MAXDOP 2 );
+ 		  
+ 		  
+ 		  --LOAD RAPS ZZZ
+@@ -404,21 +408,22 @@
+                             r.RecordSource
+                     FROM    CHSStaging.raps.vwRAPS_RESPONSE_ZZZ r
+                             LEFT JOIN dbo.S_RAPS_Response_ZZZ z ON z.H_RAPS_Response_RK = r.H_RAPS_Response_RK
+-                                                              AND z.HashDiff = r.HashDiff
+-                                                              AND z.RecordEndDate IS NULL
+-                    WHERE   z.S_RAPS_Response_ZZZ_RK IS NULL; 
++                                                                   AND z.HashDiff = r.HashDiff
++                                                                   AND z.RecordEndDate IS NULL
++                    WHERE   z.S_RAPS_Response_ZZZ_RK IS NULL
++            OPTION  ( MAXDOP 2 ); 
+ 
+ 
+ 		  --RECORD END DATE CLEANUP
+             UPDATE  dbo.S_RAPS_Response_ZZZ
+-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1,
+-                                                        MIN(z.LoadDate))
++            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                       FROM      dbo.S_RAPS_Response_ZZZ AS z
+                                       WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+                                                 AND z.LoadDate > a.LoadDate
+                                     )
+             FROM    dbo.S_RAPS_Response_ZZZ a
+-            WHERE   a.RecordEndDate IS NULL;
++            WHERE   a.RecordEndDate IS NULL
++            OPTION  ( MAXDOP 2 );
+ 
+ 		  
+ 		  --LOAD MemberHICN satellite
+@@ -441,19 +446,20 @@
+                             LEFT JOIN dbo.S_MemberHICN s ON s.H_Member_RK = r.H_Member_RK
+                                                             AND s.RecordEndDate IS NULL
+                                                             AND r.S_MemberHICN_HashDiff = s.HashDiff
+-                    WHERE   s.S_MemberHICN_RK IS NULL; 
++                    WHERE   s.S_MemberHICN_RK IS NULL
++            OPTION  ( MAXDOP 2 ); 
+ 
+ 
+ 		  --RECORD END DATE CLEANUP
+             UPDATE  dbo.S_MemberHICN
+-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1,
+-                                                        MIN(z.LoadDate))
++            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                       FROM      dbo.S_MemberHICN AS z
+                                       WHERE     z.H_Member_RK = a.H_Member_RK
+                                                 AND z.LoadDate > a.LoadDate
+                                     )
+             FROM    dbo.S_MemberHICN a
+-            WHERE   a.RecordEndDate IS NULL;
++            WHERE   a.RecordEndDate IS NULL
++            OPTION  ( MAXDOP 2 );
+ 
+ 
+ 
+diff --git a/Stored Procedures/dw.spGetRAPSMember.sql b/Stored Procedures/dw.spGetRAPSMember.sql
+index 7f9b0c1..79e4545 100644
+--- a/Stored Procedures/dw.spGetRAPSMember.sql
++++ b/Stored Procedures/dw.spGetRAPSMember.sql
+@@ -9,15 +9,27 @@
+ ---- Usage:			
+ ----		  EXECUTE dw.spGetRAPSMember '06/10/2016'
+ ---- =============================================
+-CREATE PROC [dw].[spGetRAPSMember] @LastLoadTime DATETIME
++CREATE PROC [dw].[spGetRAPSMember]
++    @LastLoadTime DATETIME
+ AS
+     SET NOCOUNT ON; 
+ 
+     SELECT DISTINCT
+-            h.Member_BK AS CentauriMemberID 
++            h.Member_BK AS CentauriMemberID ,
++            s.LastName ,
++            s.FirstName ,
++            CONVERT(VARCHAR(10),CASE s.Gender WHEN '1' THEN 'M' WHEN '2' THEN 'F' ELSE s.Gender END) AS Gender ,
++            CONVERT(VARCHAR(8),s.DOB,112) AS DOB ,
++            c.Client_BK AS CentauriClientID ,
++            h.RecordSource ,
++            ISNULL(s.LoadDate, h.LoadDate) AS LoadDate
+     FROM    dbo.H_Member h
+             INNER JOIN dbo.L_MemberRAPSResponse l ON l.H_Member_RK = h.H_Member_RK
+-    WHERE   l.RecordEndDate IS NULL AND h.LoadDate > @LastLoadTime;
++            LEFT JOIN dbo.S_MemberDemo s ON s.H_Member_RK = h.H_Member_RK
++            CROSS JOIN dbo.H_Client c
++    WHERE   s.RecordEndDate IS NULL
++            AND ISNULL(s.LoadDate, h.LoadDate) > @LastLoadTime;
+ 
+ 
++    
+ GO
+diff --git a/Stored Procedures/dw.spGetRAPSMemberClient.sql b/Stored Procedures/dw.spGetRAPSMemberClient.sql
+index 6d14a3b..cf11dd8 100644
+--- a/Stored Procedures/dw.spGetRAPSMemberClient.sql
++++ b/Stored Procedures/dw.spGetRAPSMemberClient.sql
+@@ -17,11 +17,12 @@
+     SELECT  DISTINCT
+             h.Member_BK AS CentauriMemberID ,
+             c.Client_BK AS CentauriClientID ,
+-            h.ClientMemberID
++            h.ClientMemberID ,
++		  h.RecordSource ,
++		  h.LoadDate
+     FROM    dbo.H_Member h
+             INNER JOIN dbo.L_MemberRAPSResponse l ON l.H_Member_RK = h.H_Member_RK
+             CROSS JOIN dbo.H_Client c
+-    WHERE   l.RecordEndDate IS NULL
+-            AND l.LoadDate > @LastLoadTime;
++    WHERE   l.LoadDate > @LastLoadTime;
+ 
+ GO
+diff --git a/Stored Procedures/dw.spGetRAPSMemberHICN.sql b/Stored Procedures/dw.spGetRAPSMemberHICN.sql
+index 28bc450..e6a2ddc 100644
+--- a/Stored Procedures/dw.spGetRAPSMemberHICN.sql
++++ b/Stored Procedures/dw.spGetRAPSMemberHICN.sql
+@@ -15,10 +15,14 @@
+ 
+     SELECT DISTINCT
+             h.Member_BK AS CentauriMemberID ,
+-		  s.HICNumber
++		  s.HICNumber ,
++		  s.RecordSource ,
++		  c.Client_BK AS CentauriClientID ,
++		  s.LoadDate
+     FROM    dbo.H_Member h
+             INNER JOIN dbo.L_MemberRAPSResponse l ON l.H_Member_RK = h.H_Member_RK
+ 		  INNER JOIN dbo.S_MemberHICN s ON s.H_Member_RK = h.H_Member_RK
++		  CROSS JOIN dbo.H_Client c
+     WHERE   s.RecordEndDate IS NULL AND s.LoadDate > @LastLoadTime;
+ 
+ GO
+diff --git a/Stored Procedures/dw.spGetRAPSResponse.sql b/Stored Procedures/dw.spGetRAPSResponse.sql
+index 44fc5fc..b862006 100644
+--- a/Stored Procedures/dw.spGetRAPSResponse.sql
++++ b/Stored Procedures/dw.spGetRAPSResponse.sql
+@@ -36,14 +36,14 @@
+             pvt.ClusterGrouping ,
+             a.TransactionDate ,
+             a.FileDiagType ,
+-            CASE WHEN COALESCE(REPLACE(c.DOBErrorCode, '500', ''),
+-                               REPLACE(c.HicErrorCode, '500', ''),
+-                               REPLACE(pvt.ErrorA, '500', ''),
+-                               REPLACE(pvt.ErrorB, '500', ''), '') <> ''
+-                 THEN 0
+-                 ELSE 1
+-            END AS Accepted,
+-		  c.RecordSource AS FileName
++            CASE WHEN REPLACE(c.DOBErrorCode, '500', '') <> ''
++                  OR REPLACE(c.HICErrorCode, '500', '') <> ''
++                  OR REPLACE(pvt.ErrorA, '500', '') <> ''
++                  OR REPLACE(pvt.ErrorB, '500', '') <> '' THEN 0
++             ELSE 1
++        END AS Accepted,
++		  c.RecordSource AS FileName ,
++		  c.LoadDate
+     FROM    dbo.S_RAPS_Response_CCC c
+             INNER JOIN dbo.S_RAPS_Response_AAA a ON a.H_RAPS_Response_RK = c.H_RAPS_Response_RK
+             INNER JOIN dbo.S_RAPS_Response_BBB b ON b.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+diff --git a/Tables/dbo.L_MemberRAPSResponse.sql b/Tables/dbo.L_MemberRAPSResponse.sql
+index 3315d59..7c58b2a 100644
+--- a/Tables/dbo.L_MemberRAPSResponse.sql
++++ b/Tables/dbo.L_MemberRAPSResponse.sql
+@@ -4,8 +4,7 @@
+ [H_RAPS_Response_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+ [H_Member_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+ [LoadDate] [datetime] NOT NULL CONSTRAINT [DF_L_MemberRAPSResponse_LoadDate] DEFAULT (getdate()),
+-[RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
+-[RecordEndDate] [datetime] NULL
++[RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL
+ ) ON [PRIMARY]
+ GO
+ ALTER TABLE [dbo].[L_MemberRAPSResponse] ADD CONSTRAINT [PK_L_MemberRAPSResponse] PRIMARY KEY CLUSTERED  ([L_MemberRAPSResponse_RK]) ON [PRIMARY]

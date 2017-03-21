@@ -1,0 +1,51 @@
+{
+  "Id": "1eb77d99-f25c-4d18-a31e-22e798173167",
+  "Name": "Script created at 2017-03-21 14:04.",
+  "ObjectIds": [
+    {
+      "Name": "L_MemberRAPSResponse",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "prDV_RAPS_IsFileProcessed",
+      "Owner": "dbo",
+      "ObjectType": "StoredProcedure"
+    },
+    {
+      "Name": "prDV_RAPS_LoadSats",
+      "Owner": "dbo",
+      "ObjectType": "StoredProcedure"
+    },
+    {
+      "Name": "spGetRAPSMemberClient",
+      "Owner": "dw",
+      "ObjectType": "StoredProcedure"
+    },
+    {
+      "Name": "spGetRAPSMemberHICN",
+      "Owner": "dw",
+      "ObjectType": "StoredProcedure"
+    },
+    {
+      "Name": "spGetRAPSMember",
+      "Owner": "dw",
+      "ObjectType": "StoredProcedure"
+    },
+    {
+      "Name": "spGetRAPSResponse",
+      "Owner": "dw",
+      "ObjectType": "StoredProcedure"
+    },
+    {
+      "Name": "db_owner",
+      "Owner": null,
+      "ObjectType": "Role_Role"
+    },
+    {
+      "Name": "INTERNAL\\travis.parker",
+      "Owner": null,
+      "ObjectType": "User"
+    }
+  ]
+}

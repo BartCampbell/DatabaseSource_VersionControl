@@ -1,6 +1,84 @@
-SET QUOTED_IDENTIFIER ON
+
+/*
+This migration script replaces uncommitted changes made to these objects:
+L_MemberRAPSResponse
+prDV_RAPS_IsFileProcessed
+prDV_RAPS_LoadSats
+spGetRAPSMemberClient
+spGetRAPSMemberHICN
+spGetRAPSMember
+spGetRAPSResponse
+db_owner
+INTERNAL\travis.parker
+
+Use this script to make necessary schema and data changes for these objects only. Schema changes to any other objects won't be deployed.
+
+Schema changes and migration scripts are deployed in the order they're committed.
+*/
+
+SET NUMERIC_ROUNDABORT OFF
 GO
-SET ANSI_NULLS ON
+SET ANSI_PADDING, ANSI_WARNINGS, CONCAT_NULL_YIELDS_NULL, ARITHABORT, QUOTED_IDENTIFIER, ANSI_NULLS ON
+GO
+IF NOT EXISTS (SELECT * FROM master.dbo.syslogins WHERE loginname = N'INTERNAL\travis.parker')
+CREATE LOGIN [INTERNAL\travis.parker] FROM WINDOWS
+GO
+CREATE USER [INTERNAL\travis.parker] FOR LOGIN [INTERNAL\travis.parker]
+GO
+PRINT N'Altering members of role db_owner'
+GO
+EXEC sp_addrolemember N'db_owner', N'INTERNAL\travis.parker'
+GO
+PRINT N'Altering [dbo].[L_MemberRAPSResponse]'
+GO
+ALTER TABLE [dbo].[L_MemberRAPSResponse] DROP
+COLUMN [RecordEndDate]
+GO
+PRINT N'Creating [dbo].[prDV_RAPS_IsFileProcessed]'
+GO
+
+
+
+---- =============================================
+---- Author:		Travis Parker
+---- Create date:	07/06/2016
+---- Description:	Returns 1 or 0 as indicator if file has been processed
+---- Usage:			
+----		  EXECUTE dbo.prDV_RAPS_IsFileProcessed @IsFileProcessed 
+---- =============================================
+
+CREATE PROCEDURE [dbo].[prDV_RAPS_IsFileProcessed]
+    @IsFileProcessed INT OUTPUT
+AS
+    BEGIN
+
+        SET NOCOUNT ON;
+
+        BEGIN TRY
+
+
+            SELECT TOP 1
+                    @IsFileProcessed = t.FileProcessed
+            FROM    ( SELECT    1 AS FileProcessed
+                      FROM      CHSStaging.raps.RAPS_RESPONSE_AAA
+                      WHERE     RecordSource IN ( SELECT    RecordSource
+                                                  FROM      dbo.H_RAPS_Response )
+                      UNION
+                      SELECT    0 AS FileProcessed
+                    ) t
+            ORDER BY t.FileProcessed DESC;
+
+        END TRY
+        BEGIN CATCH
+             --IF @@TRANCOUNT > 0
+             --    ROLLBACK TRANSACTION;
+            THROW;
+        END CATCH;
+    END;
+
+
+GO
+PRINT N'Altering [dbo].[prDV_RAPS_LoadSats]'
 GO
 
 
@@ -15,7 +93,7 @@ GO
 --		  EXECUTE dbo.prDV_RAPS_LoadSats
 -- =============================================
 
-CREATE PROCEDURE [dbo].[prDV_RAPS_LoadSats]
+ALTER PROCEDURE [dbo].[prDV_RAPS_LoadSats]
 AS
     BEGIN
 
@@ -473,3 +551,167 @@ AS
 
 
 GO
+PRINT N'Altering [dw].[spGetRAPSResponse]'
+GO
+---- =============================================
+---- Author:		Travis Parker
+---- Create date:	06/11/2016
+---- Description:	Gets the latest RAPS Response data for loading into the DW
+---- Usage:			
+----		  EXECUTE dw.spGetRAPSResponse '06/10/2016'
+---- =============================================
+ALTER PROC [dw].[spGetRAPSResponse]
+    @LastLoadTime DATETIME
+AS
+    SET NOCOUNT ON; 
+
+    SELECT  cl.Client_BK AS CentauriClientID ,
+            m.Member_BK AS CentauriMemberID ,
+            a.FileID ,
+            c.SeqNo ,
+            c.HicNo ,
+            RTRIM(c.PatientControlNo) AS 'PatientControlNo' ,
+            CONVERT(VARCHAR(50),dbo.ufn_parsefind(c.PatientControlNo, '-', 2)) AS ClaimNumber ,
+            c.PatientDOB ,
+            c.DOBErrorCode ,
+            c.HicErrorCode ,
+            b.PlanNo ,
+            pvt.FromDate ,
+            pvt.ThruDate ,
+            pvt.ProviderType ,
+            pvt.DXCode ,
+            pvt.ErrorA ,
+            pvt.ErrorB ,
+            pvt.RiskAssessmentCode ,
+            pvt.RiskAssessmentCodeError ,
+            pvt.ClusterGrouping ,
+            a.TransactionDate ,
+            a.FileDiagType ,
+            CASE WHEN REPLACE(c.DOBErrorCode, '500', '') <> ''
+                  OR REPLACE(c.HICErrorCode, '500', '') <> ''
+                  OR REPLACE(pvt.ErrorA, '500', '') <> ''
+                  OR REPLACE(pvt.ErrorB, '500', '') <> '' THEN 0
+             ELSE 1
+        END AS Accepted,
+		  c.RecordSource AS FileName ,
+		  c.LoadDate
+    FROM    dbo.S_RAPS_Response_CCC c
+            INNER JOIN dbo.S_RAPS_Response_AAA a ON a.H_RAPS_Response_RK = c.H_RAPS_Response_RK
+            INNER JOIN dbo.S_RAPS_Response_BBB b ON b.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+            INNER JOIN dbo.L_MemberRAPSResponse l ON l.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+            INNER JOIN dbo.H_Member m ON m.H_Member_RK = l.H_Member_RK
+            CROSS JOIN dbo.H_Client cl
+            CROSS APPLY ( VALUES
+            ( c.FromDate1, c.ThruDate1, c.ProviderType1, c.DiagnosisCode1, c.DiagClstrErrorA1, c.DiagClstrErrorB1, c.RiskAssessmentCode1, c.RiskAssessmentCodeError1, 1)
+					,
+            ( c.FromDate2, c.ThruDate2, c.ProviderType2, c.DiagnosisCode2, c.DiagClstrErrorA2, c.DiagClstrErrorB2, c.RiskAssessmentCode2, c.RiskAssessmentCodeError2, 2)
+					,
+            ( c.FromDate3, c.ThruDate3, c.ProviderType3, c.DiagnosisCode3, c.DiagClstrErrorA3, c.DiagClstrErrorB3, c.RiskAssessmentCode3, c.RiskAssessmentCodeError3, 3)
+					,
+            ( c.FromDate4, c.ThruDate4, c.ProviderType4, c.DiagnosisCode4, c.DiagClstrErrorA4, c.DiagClstrErrorB4, c.RiskAssessmentCode4, c.RiskAssessmentCodeError4, 4)
+					,
+            ( c.FromDate5, c.ThruDate5, c.ProviderType5, c.DiagnosisCode5, c.DiagClstrErrorA5, c.DiagClstrErrorB5, c.RiskAssessmentCode5, c.RiskAssessmentCodeError5, 5)
+					,
+            ( c.FromDate6, c.ThruDate6, c.ProviderType6, c.DiagnosisCode6, c.DiagClstrErrorA6, c.DiagClstrErrorB6, c.RiskAssessmentCode6, c.RiskAssessmentCodeError6, 6)
+					,
+            ( c.FromDate7, c.ThruDate7, c.ProviderType7, c.DiagnosisCode7, c.DiagClstrErrorA7, c.DiagClstrErrorB7, c.RiskAssessmentCode7, c.RiskAssessmentCodeError7, 7)
+					,
+            ( c.FromDate8, c.ThruDate8, c.ProviderType8, c.DiagnosisCode8, c.DiagClstrErrorA8, c.DiagClstrErrorB8, c.RiskAssessmentCode8, c.RiskAssessmentCodeError8, 8)
+					,
+            ( c.FromDate9, c.ThruDate9, c.ProviderType9, c.DiagnosisCode9, c.DiagClstrErrorA9, c.DiagClstrErrorB9, c.RiskAssessmentCode9, c.RiskAssessmentCodeError9, 9)
+					,
+            ( c.FromDate10, c.ThruDate10, c.ProviderType10, c.DiagnosisCode10, c.DiagClstrErrorA10, c.DiagClstrErrorB10, c.RiskAssessmentCode10, c.RiskAssessmentCodeError10, 10) ) pvt ( FromDate, ThruDate, ProviderType, DXCode, ErrorA, ErrorB, RiskAssessmentCode, RiskAssessmentCodeError, ClusterGrouping )
+    WHERE   ISNULL(pvt.FromDate, '') <> ''
+            AND ISNULL(pvt.ThruDate, '') <> ''
+            AND ISNULL(pvt.ProviderType, '') <> ''
+            AND ISNULL(pvt.DXCode, '') <> ''
+            AND c.LoadDate > @LastLoadTime;
+
+
+GO
+PRINT N'Altering [dw].[spGetRAPSMember]'
+GO
+---- =============================================
+---- Author:		Travis Parker
+---- Create date:	06/11/2016
+---- Description:	Gets the latest RAPS Response member data for loading into the DW
+---- Usage:			
+----		  EXECUTE dw.spGetRAPSMember '06/10/2016'
+---- =============================================
+ALTER PROC [dw].[spGetRAPSMember]
+    @LastLoadTime DATETIME
+AS
+    SET NOCOUNT ON; 
+
+    SELECT DISTINCT
+            h.Member_BK AS CentauriMemberID ,
+            s.LastName ,
+            s.FirstName ,
+            CONVERT(VARCHAR(10),CASE s.Gender WHEN '1' THEN 'M' WHEN '2' THEN 'F' ELSE s.Gender END) AS Gender ,
+            CONVERT(VARCHAR(8),s.DOB,112) AS DOB ,
+            c.Client_BK AS CentauriClientID ,
+            h.RecordSource ,
+            ISNULL(s.LoadDate, h.LoadDate) AS LoadDate
+    FROM    dbo.H_Member h
+            INNER JOIN dbo.L_MemberRAPSResponse l ON l.H_Member_RK = h.H_Member_RK
+            LEFT JOIN dbo.S_MemberDemo s ON s.H_Member_RK = h.H_Member_RK
+            CROSS JOIN dbo.H_Client c
+    WHERE   s.RecordEndDate IS NULL
+            AND ISNULL(s.LoadDate, h.LoadDate) > @LastLoadTime;
+
+
+    
+GO
+PRINT N'Altering [dw].[spGetRAPSMemberHICN]'
+GO
+---- =============================================
+---- Author:		Travis Parker
+---- Create date:	06/11/2016
+---- Description:	Gets the latest RAPS Response member HICN data for loading into the DW
+---- Usage:			
+----		  EXECUTE dw.spGetRAPSMemberHICN '06/10/2016'
+---- =============================================
+ALTER PROC [dw].[spGetRAPSMemberHICN] @LastLoadTime DATETIME
+AS
+    SET NOCOUNT ON; 
+
+    SELECT DISTINCT
+            h.Member_BK AS CentauriMemberID ,
+		  s.HICNumber ,
+		  s.RecordSource ,
+		  c.Client_BK AS CentauriClientID ,
+		  s.LoadDate
+    FROM    dbo.H_Member h
+            INNER JOIN dbo.L_MemberRAPSResponse l ON l.H_Member_RK = h.H_Member_RK
+		  INNER JOIN dbo.S_MemberHICN s ON s.H_Member_RK = h.H_Member_RK
+		  CROSS JOIN dbo.H_Client c
+    WHERE   s.RecordEndDate IS NULL AND s.LoadDate > @LastLoadTime;
+
+GO
+PRINT N'Altering [dw].[spGetRAPSMemberClient]'
+GO
+---- =============================================
+---- Author:		Travis Parker
+---- Create date:	06/11/2016
+---- Description:	Gets the latest RAPS Response MemberClient data for loading into the DW
+---- Usage:			
+----		  EXECUTE dw.spGetRAPSMemberClient '06/10/2016'
+---- =============================================
+ALTER PROC [dw].[spGetRAPSMemberClient]
+    @LastLoadTime DATETIME
+AS
+    SET NOCOUNT ON; 
+
+    SELECT  DISTINCT
+            h.Member_BK AS CentauriMemberID ,
+            c.Client_BK AS CentauriClientID ,
+            h.ClientMemberID ,
+		  h.RecordSource ,
+		  h.LoadDate
+    FROM    dbo.H_Member h
+            INNER JOIN dbo.L_MemberRAPSResponse l ON l.H_Member_RK = h.H_Member_RK
+            CROSS JOIN dbo.H_Client c
+    WHERE   l.LoadDate > @LastLoadTime;
+
+GO
+
