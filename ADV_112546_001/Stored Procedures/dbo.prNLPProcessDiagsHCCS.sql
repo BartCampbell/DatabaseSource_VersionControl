@@ -24,11 +24,18 @@ BEGIN
 
 
 
-	--MERGE NEW DIAGS with TBLNPL2VALIDATE
+	--MERGE ICD9
 	MERGE dbo.tblNPL2Validate AS target
 	USING (SELECT Suspect_PK,DiagnosisCode FROM VivaNLPHCCResults WHERE SubmitInd = 0) AS source
     ON(target.Suspect_PK = source.Suspect_PK AND target.DiagnosisCode = source.DiagnosisCode)
 	WHEN NOT MATCHED THEN 
 		INSERT(Suspect_PK, DiagnosisCode) VALUES (source.Suspect_PK, source.DiagnosisCode);
+	
+	--Merge ICD10
+	MERGE dbo.tblNPL2Validate AS target
+	USING (SELECT Suspect_PK, DiagnosisCode, ICD10Code FROM NLPHCCResults WHERE SubmitInd = 0) AS source
+    ON(target.Suspect_PK = source.Suspect_PK AND target.DiagnosisCode = source.ICD10code)
+	WHEN NOT MATCHED THEN 
+	INSERT(Suspect_PK, DiagnosisCode) VALUES (source.Suspect_PK, source.ICD10Code);
 END
 GO
