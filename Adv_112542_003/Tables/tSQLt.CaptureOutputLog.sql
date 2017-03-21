@@ -1,7 +1,7 @@
 CREATE TABLE [tSQLt].[CaptureOutputLog]
 (
 [Id] [int] NOT NULL IDENTITY(1, 1),
-[OutputText] [nvarchar] (max) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
+[OutputText] [nvarchar] (max) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 ALTER TABLE [tSQLt].[CaptureOutputLog] ADD CONSTRAINT [PK__CaptureO__3214EC0788358A50] PRIMARY KEY CLUSTERED  ([Id]) WITH (FILLFACTOR=80) ON [PRIMARY]

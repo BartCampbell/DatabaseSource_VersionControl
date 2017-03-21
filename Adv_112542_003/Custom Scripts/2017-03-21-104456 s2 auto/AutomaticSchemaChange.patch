@@ -1,0 +1,2628 @@
+diff --git a/RedGateDatabaseInfo.xml b/RedGateDatabaseInfo.xml
+new file mode 100644
+index 0000000..d1e3a18
+--- /dev/null
++++ b/RedGateDatabaseInfo.xml
+@@ -0,0 +1,62 @@
++﻿<?xml version="1.0" encoding="utf-8"?>
++<DatabaseInformation Version="2">
++  <ScriptFileEncoding>UTF8</ScriptFileEncoding>
++  <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
++  <DefaultSchema>dbo</DefaultSchema>
++  <DefaultUser>dbo</DefaultUser>
++  <DefaultFilegroup>PRIMARY</DefaultFilegroup>
++  <DatabaseVersion>12</DatabaseVersion>
++  <IsAzure>False</IsAzure>
++  <MaxDataFileSize>10485760</MaxDataFileSize>
++  <WriteToFileOptions>
++    <Prefixes>
++      <None>
++      </None>
++      <Table>Tables</Table>
++      <StoredProcedure>Stored Procedures</StoredProcedure>
++      <View>Views</View>
++      <Default>Defaults</Default>
++      <FullTextCatalog>Storage\Full Text Catalogs</FullTextCatalog>
++      <Function>Functions</Function>
++      <Role>Security\Roles</Role>
++      <Rule>Rules</Rule>
++      <User>Security\Users</User>
++      <UserDefinedType>Types\User-defined Data Types</UserDefinedType>
++      <Trigger>
++      </Trigger>
++      <DdlTrigger>Database Triggers</DdlTrigger>
++      <Assembly>Assemblies</Assembly>
++      <Synonym>Synonyms</Synonym>
++      <XmlSchemaCollection>Types\XML Schema Collections</XmlSchemaCollection>
++      <MessageType>Service Broker\Message Types</MessageType>
++      <Contract>Service Broker\Contracts</Contract>
++      <Queue>Service Broker\Queues</Queue>
++      <Service>Service Broker\Services</Service>
++      <Route>Service Broker\Routes</Route>
++      <EventNotification>Service Broker\Event Notifications</EventNotification>
++      <PartitionScheme>Storage\Partition Schemes</PartitionScheme>
++      <PartitionFunction>Storage\Partition Functions</PartitionFunction>
++      <Field>
++      </Field>
++      <Index>
++      </Index>
++      <Schema>Security\Schemas</Schema>
++      <ServiceBinding>Service Broker\Remote Service Bindings</ServiceBinding>
++      <Certificate>Security\Certificates</Certificate>
++      <SymmetricKey>Security\Symmetric Keys</SymmetricKey>
++      <AsymmetricKey>Security\Asymmetric Keys</AsymmetricKey>
++      <CheckConstraint>
++      </CheckConstraint>
++      <FullTextStoplist>Storage\Full Text Stoplists</FullTextStoplist>
++      <ExtendedProperty>Extended Properties</ExtendedProperty>
++      <Data>Data</Data>
++      <Sequence>Sequences</Sequence>
++      <SearchPropertyList>Search Property Lists</SearchPropertyList>
++      <SecurityPolicy>Security Policies</SecurityPolicy>
++    </Prefixes>
++    <DataWriteAllFilesInOneDirectory>True</DataWriteAllFilesInOneDirectory>
++  </WriteToFileOptions>
++  <DataFileSet>
++    <Count>0</Count>
++  </DataFileSet>
++</DatabaseInformation>
+\ No newline at end of file
+diff --git a/Security/Schemas/stage.sql b/Security/Schemas/stage.sql
+new file mode 100644
+index 0000000..3ffbf11
+--- /dev/null
++++ b/Security/Schemas/stage.sql
+@@ -0,0 +1,13 @@
++CREATE SCHEMA [stage]
++AUTHORIZATION [dbo]
++GO
++GRANT ALTER ON SCHEMA:: [stage] TO [ModifyTable]
++GO
++GRANT VIEW DEFINITION ON SCHEMA:: [stage] TO [ModifyTable]
++GO
++GRANT INSERT ON SCHEMA:: [stage] TO [ModifyTable]
++GO
++GRANT DELETE ON SCHEMA:: [stage] TO [ModifyTable]
++GO
++GRANT UPDATE ON SCHEMA:: [stage] TO [ModifyTable]
++GO
+diff --git a/Security/Schemas/tSQLt.sql b/Security/Schemas/tSQLt.sql
+new file mode 100644
+index 0000000..2bacf56
+--- /dev/null
++++ b/Security/Schemas/tSQLt.sql
+@@ -0,0 +1,3 @@
++CREATE SCHEMA [tSQLt]
++AUTHORIZATION [dbo]
++GO
+diff --git a/Stored Procedures/dbo.qa_getMemberDetail.sql b/Stored Procedures/dbo.qa_getMemberDetail.sql
+new file mode 100644
+index 0000000..634fbc9
+--- /dev/null
++++ b/Stored Procedures/dbo.qa_getMemberDetail.sql
+@@ -0,0 +1,70 @@
++SET QUOTED_IDENTIFIER ON
++GO
++SET ANSI_NULLS ON
++GO
++-- =============================================
++-- Author:		Sajid Ali
++-- Create date: Mar-14-2014
++-- Description:	RA Coder will use this sp to pull list of members details in a project
++-- =============================================
++--	qa_getMemberDetail 13129,15620,0,0
++CREATE PROCEDURE [dbo].[qa_getMemberDetail]  
++	@Member BigInt,
++	@Suspect BigInt,
++	@DetailType tinyint,
++	@DetailInfo smallint
++AS
++BEGIN
++
++	SELECT DISTINCT Provider_PK,ProviderMaster_PK INTO #Prv FROM tblProvider WHERE ProviderMaster_PK IN (SELECT DISTINCT ProviderMaster_PK FROM tblProvider P INNER JOIN tblSuspect S ON S.Provider_PK = P.Provider_PK WHERE S.Suspect_PK = @Suspect)
++	/*
++	--Diagnosis Data without Historical Data - Start
++
++		SELECT CD.CodedData_PK Data_PK,CD.DiagnosisCode,DOS_From DOS_From,DOS_Thru,1 DataType,Year(DOS_Thru) DOS_Year, NoteType
++			,V12HCC,V21HCC,V22HCC,RxHCC,C.IsICD10,IsNull(IsConfirmed,0) IsConfirmed,IsNull(IsAdded,0) IsAdded,IsNull(IsRemoved,0) IsRemoved,IsNull(IsChanged,0) IsChanged
++		FROM tblCodedData CD WITH (NOLOCK)  
++			LEFT JOIN tblNoteType NT WITH (NOLOCK) ON CD.CodedSource_PK = NT.NoteType_PK  
++			LEFT JOIN tblCodedDataQA QA WITH (NOLOCK) ON QA.CodedData_PK = CD.CodedData_PK
++			LEFT JOIN tblModelCode C WITH (NOLOCK) ON C.DiagnosisCode = CD.DiagnosisCode
++		WHERE Suspect_PK=@Suspect 
++			AND IsNull(CD.Is_Deleted,0)=0
++		ORDER BY DOS_Thru DESC
++
++	--Diagnosis Data without Historical Data - End
++	*/
++	--Diagnosis Data with Historical Data - Start	
++		SELECT MAX(Data_PK) Data_PK,DiagnosisCode,DOS_From DOS_From,DOS_Thru,MIN(DataType) DataType,Year(DOS_Thru) DOS_Year,MAX(CodedSource_PK) CodedSource_PK INTO #tmpData FROM (
++			SELECT CD.CodedData_PK Data_PK,CD.DiagnosisCode,DOS_From DOS_From,DOS_Thru,1 DataType,Year(DOS_Thru) DOS_Year,CD.CodedSource_PK
++				FROM tblCodedData CD WITH (NOLOCK)
++				WHERE Suspect_PK=@Suspect AND IsNull(CD.Is_Deleted,0)=0
++			UNION
++			SELECT -1 Data_PK,DiagnosisCode,DOS_From,DOS_Thru,3 DataType,Year(DOS_Thru) DOS_Year,0 CodedSource_PK
++				FROM tblClaimData CD WITH (NOLOCK) 
++				INNER JOIN #Prv P ON P.ProviderMaster_PK = CD.ProviderMaster_PK 
++				WHERE Member_PK=@Member AND Year(DOS_Thru)>=Year(GetDate())-2 AND DiagnosisCode<>''
++		) T GROUP BY DiagnosisCode,DOS_From,DOS_Thru
++
++		SELECT CD.Data_PK,CD.DiagnosisCode,DOS_From DOS_From,DOS_Thru,DataType,Year(DOS_Thru) DOS_Year, NoteType
++			,V12HCC,V21HCC,V22HCC,RxHCC,C.IsICD10,IsNull(IsConfirmed,0) IsConfirmed,IsNull(IsAdded,0) IsAdded,IsNull(IsRemoved,0) IsRemoved,IsNull(IsChanged,0) IsChanged
++		FROM #tmpData CD   
++			LEFT JOIN tblNoteType NT WITH (NOLOCK) ON CD.CodedSource_PK = NT.NoteType_PK  
++			LEFT JOIN tblCodedDataQA QA WITH (NOLOCK) ON QA.CodedData_PK = CD.Data_PK
++			LEFT JOIN tblModelCode C WITH (NOLOCK) ON C.DiagnosisCode = CD.DiagnosisCode
++		ORDER BY DOS_Thru DESC
++		--Diagnosis Data with Historical Data - Ends
++		
++
++	IF (@DetailType=1)
++		RETURN;
++	--Captured Source
++	SELECT * FROM tblCodedSource WITH (NOLOCK) ORDER BY sortOrder
++	
++	SELECT COUNT(*) FROM tblScannedData WITH (NOLOCK) WHERE Suspect_PK=@Suspect
++	
++	SELECT NoteText_PK FROM tblSuspectNote WITH (NOLOCK) WHERE Suspect_PK = @Suspect
++	SELECT Note_Text FROM tblSuspectNoteText WITH (NOLOCK) WHERE Suspect_PK = @Suspect
++	
++	SELECT NoteType_PK CodedSource_PK, NoteType CodedSource FROM tblNoteType WITH (NOLOCK)
++END
++
++GO
+diff --git a/Stored Procedures/dbo.sr_getExportSummary.sql b/Stored Procedures/dbo.sr_getExportSummary.sql
+new file mode 100644
+index 0000000..6a37c69
+--- /dev/null
++++ b/Stored Procedures/dbo.sr_getExportSummary.sql
+@@ -0,0 +1,280 @@
++SET QUOTED_IDENTIFIER ON
++GO
++SET ANSI_NULLS ON
++GO
++-- =============================================
++-- Author:		Sajid Ali
++-- Create date: Mar-12-2014
++-- Description:	RA Coder will use this sp to pull list of providers in a project
++-- =============================================
++--	sr_getExportSummary 1,1,0,1
++CREATE PROCEDURE [dbo].[sr_getExportSummary] 
++	@Projects varchar(100),
++	@ProjectGroup varchar(10),
++	@segment int,
++	@user int
++AS
++BEGIN
++	-- PROJECT SELECTION
++	CREATE TABLE #tmpProject (Project_PK INT)
++	IF @Projects='0'
++	BEGIN
++		IF Exists (SELECT * FROM tblUser WHERE IsAdmin=1 AND User_PK=@User)	--For Admins
++			INSERT INTO #tmpProject(Project_PK)
++			SELECT Project_PK FROM tblProject P WHERE P.IsRetrospective=1 AND (@ProjectGroup=0 OR ProjectGroup_PK=@ProjectGroup)
++		ELSE
++			INSERT INTO #tmpProject(Project_PK)
++			SELECT P.Project_PK FROM tblProject P LEFT JOIN tblUserProject UP ON UP.Project_PK = P.Project_PK
++			WHERE P.IsRetrospective=1 AND UP.User_PK=@User AND (@ProjectGroup=0 OR ProjectGroup_PK=@ProjectGroup)
++	END
++	ELSE
++		EXEC ('INSERT INTO #tmpProject(Project_PK) SELECT Project_PK FROM tblProject WHERE Project_PK IN ('+@Projects+') AND ('+@ProjectGroup+'=0 OR ProjectGroup_PK='+@ProjectGroup+')');	
++	-- PROJECT SELECTION
++
++	--Schedule Info
++	CREATE TABLE #tmpSch(Project_PK [int] NOT NULL,Provider_PK bigint NOT NULL,Schedule DateTime) --,
++	--PRINT 'INSERT INTO #tmp'
++	INSERT INTO #tmpSch
++	SELECT DISTINCT S.Project_PK,S.Provider_PK,MIN(IsNull(PO.LastUpdated_Date,S.Scanned_Date)) Schedule
++	FROM tblSuspect S WITH (NOLOCK)
++			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
++			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
++			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
++	WHERE PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL
++	GROUP BY S.Project_PK,S.Provider_PK
++	CREATE CLUSTERED INDEX  idxTProjectPK ON #tmpSch (Project_PK,Provider_PK)
++;
++    
++	--Project Summary
++	SELECT 
++		(SELECT COUNT(*) FROM tblSuspect S WITH (NOLOCK) INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK WHERE (@segment=0 OR M.Segment_PK=@segment)) TotalCharts,
++		(SELECT COUNT(DISTINCT S.Suspect_PK)
++			FROM tblSuspect S WITH (NOLOCK)
++			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK 
++			INNER JOIN #tmpSch Sch ON Sch.Project_PK = S.Project_PK AND Sch.Provider_PK = S.Provider_PK
++			WHERE (@segment=0 OR M.Segment_PK=@segment)
++		) ScheduledCharts,
++		(SELECT COUNT(*) FROM tblSuspect S WITH (NOLOCK) INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK WHERE S.IsScanned=1 AND (@segment=0 OR M.Segment_PK=@segment)) ScannedCharts,
++		(SELECT COUNT(*) FROM tblSuspect S WITH (NOLOCK) INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK WHERE S.IsCNA=1 AND S.IsScanned=0 AND (@segment=0 OR M.Segment_PK=@segment)) CNACharts,
++		(SELECT COUNT(*) FROM tblSuspect S WITH (NOLOCK) INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK WHERE S.IsCoded=1 AND (@segment=0 OR M.Segment_PK=@segment)) AuditedCharts,
++		(SELECT COUNT(DISTINCT S.Suspect_PK) FROM tblSuspect S WITH (NOLOCK) 
++			INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
++			INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
++			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK 
++			INNER JOIN tblProviderOfficeStatus cPO WITH (NOLOCK)  ON P.ProviderOffice_PK = cPO.ProviderOffice_PK
++			WHERE cPO.OfficeIssueStatus IN (1,6) AND (@segment=0 OR M.Segment_PK=@segment)
++		) OfficeWithNotesCharts,
++		(SELECT COUNT(DISTINCT cPO.ProviderOffice_PK) FROM tblSuspect S WITH (NOLOCK) 
++			INNER JOIN #tmpProject tP ON tP.Project_PK = S.Project_PK
++			INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
++			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK 
++			INNER JOIN tblProviderOfficeStatus cPO WITH (NOLOCK)  ON P.ProviderOffice_PK = cPO.ProviderOffice_PK
++			WHERE cPO.OfficeIssueStatus IN (1,6) AND (@segment=0 OR M.Segment_PK=@segment)
++		) OfficeWithNotes    
++
++    --Scheduled Providers
++	SELECT 
++		PM.Provider_ID [Provider ID]
++		,PM.Lastname+IsNull(', '+PM.Firstname,'') [Provider Name]
++		,PO.Address [Address Line 1],ZC.City,ZC.ZipCode,ZC.State
++		,PO.GroupName [Group Name],PO.ContactPerson [Contact Name],PO.ContactNumber [Phone Number]
++		,Sch.Schedule
++		,CASE WHEN DATEDIFF(day,Sch.Schedule,GetDate())>0 AND (Count(DISTINCT S.Suspect_PK)-COUNT(DISTINCT CASE WHEN Scanned_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END)-COUNT(DISTINCT CASE WHEN CNA_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END))>0 THEN CAST(DATEDIFF(day,Sch.Schedule,GetDate()) AS VARCHAR(10)) ELSE '' END [Days Overdue]
++		--Alex Palomino for 10/24/2013 1300-1800 Hrs
++    	,Count(DISTINCT S.Suspect_PK) Charts
++    	,COUNT(DISTINCT CASE WHEN Scanned_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END) Scanned
++    	,COUNT(DISTINCT CASE WHEN CNA_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END) CNA 
++		,Count(DISTINCT S.Suspect_PK)-COUNT(DISTINCT CASE WHEN Scanned_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END)-COUNT(DISTINCT CASE WHEN CNA_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END) Remaining
++		,PM.TIN		
++    	FROM tblSuspect S
++		INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
++		INNER JOIN #tmpSch Sch ON Sch.Project_PK = S.Project_PK AND Sch.Provider_PK = S.Provider_PK    	
++    	INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
++		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
++    	INNER JOIN tblProviderOffice PO ON P.ProviderOffice_PK = PO.ProviderOffice_PK
++		INNER JOIN cacheProviderOffice cPO ON cPO.Project_PK = S.Project_PK AND cPO.ProviderOffice_PK = PO.ProviderOffice_PK
++    	LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK=PO.ZipCode_PK
++		/*
++    	OUTER APPLY (
++    					--SELECT TOP 1 IsNull(U.Firstname+' '+U.Lastname+' for ','')+CAST(Month(Sch_Start) AS VARCHAR)+'/'+CAST(Day(Sch_Start) AS VARCHAR)+'/'+CAST(Year(Sch_Start) AS VARCHAR)+' '+Right(0+CAST(DatePart(Hour,Sch_Start) AS VARCHAR),2)+Right(0+CAST(DatePart(Minute,Sch_Start) AS VARCHAR),2)+'-'+Right(0+CAST(DatePart(Hour,Sch_End) AS VARCHAR),2)+Right(0+CAST(DatePart(Minute,Sch_End) AS VARCHAR),2)+' Hrs' Schedule
++						SELECT TOP 1 Sch_Start Schedule
++    					FROM tblProviderOfficeSchedule POS
++    					LEFT JOIN tblUser U ON POS.Sch_User_PK = U.User_PK 
++    					WHERE POS.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = POS.Project_PK 
++    					ORDER BY Sch_Start DESC
++    				) T
++					*/
++    WHERE (@segment=0 OR M.Segment_PK=@segment)
++    GROUP BY PM.Provider_ID,PM.Lastname,PM.Firstname,PO.Address,ZC.City,ZC.State,ZC.ZipCode,PM.TIN,PO.GroupName,PO.ContactPerson,PO.ContactNumber,Sch.Schedule
++    ORDER BY PM.Lastname,PM.Firstname
++    
++    --Not Scheduled Providers
++	SELECT 
++		PM.Provider_ID [Provider ID]
++		,PM.Lastname+IsNull(', '+PM.Firstname,'') [Provider Name]
++		,PO.Address [Address Line 1],ZC.City,ZC.ZipCode,ZC.State
++		,PO.GroupName [Group Name],PO.ContactPerson [Contact Name],PO.ContactNumber [Phone Number]
++    	,Count(DISTINCT S.Suspect_PK) Charts ,PM.TIN	
++    	FROM tblSuspect S
++		INNER JOIN tblMember M ON M.Member_PK = S.Member_PK
++    	INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
++    	INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
++		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
++    	LEFT JOIN tblProviderOffice PO ON P.ProviderOffice_PK = PO.ProviderOffice_PK
++    	LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK=PO.ZipCode_PK
++		LEFT JOIN #tmpSch Sch ON Sch.Project_PK = S.Project_PK AND Sch.Provider_PK = S.Provider_PK
++    WHERE Sch.Provider_PK IS NULL AND (@segment=0 OR M.Segment_PK=@segment)
++    GROUP BY PM.Provider_ID,PM.Lastname,PM.Firstname,PO.Address,ZC.City,ZC.State,ZC.ZipCode,PM.TIN,PO.GroupName,PO.ContactPerson,PO.ContactNumber
++    ORDER BY PM.Lastname,PM.Firstname    
++ 
++    --Issue Details Providers
++	CREATE TABLE #tmpIssueOffice(Project_PK [int] NOT NULL,ProviderOffice_PK BIGINT NOT NULL,ContactNote_PK TinyInt NOT NULL PRIMARY KEY CLUSTERED (Project_PK ASC,ProviderOffice_PK ASC,ContactNote_PK ASC)) ON [PRIMARY]
++
++	Insert Into #tmpIssueOffice
++	SELECT DISTINCT 0 Project_PK,PO.ProviderOffice_PK,T.ContactNote_PK
++	FROM  tblProviderOfficeStatus PO
++		CROSS Apply (
++			SELECT TOP 1 CNO.ContactNote_PK 
++				FROM tblContactNotesOffice CNO INNER JOIN tblContactNote CN 
++					ON CN.ContactNote_PK = CNO.ContactNote_PK
++				WHERE PO.ProviderOffice_PK = CNO.Office_PK AND CN.IsIssue=1 --PO.Project_PK = CNO.Project_PK AND 
++				ORDER BY CNO.LastUpdated_Date DESC) T
++		WHERE PO.OfficeIssueStatus IN (1,2,5,6) 
++
++	SELECT 
++		PM.Provider_ID [Provider ID]
++		,PM.Lastname+IsNull(', '+PM.Firstname,'') [Provider Name]
++		,PO.Address [Address Line 1],ZC.City,ZC.ZipCode,ZC.State
++		,PO.GroupName [Group Name],PO.ContactPerson [Contact Name],PO.ContactNumber [Phone Number]
++    	,Count(DISTINCT S.Suspect_PK) Charts
++		,Count(DISTINCT CASE WHEN S.IsScanned=1 THEN S.Suspect_PK ELSE NULL END) Scanned
++		,MAX(CN.ContactNote_Text) [Notes],PM.TIN  	
++    	FROM tblSuspect S
++		INNER JOIN tblMember M ON M.Member_PK = S.Member_PK
++    	INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
++    	INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
++		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
++    	INNER JOIN tblProviderOffice PO ON P.ProviderOffice_PK = PO.ProviderOffice_PK
++		INNER JOIN #tmpIssueOffice tIO ON tIO.ProviderOffice_PK = PO.ProviderOffice_PK --AND S.Project_PK = tIO.Project_PK
++		INNER JOIN tblContactNote CN ON CN.ContactNote_PK = tIO.ContactNote_PK
++		LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK=PO.ZipCode_PK
++    WHERE (@segment=0 OR M.Segment_PK=@segment)
++    GROUP BY S.Project_PK,PO.ProviderOffice_PK,PM.Provider_ID,PM.Lastname,PM.Firstname,PO.Address,ZC.City,ZC.State,ZC.ZipCode,PM.TIN,PO.GroupName,PO.ContactPerson,PO.ContactNumber
++    ORDER BY PM.Lastname,PM.Firstname
++
++    --CNA Providers
++    --If all provider charts are CNA then we count is as removed
++	SELECT 
++		PM.Provider_ID [Provider ID]
++		,PM.Lastname+IsNull(', '+PM.Firstname,'') [Provider Name]
++		,PO.Address [Address Line 1],ZC.City,ZC.ZipCode,ZC.State
++		,PO.GroupName [Group Name],PO.ContactPerson [Contact Name],PO.ContactNumber [Phone Number]
++		,'All charts are CNA' Notes
++    	,Count(DISTINCT S.Suspect_PK) Charts,PM.TIN
++    	FROM tblSuspect S
++		INNER JOIN tblMember M ON M.Member_PK = S.Member_PK
++    	INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
++    	INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
++		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
++    	INNER JOIN tblProviderOffice PO ON P.ProviderOffice_PK = PO.ProviderOffice_PK
++    	LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK=PO.ZipCode_PK
++	WHERE @segment=0 OR M.Segment_PK=@segment
++    GROUP BY PM.Provider_ID,PM.Lastname,PM.Firstname,PO.Address,ZC.City,ZC.State,ZC.ZipCode,PM.TIN,PO.GroupName,PO.ContactPerson,PO.ContactNumber
++    Having Count(DISTINCT S.Suspect_PK) = COUNT(DISTINCT CASE WHEN CNA_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END)
++    ORDER BY PM.Lastname,PM.Firstname    
++
++    -- Scanned
++ 	SELECT 
++		PM.Provider_ID [Provider ID]
++		,PM.Lastname+', '+PM.Firstname [Provider Name]
++		,PO.Address [Address Line 1],ZC.City,ZC.ZipCode,ZC.State
++		,PO.GroupName [Group Name],PO.ContactPerson [Contact Name],PO.ContactNumber [Phone Number]
++		--Alex Palomino for 10/24/2013 1300-1800 Hrs
++    	,Count(DISTINCT S.Suspect_PK) Charts
++    	,COUNT(DISTINCT CASE WHEN Scanned_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END) Scanned
++    	,COUNT(DISTINCT CASE WHEN Coded_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END) Coded
++    	,COUNT(DISTINCT CASE WHEN CNA_User_PK IS NULL THEN NULL ELSE S.Suspect_PK END) CNA    ,PM.TIN	
++    	FROM tblSuspect S
++		INNER JOIN tblMember M ON M.Member_PK = S.Member_PK
++		INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK    	
++    	INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
++		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
++    	INNER JOIN tblProviderOffice PO ON P.ProviderOffice_PK = PO.ProviderOffice_PK
++    	LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK=PO.ZipCode_PK
++    	    WHERE S.Scanned_User_PK IS NOT NULL AND (@segment=0 OR M.Segment_PK=@segment)
++    GROUP BY PM.Provider_ID,PM.Lastname,PM.Firstname,PO.Address,ZC.City,ZC.State,ZC.ZipCode,PM.TIN,PO.GroupName,PO.ContactPerson,PO.ContactNumber
++    ORDER BY PM.Lastname,PM.Firstname
++
++	EXEC ('SELECT * FROM tblProject WHERE Project_PK IN ('+@Projects+')')
++	SELECT * FROM tblSegment WHERE Segment_PK = @segment
++
++	--Turnaround Time Report
++	SELECT T.Project_PK,T.Office_PK ProviderOffice_PK,contact_num,MIN(CAST(LastUpdated_Date AS DATE)) ContactDate 
++		INTO #tmpContact FROM tblContactNotesOffice T INNER JOIN #tmpProject Pr ON Pr.Project_PK = T.Project_PK
++			GROUP BY T.Project_PK,T.Office_PK,contact_num 
++	SELECT T.Project_PK,ProviderOffice_PK,MIN(CAST(Sch_Start AS DATE)) SchedulerDate 
++		INTO #tmpSchedule FROM tblProviderOfficeSchedule T INNER JOIN #tmpProject Pr ON Pr.Project_PK = T.Project_PK
++			GROUP BY T.Project_PK,ProviderOffice_PK
++
++	SELECT Project_PK, ProviderOffice_PK
++			,MIN([1st Contact]) [1st Contact] ,MIN([2nd Contact]) [2nd Contact] ,MIN([3rd Contact]) [3rd Contact] ,MIN([4th Contact]) [4th Contact] ,MIN([Schedule]) [Schedule]
++			,MIN([Invoice Rec Start]) [Invoice Rec Start] ,MAX([Invoice Rec End]) [Invoice Rec End] ,MIN([Chart Rec Start]) [Chart Rec Start] ,MAX([Chart Rec End]) [Chart Rec End] ,MIN([Chart Extraction Start]) [Chart Extraction Start] ,MAX([Chart Extraction End]) [Chart Extraction End] ,MAX(TotalCharts) TotalCharts ,MAX(Extracted) Extracted ,MAX(CNA) CNA
++	INTO #tmpTurnaround FROM (
++		SELECT S.Project_PK,PO.ProviderOffice_PK
++				,NULL [1st Contact] ,NULL [2nd Contact] ,NULL [3rd Contact] ,NULL [4th Contact]
++				,NULL [Schedule]
++				,MIN(CAST(InvoiceRec_Date AS DATE)) [Invoice Rec Start]
++				,MAX(CAST(InvoiceRec_Date AS DATE)) [Invoice Rec End]
++				,MIN(CAST(IsNull(ChartRec_MailIn_Date,ChartRec_FaxIn_Date) AS DATE)) [Chart Rec Start]
++				,MAX(CAST(IsNull(ChartRec_MailIn_Date,ChartRec_FaxIn_Date) AS DATE)) [Chart Rec End]
++				,MIN(CAST(Scanned_Date AS DATE)) [Chart Extraction Start]
++				,MAX(CAST(Scanned_Date AS DATE)) [Chart Extraction End]
++				,COUNT(*) TotalCharts
++				,COUNT(CASE WHEN IsScanned=1 THEN S.Suspect_PK ELSE NULL END) Extracted
++				,COUNT(CASE WHEN IsScanned=0 AND IsCNA=1 THEN S.Suspect_PK ELSE NULL END) CNA
++			FROM tblSuspect S
++			INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
++			INNER JOIN tblProviderOffice PO ON PO.ProviderOffice_PK = P.ProviderOffice_PK
++			INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
++		GROUP BY S.Project_PK,PO.ProviderOffice_PK
++		UNION
++		SELECT Project_PK, ProviderOffice_PK
++				,ContactDate [1st Contact] ,NULL [2nd Contact] ,NULL [3rd Contact] ,NULL [4th Contact] ,NULL [Schedule]
++				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA
++			FROM #tmpContact WHERE contact_num=1
++		UNION
++		SELECT Project_PK, ProviderOffice_PK
++				,NULL [1st Contact] ,ContactDate [2nd Contact] ,NULL [3rd Contact] ,NULL [4th Contact] ,NULL [Schedule]
++				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA
++			FROM #tmpContact WHERE contact_num=2
++		UNION
++		SELECT Project_PK, ProviderOffice_PK
++				,NULL [1st Contact] ,NULL [2nd Contact] ,ContactDate [3rd Contact] ,NULL [4th Contact] ,NULL [Schedule]
++				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA
++			FROM #tmpContact WHERE contact_num=3
++		UNION
++		SELECT Project_PK, ProviderOffice_PK
++				,NULL [1st Contact] ,NULL [2nd Contact] ,NULL [3rd Contact] ,ContactDate [4th Contact] ,NULL [Schedule]
++				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA
++			FROM #tmpContact WHERE contact_num=4
++		UNION
++		SELECT Project_PK, ProviderOffice_PK
++				,NULL [1st Contact] ,NULL [2nd Contact] ,NULL [3rd Contact] ,NULL [4th Contact] ,SchedulerDate [Schedule]
++				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA
++			FROM #tmpSchedule
++	) T GROUP BY Project_PK, ProviderOffice_PK
++
++	SELECT PO.Address [Address Line 1],ZC.City,ZC.ZipCode,ZC.State
++		,PO.GroupName [Group Name],PO.ContactPerson [Contact Name],PO.ContactNumber [Phone Number]
++		,[1st Contact],[2nd Contact],[3rd Contact],[4th Contact],IsNull(IsNull([Schedule],[Invoice Rec Start]),[Chart Rec Start]) Schedule
++		,[Invoice Rec Start] ,CASE WHEN [Invoice Rec End] = [Invoice Rec Start] THEN NULL ELSE [Invoice Rec End] END [Invoice Rec End]
++		,[Chart Rec Start] , CASE WHEN [Chart Rec End]=[Chart Rec Start] THEN NULL ELSE [Chart Rec End] END [Chart Rec End]
++		,[Chart Extraction Start] , CASE WHEN [Chart Extraction End]=[Chart Extraction Start] THEN NULL ELSE [Chart Extraction END] END [Chart Extraction End]
++		,TotalCharts ,Extracted ,CNA, TotalCharts-Extracted-CNA Remaining
++	FROM #tmpTurnaround T
++		INNER JOIN tblProviderOffice PO ON PO.ProviderOffice_PK =  T.ProviderOffice_PK
++		LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK = PO.ZipCode_PK
++	--WHERE TotalCharts=Extracted+CNA
++END
++
++GO
+diff --git a/Tables/dbo.ChaseFiles.sql b/Tables/dbo.ChaseFiles.sql
+new file mode 100644
+index 0000000..80db97b
+--- /dev/null
++++ b/Tables/dbo.ChaseFiles.sql
+@@ -0,0 +1,8 @@
++CREATE TABLE [dbo].[ChaseFiles]
++(
++[ChaseID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Chart_File_Name] [varchar] (1000) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Suspect_PK] [int] NOT NULL,
++[IsProcessed] [int] NOT NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.StagingHash.sql b/Tables/dbo.StagingHash.sql
+new file mode 100644
+index 0000000..a516698
+--- /dev/null
++++ b/Tables/dbo.StagingHash.sql
+@@ -0,0 +1,9 @@
++CREATE TABLE [dbo].[StagingHash]
++(
++[HashDiff] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[TableName] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CreateDate] [datetime] NULL CONSTRAINT [DF__StagingHa__Creat__239E4DCF] DEFAULT (getdate())
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[StagingHash] ADD CONSTRAINT [PK_StagingHash] PRIMARY KEY CLUSTERED  ([HashDiff]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.YHA_20151218_RAPS.sql b/Tables/dbo.YHA_20151218_RAPS.sql
+new file mode 100644
+index 0000000..9fe0ebe
+--- /dev/null
++++ b/Tables/dbo.YHA_20151218_RAPS.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[YHA_20151218_RAPS]
++(
++[MEMBER ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PROVIDER TYPE] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE FROM DT] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE TO DT] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD Code] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DX CODE CATEGORY] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION REASON] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Page From] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Page To] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CHART NAME] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.cacheProviderOffice.sql b/Tables/dbo.cacheProviderOffice.sql
+new file mode 100644
+index 0000000..25f8441
+--- /dev/null
++++ b/Tables/dbo.cacheProviderOffice.sql
+@@ -0,0 +1,25 @@
++CREATE TABLE [dbo].[cacheProviderOffice]
++(
++[Project_PK] [smallint] NOT NULL,
++[ProviderOffice_PK] [bigint] NOT NULL,
++[charts] [smallint] NULL,
++[providers] [smallint] NULL,
++[office_status] [tinyint] NULL,
++[contacted] [tinyint] NULL,
++[scheduled] [smallint] NULL,
++[extracted] [smallint] NULL,
++[coded] [smallint] NULL,
++[contact_num] [tinyint] NULL CONSTRAINT [DF__cacheProv__conta__46D27B73] DEFAULT ((1)),
++[schedule_type] [tinyint] NULL,
++[follow_up] [date] NULL,
++[CNA] [smallint] NULL,
++[extracted_count] [smallint] NULL,
++[coded_count] [smallint] NULL,
++[cna_count] [smallint] NULL,
++[dtLastContact] [smalldatetime] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[cacheProviderOffice] ADD CONSTRAINT [PK_cacheProviderOffice] PRIMARY KEY CLUSTERED  ([Project_PK], [ProviderOffice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_ProviderPKProviderOfficePK] ON [dbo].[cacheProviderOffice] ([Project_PK], [ProviderOffice_PK]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblChannel.sql b/Tables/dbo.tblChannel.sql
+new file mode 100644
+index 0000000..dbca4cc
+--- /dev/null
++++ b/Tables/dbo.tblChannel.sql
+@@ -0,0 +1,8 @@
++CREATE TABLE [dbo].[tblChannel]
++(
++[Channel_PK] [int] NOT NULL IDENTITY(1, 1),
++[Channel_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblChannel] ADD CONSTRAINT [PK_tblChannel] PRIMARY KEY CLUSTERED  ([Channel_PK]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblClaimData.sql b/Tables/dbo.tblClaimData.sql
+new file mode 100644
+index 0000000..8da56aa
+--- /dev/null
++++ b/Tables/dbo.tblClaimData.sql
+@@ -0,0 +1,28 @@
++CREATE TABLE [dbo].[tblClaimData]
++(
++[ClaimData_PK] [bigint] NOT NULL IDENTITY(1, 1),
++[Member_PK] [bigint] NOT NULL,
++[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_From] [smalldatetime] NULL,
++[DOS_Thru] [smalldatetime] NULL,
++[CPT] [varchar] (12) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ProviderMaster_PK] [bigint] NULL,
++[IsICD10] [bit] NULL,
++[Claim_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Suspect_PK] [bigint] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblClaimData] ADD CONSTRAINT [PK_tblClaimData] PRIMARY KEY CLUSTERED  ([ClaimData_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblClaimDataICD9] ON [dbo].[tblClaimData] ([DiagnosisCode]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_ClaimDataPK_Cols] ON [dbo].[tblClaimData] ([DOS_Thru]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblClaimDataMember] ON [dbo].[tblClaimData] ([Member_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblClaimDataProvider] ON [dbo].[tblClaimData] ([ProviderMaster_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_SuspectPK] ON [dbo].[tblClaimData] ([Suspect_PK]) INCLUDE ([DiagnosisCode]) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblClaimData] ADD CONSTRAINT [FK_tblClaimData_tblSuspect] FOREIGN KEY ([Suspect_PK]) REFERENCES [dbo].[tblSuspect] ([Suspect_PK])
++GO
+diff --git a/Tables/dbo.tblCodedData.sql b/Tables/dbo.tblCodedData.sql
+new file mode 100644
+index 0000000..15c1227
+--- /dev/null
++++ b/Tables/dbo.tblCodedData.sql
+@@ -0,0 +1,32 @@
++CREATE TABLE [dbo].[tblCodedData]
++(
++[CodedData_PK] [bigint] NOT NULL IDENTITY(1, 1),
++[Suspect_PK] [bigint] NOT NULL,
++[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_From] [smalldatetime] NULL,
++[DOS_Thru] [smalldatetime] NULL,
++[CPT] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Provider_PK] [bigint] NULL,
++[CodedSource_PK] [smallint] NULL,
++[IsICD10] [bit] NULL,
++[Coded_User_PK] [smallint] NULL,
++[Coded_Date] [smalldatetime] NULL,
++[Updated_Date] [smalldatetime] NULL,
++[OpenedPage] [smallint] NULL,
++[Is_Deleted] [bit] NULL,
++[ScannedData_PK] [bigint] NULL,
++[CoderLevel] [tinyint] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblCodedData] ADD CONSTRAINT [PK_tblCodedData] PRIMARY KEY CLUSTERED  ([CodedData_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_CodeData_PK] ON [dbo].[tblCodedData] ([CodedData_PK]) INCLUDE ([DiagnosisCode], [DOS_Thru]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblCodedDataSource] ON [dbo].[tblCodedData] ([CodedSource_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblCodedDataICD9] ON [dbo].[tblCodedData] ([DiagnosisCode]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblCodedDataProvider] ON [dbo].[tblCodedData] ([Provider_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblCodedDataSuspect] ON [dbo].[tblCodedData] ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblCodedDataQA.sql b/Tables/dbo.tblCodedDataQA.sql
+new file mode 100644
+index 0000000..de41ca6
+--- /dev/null
++++ b/Tables/dbo.tblCodedDataQA.sql
+@@ -0,0 +1,15 @@
++CREATE TABLE [dbo].[tblCodedDataQA]
++(
++[CodedData_PK] [bigint] NULL,
++[IsConfirmed] [bit] NULL,
++[IsRemoved] [bit] NULL,
++[Old_ICD9] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Old_CPT] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[dtInsert] [smalldatetime] NULL,
++[QA_User_PK] [int] NULL,
++[IsAdded] [bit] NULL,
++[IsChanged] [bit] NULL
++) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_CodeData_PK] ON [dbo].[tblCodedDataQA] ([CodedData_PK]) INCLUDE ([IsAdded], [IsChanged], [IsConfirmed], [IsRemoved]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblCodedSource.sql b/Tables/dbo.tblCodedSource.sql
+new file mode 100644
+index 0000000..6e91847
+--- /dev/null
++++ b/Tables/dbo.tblCodedSource.sql
+@@ -0,0 +1,9 @@
++CREATE TABLE [dbo].[tblCodedSource]
++(
++[CodedSource_PK] [smallint] NOT NULL IDENTITY(1, 1),
++[CodedSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[sortOrder] [smallint] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblCodedSource] ADD CONSTRAINT [PK_tblCodedSource] PRIMARY KEY CLUSTERED  ([CodedSource_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblContactNote.sql b/Tables/dbo.tblContactNote.sql
+new file mode 100644
+index 0000000..9bf07e9
+--- /dev/null
++++ b/Tables/dbo.tblContactNote.sql
+@@ -0,0 +1,20 @@
++CREATE TABLE [dbo].[tblContactNote]
++(
++[ContactNote_PK] [smallint] NOT NULL IDENTITY(1, 1),
++[ContactNote_Text] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[IsSystem] [bit] NULL,
++[sortOrder] [smallint] NULL,
++[IsIssue] [bit] NULL,
++[IsCNA] [bit] NULL,
++[IsFollowup] [bit] NULL,
++[Followup_days] [tinyint] NULL,
++[IsActive] [bit] NULL,
++[IsCopyCenter] [bit] NULL,
++[IsRetro] [bit] NULL,
++[IsProspective] [bit] NULL,
++[IsDataIssue] [bit] NULL,
++[AllowedAttempts] [tinyint] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblContactNote] ADD CONSTRAINT [PK_tblContactNote] PRIMARY KEY CLUSTERED  ([ContactNote_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblContactNotesOffice.sql b/Tables/dbo.tblContactNotesOffice.sql
+new file mode 100644
+index 0000000..f2b2d75
+--- /dev/null
++++ b/Tables/dbo.tblContactNotesOffice.sql
+@@ -0,0 +1,30 @@
++CREATE TABLE [dbo].[tblContactNotesOffice]
++(
++[ContactNotesOffice_PK] [int] NOT NULL IDENTITY(1, 1),
++[Project_PK] [smallint] NULL,
++[Office_PK] [bigint] NULL,
++[ContactNote_PK] [smallint] NULL,
++[ContactNoteText] [varchar] (500) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[LastUpdated_User_PK] [smallint] NULL,
++[LastUpdated_Date] [smalldatetime] NULL,
++[contact_num] [tinyint] NULL CONSTRAINT [DF__tblContac__conta__46D27B73] DEFAULT ((1)),
++[followup] [date] NULL,
++[IsResponded] [bit] NULL,
++[IsViewedByScheduler] [bit] NULL,
++[MergedProviderOffice_PK] [bigint] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblContactNotesOffice] ADD CONSTRAINT [PK_tblContactNotesOffice] PRIMARY KEY CLUSTERED  ([ContactNotesOffice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblContactNotesOffice_ContactNote] ON [dbo].[tblContactNotesOffice] ([ContactNote_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_ContactNote_PK] ON [dbo].[tblContactNotesOffice] ([ContactNote_PK], [Office_PK], [Project_PK]) INCLUDE ([LastUpdated_Date]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_CNOPK_ProjPK_OfficePK] ON [dbo].[tblContactNotesOffice] ([ContactNotesOffice_PK], [Project_PK], [Office_PK]) INCLUDE ([LastUpdated_Date]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblContactNotesOfficeUpdated] ON [dbo].[tblContactNotesOffice] ([LastUpdated_Date]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblContactNotesOffice_Office] ON [dbo].[tblContactNotesOffice] ([Office_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblContactNotesOffice_Project] ON [dbo].[tblContactNotesOffice] ([Project_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblExtractionQueue.sql b/Tables/dbo.tblExtractionQueue.sql
+new file mode 100644
+index 0000000..e445bbf
+--- /dev/null
++++ b/Tables/dbo.tblExtractionQueue.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[tblExtractionQueue]
++(
++[ExtractionQueue_PK] [int] NOT NULL IDENTITY(1, 1),
++[PDFname] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ExtractionQueueSource_PK] [tinyint] NULL,
++[FileSize] [bigint] NULL,
++[AssignedUser_PK] [smallint] NULL,
++[IsDuplicate] [bit] NULL,
++[UploadDate] [smalldatetime] NULL,
++[AssignedDate] [smalldatetime] NULL,
++[OfficeFaxOrID] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblExtractionQueue] ADD CONSTRAINT [PK_tblExtractionQueue] PRIMARY KEY CLUSTERED  ([ExtractionQueue_PK]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblExtractionQueue_User] ON [dbo].[tblExtractionQueue] ([AssignedUser_PK]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblExtractionQueueUserSource] ON [dbo].[tblExtractionQueue] ([ExtractionQueueSource_PK]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_OfficeExtractUploadDate] ON [dbo].[tblExtractionQueue] ([OfficeFaxOrID], [ExtractionQueueSource_PK], [UploadDate]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblHccCategory.sql b/Tables/dbo.tblHccCategory.sql
+new file mode 100644
+index 0000000..ef2d4db
+--- /dev/null
++++ b/Tables/dbo.tblHccCategory.sql
+@@ -0,0 +1,10 @@
++CREATE TABLE [dbo].[tblHccCategory]
++(
++[HccCategory_PK] [tinyint] NOT NULL IDENTITY(1, 1),
++[Disease] [varchar] (25) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblHccCategory] ADD CONSTRAINT [PK_tblHccCategory] PRIMARY KEY CLUSTERED  ([HccCategory_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_ALL] ON [dbo].[tblHccCategory] ([HccCategory_PK]) INCLUDE ([Disease]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblMember.sql b/Tables/dbo.tblMember.sql
+new file mode 100644
+index 0000000..82fec06
+--- /dev/null
++++ b/Tables/dbo.tblMember.sql
+@@ -0,0 +1,53 @@
++CREATE TABLE [dbo].[tblMember]
++(
++[Member_PK] [bigint] NOT NULL IDENTITY(1, 1),
++[HICNumber] [varchar] (15) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Member_ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Lastname] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Firstname] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOB] [date] NULL,
++[Gender] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Address] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ZipCode_PK] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Contact_Number] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Segment_PK] [tinyint] NULL,
++[ChartPriority] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Ref_Number] [varchar] (25) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Latitude] [float] NULL,
++[Longitude] [float] NULL,
++[parent_gardian] [varchar] (25) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[preferred_practitioner_gender] [tinyint] NULL,
++[Cell_Number] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Email_Address] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[does_not_speak_english] [bit] NULL,
++[unable_to_determine_language] [bit] NULL,
++[speaking_language] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[language_line_will_be_required_for_the_visit] [bit] NULL,
++[plan_unable_to_validate_client_vendor_relationship] [bit] NULL,
++[preferred_method_of_contact] [tinyint] NULL,
++[permission_to_leave_voicemail] [bit] NULL,
++[Orig_Address] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Orig_ZipCode_PK] [int] NULL,
++[Orig_Contact_Number] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Orig_Email_Address] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[place_of_assessment_is_not_members_home] [bit] NULL,
++[Home_Address] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Home_ZipCode_PK] [int] NULL,
++[Home_Contact_Number] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Home_Email_Address] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[members_power_of_attorney] [bit] NULL,
++[POA_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[POA_Address] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[POA_ZipCode_PK] [int] NULL,
++[POA_Contact_Number] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[POA_Email_Address] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Client_PK] [tinyint] NULL,
++[Eff_Date] [date] NULL,
++[Exp_Date] [date] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblMember] ADD CONSTRAINT [PK_tblMember] PRIMARY KEY CLUSTERED  ([Member_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_MemberPK] ON [dbo].[tblMember] ([Member_PK]) INCLUDE ([DOB], [Firstname], [Lastname], [Member_ID]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblModelCode.sql b/Tables/dbo.tblModelCode.sql
+new file mode 100644
+index 0000000..877da31
+--- /dev/null
++++ b/Tables/dbo.tblModelCode.sql
+@@ -0,0 +1,17 @@
++CREATE TABLE [dbo].[tblModelCode]
++(
++[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[Code_Description] [varchar] (230) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[V12HCC] [tinyint] NULL,
++[V21HCC] [tinyint] NULL,
++[V22HCC] [tinyint] NULL,
++[RxHCC] [tinyint] NULL,
++[start_date] [datetime] NULL,
++[end_date] [datetime] NULL,
++[IsICD10] [bit] NOT NULL
++) ON [PRIMARY]
++GO
++CREATE CLUSTERED INDEX [IX_tblModelCode] ON [dbo].[tblModelCode] ([DiagnosisCode]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_V12HCC] ON [dbo].[tblModelCode] ([V12HCC]) INCLUDE ([DiagnosisCode]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblNPL2Validate.sql b/Tables/dbo.tblNPL2Validate.sql
+new file mode 100644
+index 0000000..3df496d
+--- /dev/null
++++ b/Tables/dbo.tblNPL2Validate.sql
+@@ -0,0 +1,6 @@
++CREATE TABLE [dbo].[tblNPL2Validate]
++(
++[Suspect_PK] [bigint] NOT NULL,
++[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblNoteText.sql b/Tables/dbo.tblNoteText.sql
+new file mode 100644
+index 0000000..87b7ac9
+--- /dev/null
++++ b/Tables/dbo.tblNoteText.sql
+@@ -0,0 +1,17 @@
++CREATE TABLE [dbo].[tblNoteText]
++(
++[NoteText_PK] [smallint] NOT NULL IDENTITY(1, 1),
++[NoteText] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[IsDiagnosisNote] [bit] NULL,
++[IsChartNote] [bit] NULL,
++[Client_PK] [smallint] NULL,
++[NoteType] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[NoteType_PK] [tinyint] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblNoteText] ADD CONSTRAINT [PK_tblNoteText] PRIMARY KEY CLUSTERED  ([NoteText_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_IsChartNote] ON [dbo].[tblNoteText] ([IsChartNote]) INCLUDE ([NoteText], [NoteText_PK]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_IsDiagNote] ON [dbo].[tblNoteText] ([IsDiagnosisNote]) INCLUDE ([NoteText], [NoteText_PK], [NoteType_PK]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblNoteType.sql b/Tables/dbo.tblNoteType.sql
+new file mode 100644
+index 0000000..f979005
+--- /dev/null
++++ b/Tables/dbo.tblNoteType.sql
+@@ -0,0 +1,8 @@
++CREATE TABLE [dbo].[tblNoteType]
++(
++[NoteType_PK] [tinyint] NOT NULL,
++[NoteType] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_NoteType] ON [dbo].[tblNoteType] ([NoteType_PK]) INCLUDE ([NoteType]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblProject.sql b/Tables/dbo.tblProject.sql
+new file mode 100644
+index 0000000..9835e45
+--- /dev/null
++++ b/Tables/dbo.tblProject.sql
+@@ -0,0 +1,23 @@
++CREATE TABLE [dbo].[tblProject]
++(
++[Project_PK] [int] NOT NULL IDENTITY(1, 1),
++[Project_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[IsScan] [bit] NULL,
++[IsCode] [bit] NULL,
++[Client_PK] [smallint] NULL,
++[dtInsert] [datetime] NULL,
++[IsProspective] [bit] NULL CONSTRAINT [DF__tblProjec__IsPro__236943A5] DEFAULT ((0)),
++[IsRetrospective] [bit] NULL,
++[IsHEDIS] [bit] NULL,
++[ProjectGroup] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProjectGroup_PK] [int] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblProject] ADD CONSTRAINT [PK_tblProject] PRIMARY KEY CLUSTERED  ([Project_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblProjectClient] ON [dbo].[tblProject] ([Client_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_ProjectPK_IsRetro] ON [dbo].[tblProject] ([IsRetrospective], [Project_PK]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_Project_PK] ON [dbo].[tblProject] ([Project_PK]) INCLUDE ([IsProspective], [IsRetrospective], [Project_Name], [ProjectGroup]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblProvider.sql b/Tables/dbo.tblProvider.sql
+new file mode 100644
+index 0000000..02d0635
+--- /dev/null
++++ b/Tables/dbo.tblProvider.sql
+@@ -0,0 +1,17 @@
++CREATE TABLE [dbo].[tblProvider]
++(
++[Provider_PK] [bigint] NOT NULL IDENTITY(1, 1),
++[ProviderMaster_PK] [bigint] NULL,
++[ProviderOffice_PK] [bigint] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblProvider] ADD CONSTRAINT [PK_tblProvider_1] PRIMARY KEY CLUSTERED  ([Provider_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_ProviderPK_2] ON [dbo].[tblProvider] ([Provider_PK]) INCLUDE ([ProviderOffice_PK]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_ProviderPK] ON [dbo].[tblProvider] ([Provider_PK], [ProviderOffice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblProvider_1] ON [dbo].[tblProvider] ([ProviderMaster_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_ProviderOffice_PK] ON [dbo].[tblProvider] ([ProviderOffice_PK]) INCLUDE ([Provider_PK]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblProviderMaster.sql b/Tables/dbo.tblProviderMaster.sql
+new file mode 100644
+index 0000000..594f95b
+--- /dev/null
++++ b/Tables/dbo.tblProviderMaster.sql
+@@ -0,0 +1,15 @@
++CREATE TABLE [dbo].[tblProviderMaster]
++(
++[ProviderMaster_PK] [bigint] NOT NULL IDENTITY(1, 1),
++[Provider_ID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Lastname] [varchar] (75) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Firstname] [varchar] (75) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[LastUpdated] [smalldatetime] NULL,
++[NPI] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ProviderGroup] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblProviderMaster] ADD CONSTRAINT [PK_tblProviderMaster] PRIMARY KEY CLUSTERED  ([ProviderMaster_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblProviderOffice.sql b/Tables/dbo.tblProviderOffice.sql
+new file mode 100644
+index 0000000..82ba7f7
+--- /dev/null
++++ b/Tables/dbo.tblProviderOffice.sql
+@@ -0,0 +1,27 @@
++CREATE TABLE [dbo].[tblProviderOffice]
++(
++[ProviderOffice_PK] [bigint] NOT NULL IDENTITY(1, 1),
++[Address] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ZipCode_PK] [int] NULL,
++[ContactPerson] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ContactNumber] [varchar] (120) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[FaxNumber] [varchar] (120) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Email_Address] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[EMR_Type] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[EMR_Type_PK] [smallint] NULL,
++[GroupName] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[LocationID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ProviderOfficeBucket_PK] [smallint] NULL,
++[Pool_PK] [smallint] NULL,
++[AssignedUser_PK] [smallint] NULL,
++[AssignedDate] [smalldatetime] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblProviderOffice] ADD CONSTRAINT [PK_tblProviderOffice] PRIMARY KEY CLUSTERED  ([ProviderOffice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [idxPOAssignedUser_PK] ON [dbo].[tblProviderOffice] ([AssignedUser_PK]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [idxPOPoolPK] ON [dbo].[tblProviderOffice] ([Pool_PK]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [idxPOBucket] ON [dbo].[tblProviderOffice] ([ProviderOfficeBucket_PK]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblProviderOfficeSchedule.sql b/Tables/dbo.tblProviderOfficeSchedule.sql
+new file mode 100644
+index 0000000..d4cf8a4
+--- /dev/null
++++ b/Tables/dbo.tblProviderOfficeSchedule.sql
+@@ -0,0 +1,25 @@
++CREATE TABLE [dbo].[tblProviderOfficeSchedule]
++(
++[ProviderOfficeSchedule_PK] [int] NOT NULL IDENTITY(1, 1),
++[Project_PK] [smallint] NOT NULL,
++[ProviderOffice_PK] [bigint] NOT NULL,
++[Sch_Start] [smalldatetime] NULL,
++[Sch_End] [smalldatetime] NULL,
++[Sch_User_PK] [smallint] NULL,
++[LastUpdated_User_PK] [smallint] NULL,
++[LastUpdated_Date] [smalldatetime] NULL,
++[followup] [smallint] NULL,
++[AddInfo] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[sch_type] [smallint] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblProviderOfficeSchedule] ADD CONSTRAINT [PK_tblProviderOfficeSchedule] PRIMARY KEY CLUSTERED  ([ProviderOfficeSchedule_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule_1] ON [dbo].[tblProviderOfficeSchedule] ([LastUpdated_User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule_Prj] ON [dbo].[tblProviderOfficeSchedule] ([Project_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule_Office] ON [dbo].[tblProviderOfficeSchedule] ([ProviderOffice_PK], [Project_PK]) INCLUDE ([LastUpdated_Date]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblProviderOfficeSchedule] ON [dbo].[tblProviderOfficeSchedule] ([Sch_User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblProviderOfficeStatus.sql b/Tables/dbo.tblProviderOfficeStatus.sql
+new file mode 100644
+index 0000000..d3f399b
+--- /dev/null
++++ b/Tables/dbo.tblProviderOfficeStatus.sql
+@@ -0,0 +1,11 @@
++CREATE TABLE [dbo].[tblProviderOfficeStatus]
++(
++[Project_PK] [smallint] NOT NULL,
++[ProviderOffice_PK] [bigint] NOT NULL,
++[OfficeIssueStatus] [tinyint] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblProviderOfficeStatus] ADD CONSTRAINT [PK_tblProviderOfficeStatus] PRIMARY KEY CLUSTERED  ([Project_PK], [ProviderOffice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_OfficeStatus] ON [dbo].[tblProviderOfficeStatus] ([OfficeIssueStatus]) INCLUDE ([Project_PK], [ProviderOffice_PK]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblRAPSData.sql b/Tables/dbo.tblRAPSData.sql
+new file mode 100644
+index 0000000..34f9117
+--- /dev/null
++++ b/Tables/dbo.tblRAPSData.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[tblRAPSData]
++(
++[RAPSData_PK] [bigint] NOT NULL IDENTITY(1, 1),
++[Member_PK] [bigint] NOT NULL,
++[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_From] [date] NULL,
++[DOS_Thru] [date] NULL,
++[CPT] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ProviderMaster_PK] [bigint] NULL,
++[IsICD10] [bit] NULL,
++[TransactionDate] [date] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblRAPSData] ADD CONSTRAINT [PK_tblRAPSData] PRIMARY KEY CLUSTERED  ([RAPSData_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblRAPSDataICD9] ON [dbo].[tblRAPSData] ([DiagnosisCode]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblRAPSDataMember] ON [dbo].[tblRAPSData] ([Member_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblRAPSDataProvider] ON [dbo].[tblRAPSData] ([ProviderMaster_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblScannedData.sql b/Tables/dbo.tblScannedData.sql
+new file mode 100644
+index 0000000..046327b
+--- /dev/null
++++ b/Tables/dbo.tblScannedData.sql
+@@ -0,0 +1,16 @@
++CREATE TABLE [dbo].[tblScannedData]
++(
++[ScannedData_PK] [bigint] NOT NULL IDENTITY(1, 1),
++[Suspect_PK] [bigint] NULL,
++[DocumentType_PK] [tinyint] NULL,
++[FileName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[User_PK] [smallint] NULL,
++[dtInsert] [smalldatetime] NULL,
++[is_deleted] [bit] NULL CONSTRAINT [DF__tblScanne__is_de__3F115E1A] DEFAULT ((0)),
++[CodedStatus] [tinyint] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblScannedData] ADD CONSTRAINT [PK_tblScannedData] PRIMARY KEY CLUSTERED  ([ScannedData_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblScannedData_Suspect] ON [dbo].[tblScannedData] ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblScheduleType.sql b/Tables/dbo.tblScheduleType.sql
+new file mode 100644
+index 0000000..0aaf845
+--- /dev/null
++++ b/Tables/dbo.tblScheduleType.sql
+@@ -0,0 +1,8 @@
++CREATE TABLE [dbo].[tblScheduleType]
++(
++[ScheduleType_PK] [tinyint] NOT NULL,
++[ScheduleType] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblScheduleType] ADD CONSTRAINT [PK_tblScheduleType] PRIMARY KEY CLUSTERED  ([ScheduleType_PK]) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblSegment.sql b/Tables/dbo.tblSegment.sql
+new file mode 100644
+index 0000000..30c4b39
+--- /dev/null
++++ b/Tables/dbo.tblSegment.sql
+@@ -0,0 +1,8 @@
++CREATE TABLE [dbo].[tblSegment]
++(
++[Segment_PK] [tinyint] NOT NULL IDENTITY(1, 1),
++[Segment] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblSegment] ADD CONSTRAINT [PK_tblSegment] PRIMARY KEY CLUSTERED  ([Segment_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblSuspect.sql b/Tables/dbo.tblSuspect.sql
+new file mode 100644
+index 0000000..ae08ef7
+--- /dev/null
++++ b/Tables/dbo.tblSuspect.sql
+@@ -0,0 +1,108 @@
++CREATE TABLE [dbo].[tblSuspect]
++(
++[Project_PK] [int] NULL,
++[Provider_PK] [int] NULL,
++[Member_PK] [int] NULL,
++[Suspect_PK] [bigint] NOT NULL IDENTITY(1, 1),
++[IsScanned] [bit] NULL,
++[IsCNA] [bit] NULL,
++[IsCoded] [bit] NULL,
++[IsQA] [bit] NULL,
++[Scanned_User_PK] [int] NULL,
++[CNA_User_PK] [int] NULL,
++[Coded_User_PK] [int] NULL,
++[QA_User_PK] [int] NULL,
++[Scanned_Date] [smalldatetime] NULL,
++[CNA_Date] [smalldatetime] NULL,
++[Coded_Date] [smalldatetime] NULL,
++[QA_Date] [smalldatetime] NULL,
++[IsDiagnosisCoded] [bit] NULL,
++[IsNotesCoded] [bit] NULL,
++[LastAccessed_Date] [smalldatetime] NULL,
++[LastUpdated] [smalldatetime] NULL,
++[dtCreated] [smalldatetime] NULL,
++[IsInvoiced] [bit] NULL,
++[MemberStatus] [tinyint] NULL,
++[ProspectiveFormStatus] [tinyint] NULL,
++[InvoiceRec_Date] [smalldatetime] NULL,
++[ChartRec_FaxIn_Date] [smalldatetime] NULL,
++[ChartRec_MailIn_Date] [smalldatetime] NULL,
++[ChartRec_InComp_Date] [smalldatetime] NULL,
++[IsHighPriority] [bit] NULL,
++[IsInComp_Replied] [bit] NULL,
++[ChaseID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ChartPriority] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ChartRec_Date] [smalldatetime] NULL,
++[InvoiceExt_Date] [smalldatetime] NULL,
++[ContractCode] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PROVIDER_SPECIALTY] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Channel_PK] [int] NULL,
++[ChaseStatus_PK] [int] NULL,
++[PlanLID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
++) ON [PRIMARY]
++GO
++SET QUOTED_IDENTIFIER ON
++GO
++SET ANSI_NULLS ON
++GO
++CREATE TRIGGER [dbo].[upd_tblSuspect] 
++   ON  [dbo].[tblSuspect]
++   AFTER UPDATE
++AS
++BEGIN
++	SELECT DISTINCT IsNull(P.ProviderOffice_PK,0) ProviderOffice_PK,S.Project_PK INTO #tmp FROM inserted S INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
++
++	SELECT P.ProviderOffice_PK,S.Project_PK
++		,Count(1) Charts
++		,Count(Scanned_User_PK) Scanned
++		,Count(Coded_User_PK) Coded
++		,SUM(CASE WHEN IsScanned=0 AND IsCNA=1 THEN 1 ELSE 0 END) CNA INTO #tmp2
++		FROM tblSuspect S WITH (NOLOCK) INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
++			INNER JOIN #tmp T ON T.Project_PK = S.Project_PK AND T.ProviderOffice_PK = P.ProviderOffice_PK
++		GROUP BY P.ProviderOffice_PK,S.Project_PK
++
++	Update C SET Charts=T.Charts,cna_count=T.CNA, extracted_count=t.Scanned,coded_count=t.Coded
++		FROM cacheProviderOffice C WITH (ROWLock) 
++		INNER JOIN #tmp2 T ON T.Project_PK = C.Project_PK AND T.ProviderOffice_PK = C.ProviderOffice_PK
++
++	SELECT SUM(Charts) Charts, SUM(Charts-Scanned-CNA) Remaining, ProviderOffice_PK INTO #tmp3 FROM #tmp2 GROUP BY ProviderOffice_PK
++
++	IF EXISTS (SELECT * FROM #tmp3 WHERE Remaining=0)
++		Update C SET C.ProviderOfficeBucket_PK=0
++		FROM tblProviderOffice C WITH (ROWLock) 
++			INNER JOIN #tmp3 T ON T.ProviderOffice_PK = C.ProviderOffice_PK AND T.Remaining=0
++
++	IF EXISTS (SELECT * FROM #tmp3 WHERE Remaining>0 AND Charts>Remaining)
++		Update C SET C.ProviderOfficeBucket_PK=6
++		FROM tblProviderOffice C WITH (ROWLock) 
++			INNER JOIN #tmp3 T ON T.ProviderOffice_PK = C.ProviderOffice_PK AND T.Remaining>0 AND T.Charts>T.Remaining
++
++	DROP TABLE #tmp3
++	DROP TABLE #tmp2
++	DROP TABLE #tmp
++END
++GO
++ALTER TABLE [dbo].[tblSuspect] ADD CONSTRAINT [PK_tblSuspect] PRIMARY KEY CLUSTERED  ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_ChartPriority] ON [dbo].[tblSuspect] ([ChartPriority]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblSuspectChaseStatus] ON [dbo].[tblSuspect] ([ChaseStatus_PK]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_IsCoded] ON [dbo].[tblSuspect] ([IsCoded]) INCLUDE ([Coded_Date], [Coded_User_PK], [Member_PK], [Project_PK], [Provider_PK], [QA_Date], [QA_User_PK], [Scanned_User_PK], [Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_MemberSuspect_PK] ON [dbo].[tblSuspect] ([IsScanned], [IsCoded]) INCLUDE ([Member_PK], [Suspect_PK]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblSuspectMember] ON [dbo].[tblSuspect] ([Member_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblSuspectProject] ON [dbo].[tblSuspect] ([Project_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_ProjectPk_CodedUserPK] ON [dbo].[tblSuspect] ([Project_PK], [Coded_User_PK]) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_ProjectPKProviderPK] ON [dbo].[tblSuspect] ([Project_PK], [Provider_PK]) INCLUDE ([CNA_User_PK], [Coded_User_PK], [LastAccessed_Date], [Member_PK], [Scanned_User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblSuspectProvider] ON [dbo].[tblSuspect] ([Provider_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IDX_SuspectPK_ScanDate] ON [dbo].[tblSuspect] ([Suspect_PK]) INCLUDE ([Scanned_Date]) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblSuspect] ADD CONSTRAINT [FK_tblSuspect_tblChannel] FOREIGN KEY ([Channel_PK]) REFERENCES [dbo].[tblChannel] ([Channel_PK])
++GO
+diff --git a/Tables/dbo.tblSuspectNote.sql b/Tables/dbo.tblSuspectNote.sql
+new file mode 100644
+index 0000000..d8e9a41
+--- /dev/null
++++ b/Tables/dbo.tblSuspectNote.sql
+@@ -0,0 +1,10 @@
++CREATE TABLE [dbo].[tblSuspectNote]
++(
++[Suspect_PK] [bigint] NOT NULL,
++[NoteText_PK] [smallint] NOT NULL,
++[Coded_User_PK] [smallint] NULL,
++[Coded_Date] [smalldatetime] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblSuspectNote] ADD CONSTRAINT [PK_tblSuspectNote] PRIMARY KEY CLUSTERED  ([Suspect_PK], [NoteText_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblSuspectNoteText.sql b/Tables/dbo.tblSuspectNoteText.sql
+new file mode 100644
+index 0000000..8cf08c5
+--- /dev/null
++++ b/Tables/dbo.tblSuspectNoteText.sql
+@@ -0,0 +1,10 @@
++CREATE TABLE [dbo].[tblSuspectNoteText]
++(
++[Suspect_PK] [bigint] NOT NULL,
++[Note_Text] [varchar] (1000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Coded_User_PK] [smallint] NULL,
++[Coded_Date] [smalldatetime] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblSuspectNoteText] ADD CONSTRAINT [PK_tblSuspectNoteText] PRIMARY KEY CLUSTERED  ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblUser.sql b/Tables/dbo.tblUser.sql
+new file mode 100644
+index 0000000..474f325
+--- /dev/null
++++ b/Tables/dbo.tblUser.sql
+@@ -0,0 +1,49 @@
++CREATE TABLE [dbo].[tblUser]
++(
++[User_PK] [int] NOT NULL IDENTITY(1, 1),
++[Username] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Password] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Lastname] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Firstname] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Email_Address] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[IsAdmin] [bit] NULL,
++[IsScanTech] [bit] NULL,
++[IsScheduler] [bit] NULL,
++[IsReviewer] [bit] NULL,
++[IsQA] [bit] NULL,
++[IsHRA] [bit] NULL,
++[IsActive] [bit] NULL,
++[only_work_selected_hours] [bit] NULL,
++[only_work_selected_zipcodes] [bit] NULL,
++[deactivate_after] [smalldatetime] NULL,
++[linked_provider_id] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[linked_provider_pk] [bigint] NULL,
++[IsClient] [bit] NULL CONSTRAINT [DF__tblUser__IsClien__6DCC4D03] DEFAULT ((0)),
++[sch_Name] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[sch_Tel] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[sch_Fax] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[IsSchedulerSV] [bit] NULL,
++[IsScanTechSV] [bit] NULL,
++[IsChangePasswordOnFirstLogin] [bit] NULL,
++[Location_PK] [tinyint] NULL,
++[isQCC] [bit] NULL,
++[willing2travell] [smallint] NULL,
++[is_male] [bit] NULL,
++[address] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[zipcode_pk] [int] NULL,
++[Latitude] [float] NULL,
++[Longitude] [float] NULL,
++[linked_scheduler_user_pk] [int] NULL,
++[EmploymentStatus] [tinyint] NULL,
++[EmploymentAgency] [tinyint] NULL,
++[isAllowDownload] [bit] NULL,
++[CoderLevel] [tinyint] NULL,
++[IsSchedulerManager] [bit] NULL,
++[IsInvoiceAccountant] [bit] NULL,
++[IsBillingAccountant] [bit] NULL,
++[IsManagementUser] [bit] NULL,
++[IsCoderOnsite] [bit] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblUser] ADD CONSTRAINT [PK_tblUser] PRIMARY KEY CLUSTERED  ([User_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblUserProject.sql b/Tables/dbo.tblUserProject.sql
+new file mode 100644
+index 0000000..86270a0
+--- /dev/null
++++ b/Tables/dbo.tblUserProject.sql
+@@ -0,0 +1,8 @@
++CREATE TABLE [dbo].[tblUserProject]
++(
++[User_PK] [smallint] NOT NULL,
++[Project_PK] [smallint] NOT NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblUserProject] ADD CONSTRAINT [PK_tblUserProject] PRIMARY KEY CLUSTERED  ([User_PK], [Project_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tblZipCode.sql b/Tables/dbo.tblZipCode.sql
+new file mode 100644
+index 0000000..cf26053
+--- /dev/null
++++ b/Tables/dbo.tblZipCode.sql
+@@ -0,0 +1,15 @@
++CREATE TABLE [dbo].[tblZipCode]
++(
++[ZipCode_PK] [int] NOT NULL,
++[ZipCode] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
++[City] [varchar] (40) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[State] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[County] [varchar] (40) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Latitude] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Longitude] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [dbo].[tblZipCode] ADD CONSTRAINT [PK_tblZipCodes_1] PRIMARY KEY CLUSTERED  ([ZipCode_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
++CREATE NONCLUSTERED INDEX [IX_tblZipCodes] ON [dbo].[tblZipCode] ([ZipCode]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpChartLog.sql b/Tables/dbo.tmpChartLog.sql
+new file mode 100644
+index 0000000..27baf6d
+--- /dev/null
++++ b/Tables/dbo.tmpChartLog.sql
+@@ -0,0 +1,6 @@
++CREATE TABLE [dbo].[tmpChartLog]
++(
++[ChartName ] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ZIP File] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpDeletesAnalysis.sql b/Tables/dbo.tmpDeletesAnalysis.sql
+new file mode 100644
+index 0000000..da61367
+--- /dev/null
++++ b/Tables/dbo.tmpDeletesAnalysis.sql
+@@ -0,0 +1,26 @@
++CREATE TABLE [dbo].[tmpDeletesAnalysis]
++(
++[MEMBER ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PROVIDER TYPE] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE FROM DT] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE TO DT] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[REN Provider ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD Code] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DX CODE CATEGORY] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION REASON] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Page From] [float] NULL,
++[Page To] [float] NULL,
++[REN_TIN] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PIN] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PID] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CHART NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Visionary Comments] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Login] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Column1] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Column12] [nvarchar] (510) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Visionary Final Comments] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExport.sql b/Tables/dbo.tmpExport.sql
+new file mode 100644
+index 0000000..041db49
+--- /dev/null
++++ b/Tables/dbo.tmpExport.sql
+@@ -0,0 +1,24 @@
++CREATE TABLE [dbo].[tmpExport]
++(
++[MEMBER ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PROVIDER TYPE] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE FROM DT] [date] NULL,
++[SERVICE TO DT] [date] NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD Code] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DX CODE CATEGORY] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ICD CODE DISPOSITION] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION REASON] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[Page From] [smallint] NULL,
++[Page To] [smallint] NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member_PK] [int] NULL,
++[Suspect_PK] [bigint] NOT NULL,
++[ChaseID] [bigint] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtena.sql b/Tables/dbo.tmpExportAtena.sql
+new file mode 100644
+index 0000000..06f87e3
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtena.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[tmpExportAtena]
++(
++[MEMBER ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PROVIDER TYPE] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE FROM DT] [date] NULL,
++[SERVICE TO DT] [date] NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD Code] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DX CODE CATEGORY] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ICD CODE DISPOSITION] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION REASON] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Page From] [smallint] NULL,
++[Page To] [smallint] NULL,
++[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CHART NAME] [varchar] (82) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtenaNoClaimID.sql b/Tables/dbo.tmpExportAtenaNoClaimID.sql
+new file mode 100644
+index 0000000..c7175dd
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtenaNoClaimID.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[tmpExportAtenaNoClaimID]
++(
++[MEMBER ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PROVIDER TYPE] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE FROM DT] [date] NULL,
++[SERVICE TO DT] [date] NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD Code] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DX CODE CATEGORY] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ICD CODE DISPOSITION] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION REASON] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Page From] [smallint] NULL,
++[Page To] [smallint] NULL,
++[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CHART NAME] [varchar] (82) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtenaNoClaimID_bak_500.sql b/Tables/dbo.tmpExportAtenaNoClaimID_bak_500.sql
+new file mode 100644
+index 0000000..99a4715
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtenaNoClaimID_bak_500.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[tmpExportAtenaNoClaimID_bak_500]
++(
++[MEMBER ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PROVIDER TYPE] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE FROM DT] [date] NULL,
++[SERVICE TO DT] [date] NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD Code] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DX CODE CATEGORY] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ICD CODE DISPOSITION] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION REASON] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Page From] [smallint] NULL,
++[Page To] [smallint] NULL,
++[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtenaNoClaimID_bak_Catchup.sql b/Tables/dbo.tmpExportAtenaNoClaimID_bak_Catchup.sql
+new file mode 100644
+index 0000000..4b4b7c2
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtenaNoClaimID_bak_Catchup.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[tmpExportAtenaNoClaimID_bak_Catchup]
++(
++[MEMBER ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PROVIDER TYPE] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE FROM DT] [date] NULL,
++[SERVICE TO DT] [date] NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD Code] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DX CODE CATEGORY] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ICD CODE DISPOSITION] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION REASON] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Page From] [smallint] NULL,
++[Page To] [smallint] NULL,
++[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtenaNoClaimID_bak_Prod.sql b/Tables/dbo.tmpExportAtenaNoClaimID_bak_Prod.sql
+new file mode 100644
+index 0000000..603c8fd
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtenaNoClaimID_bak_Prod.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[tmpExportAtenaNoClaimID_bak_Prod]
++(
++[MEMBER ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PROVIDER TYPE] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE FROM DT] [date] NULL,
++[SERVICE TO DT] [date] NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD Code] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DX CODE CATEGORY] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ICD CODE DISPOSITION] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION REASON] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Page From] [smallint] NULL,
++[Page To] [smallint] NULL,
++[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtenaProvMemb.sql b/Tables/dbo.tmpExportAtenaProvMemb.sql
+new file mode 100644
+index 0000000..259524e
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtenaProvMemb.sql
+@@ -0,0 +1,13 @@
++CREATE TABLE [dbo].[tmpExportAtenaProvMemb]
++(
++[Member ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member_PK] [int] NULL,
++[Suspect_PK] [bigint] NOT NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ChaseID] [bigint] NULL,
++[InDummy] [int] NULL,
++[InNormal] [int] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtenaProvMemb_bak_500.sql b/Tables/dbo.tmpExportAtenaProvMemb_bak_500.sql
+new file mode 100644
+index 0000000..2dd789a
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtenaProvMemb_bak_500.sql
+@@ -0,0 +1,13 @@
++CREATE TABLE [dbo].[tmpExportAtenaProvMemb_bak_500]
++(
++[Member ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member_PK] [int] NULL,
++[Suspect_PK] [bigint] NOT NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ChaseID] [bigint] NULL,
++[InDummy] [int] NULL,
++[InNormal] [int] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtenaProvMemb_bak_Catchup.sql b/Tables/dbo.tmpExportAtenaProvMemb_bak_Catchup.sql
+new file mode 100644
+index 0000000..13f7f1f
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtenaProvMemb_bak_Catchup.sql
+@@ -0,0 +1,13 @@
++CREATE TABLE [dbo].[tmpExportAtenaProvMemb_bak_Catchup]
++(
++[Member ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member_PK] [int] NULL,
++[Suspect_PK] [bigint] NOT NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ChaseID] [bigint] NULL,
++[InDummy] [int] NULL,
++[InNormal] [int] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtenaProvMemb_bak_Prod.sql b/Tables/dbo.tmpExportAtenaProvMemb_bak_Prod.sql
+new file mode 100644
+index 0000000..45d61bf
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtenaProvMemb_bak_Prod.sql
+@@ -0,0 +1,13 @@
++CREATE TABLE [dbo].[tmpExportAtenaProvMemb_bak_Prod]
++(
++[Member ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member_PK] [int] NULL,
++[Suspect_PK] [bigint] NOT NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ChaseID] [bigint] NULL,
++[InDummy] [int] NULL,
++[InNormal] [int] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtena_bak_500.sql b/Tables/dbo.tmpExportAtena_bak_500.sql
+new file mode 100644
+index 0000000..70b54f4
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtena_bak_500.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[tmpExportAtena_bak_500]
++(
++[MEMBER ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PROVIDER TYPE] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE FROM DT] [date] NULL,
++[SERVICE TO DT] [date] NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD Code] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DX CODE CATEGORY] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ICD CODE DISPOSITION] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION REASON] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Page From] [smallint] NULL,
++[Page To] [smallint] NULL,
++[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtena_bak_Catchup.sql b/Tables/dbo.tmpExportAtena_bak_Catchup.sql
+new file mode 100644
+index 0000000..774c761
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtena_bak_Catchup.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[tmpExportAtena_bak_Catchup]
++(
++[MEMBER ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PROVIDER TYPE] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE FROM DT] [date] NULL,
++[SERVICE TO DT] [date] NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD Code] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DX CODE CATEGORY] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ICD CODE DISPOSITION] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION REASON] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Page From] [smallint] NULL,
++[Page To] [smallint] NULL,
++[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportAtena_bak_Prod.sql b/Tables/dbo.tmpExportAtena_bak_Prod.sql
+new file mode 100644
+index 0000000..afbe625
+--- /dev/null
++++ b/Tables/dbo.tmpExportAtena_bak_Prod.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[tmpExportAtena_bak_Prod]
++(
++[MEMBER ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PROVIDER TYPE] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SERVICE FROM DT] [date] NULL,
++[SERVICE TO DT] [date] NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD Code] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DX CODE CATEGORY] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ICD CODE DISPOSITION] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD CODE DISPOSITION REASON] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Page From] [smallint] NULL,
++[Page To] [smallint] NULL,
++[REN_TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[REN_PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportChartStaging.sql b/Tables/dbo.tmpExportChartStaging.sql
+new file mode 100644
+index 0000000..8fc29ed
+--- /dev/null
++++ b/Tables/dbo.tmpExportChartStaging.sql
+@@ -0,0 +1,16 @@
++CREATE TABLE [dbo].[tmpExportChartStaging]
++(
++[Member ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member_PK] [int] NULL,
++[Suspect_PK] [bigint] NOT NULL,
++[CHART NAME] [varchar] (78) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[InDummy] [int] NULL,
++[InNormal] [int] NULL,
++[DOB] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ProviderName] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ProviderContact] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpExportChases.sql b/Tables/dbo.tmpExportChases.sql
+new file mode 100644
+index 0000000..ca7024e
+--- /dev/null
++++ b/Tables/dbo.tmpExportChases.sql
+@@ -0,0 +1,14 @@
++CREATE TABLE [dbo].[tmpExportChases]
++(
++[Member ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member Individual ID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[REN Provider ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member_PK] [int] NULL,
++[Suspect_PK] [bigint] NOT NULL,
++[CHART NAME] [varchar] (75) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ChaseID] [bigint] NULL,
++[InDummy] [int] NULL,
++[InNormal] [int] NULL,
++[QuickRAPSDate] [datetime] NOT NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpInvoices1.sql b/Tables/dbo.tmpInvoices1.sql
+new file mode 100644
+index 0000000..a16b5a9
+--- /dev/null
++++ b/Tables/dbo.tmpInvoices1.sql
+@@ -0,0 +1,21 @@
++CREATE TABLE [dbo].[tmpInvoices1]
++(
++[Member_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[MemberName] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Provider_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ProviderName] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Address] [varchar] (250) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[City] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[State] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Zip] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[AmountPaid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Date] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Payee] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[TotalAmount] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Confirmation #] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Payment Type] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Source] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Notes] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Invoice_PK] [int] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpInvoices2.sql b/Tables/dbo.tmpInvoices2.sql
+new file mode 100644
+index 0000000..6bf8b09
+--- /dev/null
++++ b/Tables/dbo.tmpInvoices2.sql
+@@ -0,0 +1,19 @@
++CREATE TABLE [dbo].[tmpInvoices2]
++(
++[Member_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[MemberName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Provider_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ProviderName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Address] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[City] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ State] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Zip] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[ AmountPaid ] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[TotalAmount] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Confirmation #] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Payment Type] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Payee] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Date] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Invoice_PK] [int] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/dbo.tmpInvoices3.sql b/Tables/dbo.tmpInvoices3.sql
+new file mode 100644
+index 0000000..869289d
+--- /dev/null
++++ b/Tables/dbo.tmpInvoices3.sql
+@@ -0,0 +1,13 @@
++CREATE TABLE [dbo].[tmpInvoices3]
++(
++[Invoice] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Patient Name] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Site Name] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Site Address] [varchar] (150) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Amnt] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Recorded] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Confirmation # ] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Payment Type ] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Invoice_PK] [int] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.Chases.sql b/Tables/stage.Chases.sql
+new file mode 100644
+index 0000000..aece009
+--- /dev/null
++++ b/Tables/stage.Chases.sql
+@@ -0,0 +1,42 @@
++CREATE TABLE [stage].[Chases]
++(
++[AdvanceOECRawID] [int] NOT NULL,
++[FileName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[LoadDate] [datetime2] (3) NOT NULL,
++[ClientID] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberHICN] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MedicalRecordID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberLastName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberFirstName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberDOB] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberGender] [char] (1) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderNPI] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderLastName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderFirstName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderSpecialty] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderAddress] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderCity] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderState] [char] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderZip] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderPhone] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ClaimID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD9_ICD10_Ind] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_FromDate] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_ToDate] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PRICING_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_TAX_ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MHFacilityFlag] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[NetworkIndicator] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[CentauriMemberID] [int] NULL,
++[CentauriProviderID] [int] NULL,
++[CentauriChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProjectName] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderMaster_PK] [int] NULL,
++[ProviderOffice_PK] [int] NULL,
++[Member_PK] [int] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.Chases13Add.sql b/Tables/stage.Chases13Add.sql
+new file mode 100644
+index 0000000..ed31234
+--- /dev/null
++++ b/Tables/stage.Chases13Add.sql
+@@ -0,0 +1,43 @@
++CREATE TABLE [stage].[Chases13Add]
++(
++[AdvanceOECRawID] [int] NOT NULL,
++[FileName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[LoadDate] [datetime2] (3) NOT NULL,
++[ClientID] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberHICN] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MedicalRecordID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberLastName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberFirstName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberDOB] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberGender] [char] (1) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderNPI] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderLastName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderFirstName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderSpecialty] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderAddress] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderCity] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderState] [char] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderZip] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderPhone] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ClaimID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD9_ICD10_Ind] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_FromDate] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_ToDate] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PRICING_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_TAX_ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MHFacilityFlag] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[NetworkIndicator] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[CentauriMemberID] [int] NULL,
++[CentauriProviderID] [int] NULL,
++[CentauriChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProjectName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_PK] [int] NULL,
++[ProviderMaster_PK] [int] NULL,
++[ProviderOffice_PK] [int] NULL,
++[Member_PK] [int] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.Chases20Add.sql b/Tables/stage.Chases20Add.sql
+new file mode 100644
+index 0000000..fe8fd5d
+--- /dev/null
++++ b/Tables/stage.Chases20Add.sql
+@@ -0,0 +1,43 @@
++CREATE TABLE [stage].[Chases20Add]
++(
++[AdvanceOECRawID] [int] NOT NULL,
++[FileName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[LoadDate] [datetime2] (3) NOT NULL,
++[ClientID] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberHICN] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MedicalRecordID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberLastName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberFirstName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberDOB] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberGender] [char] (1) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderNPI] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderLastName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderFirstName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderSpecialty] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderAddress] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderCity] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderState] [char] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderZip] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderPhone] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ClaimID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD9_ICD10_Ind] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_FromDate] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_ToDate] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PRICING_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_TAX_ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MHFacilityFlag] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[NetworkIndicator] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[CentauriMemberID] [int] NULL,
++[CentauriProviderID] [int] NULL,
++[CentauriChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProjectName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_PK] [int] NULL,
++[ProviderMaster_PK] [int] NULL,
++[ProviderOffice_PK] [int] NULL,
++[Member_PK] [int] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.Chases35Add.sql b/Tables/stage.Chases35Add.sql
+new file mode 100644
+index 0000000..242840b
+--- /dev/null
++++ b/Tables/stage.Chases35Add.sql
+@@ -0,0 +1,43 @@
++CREATE TABLE [stage].[Chases35Add]
++(
++[AdvanceOECRawID] [int] NOT NULL,
++[FileName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[LoadDate] [datetime2] (3) NOT NULL,
++[ClientID] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberHICN] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MedicalRecordID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberLastName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberFirstName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberDOB] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberGender] [char] (1) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderNPI] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderLastName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderFirstName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderSpecialty] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderAddress] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderCity] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderState] [char] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderZip] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderPhone] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ClaimID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ICD9_ICD10_Ind] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_FromDate] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_ToDate] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PRICING_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_TAX_ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MHFacilityFlag] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[NetworkIndicator] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[CentauriMemberID] [int] NULL,
++[CentauriProviderID] [int] NULL,
++[CentauriChaseID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProjectName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_PK] [int] NULL,
++[ProviderMaster_PK] [int] NULL,
++[ProviderOffice_PK] [int] NULL,
++[Member_PK] [int] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.ClaimLineDetail.sql b/Tables/stage.ClaimLineDetail.sql
+new file mode 100644
+index 0000000..a447c33
+--- /dev/null
++++ b/Tables/stage.ClaimLineDetail.sql
+@@ -0,0 +1,24 @@
++CREATE TABLE [stage].[ClaimLineDetail]
++(
++[ChaseID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ClientMemberID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ClaimID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceLine] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[RevenueCode] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceCode] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceModifierCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillTypeCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FacilityTypeCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderNPI] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderLastName] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderFirstName] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderSpecialty] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderAddress] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderCity] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderState] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderZip] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderPhone] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderFax] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[EmployeeYN] [varchar] (1) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.MHHS-HIX1603 move to CHASE LIST 02 - DNC (002).sql b/Tables/stage.MHHS-HIX1603 move to CHASE LIST 02 - DNC (002).sql
+new file mode 100644
+index 0000000..0c45040
+--- /dev/null
++++ b/Tables/stage.MHHS-HIX1603 move to CHASE LIST 02 - DNC (002).sql
+@@ -0,0 +1,6 @@
++CREATE TABLE [stage].[MHHS-HIX1603 move to CHASE LIST 02 - DNC (002)]
++(
++[MHHS-HIX1603 Chase ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MHMD] [varchar] (1) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.MemberHCC.sql b/Tables/stage.MemberHCC.sql
+new file mode 100644
+index 0000000..4a4fd12
+--- /dev/null
++++ b/Tables/stage.MemberHCC.sql
+@@ -0,0 +1,6 @@
++CREATE TABLE [stage].[MemberHCC]
++(
++[ClientMemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[HCC] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.MemorialHermann_152 Charts in Issue Log.sql b/Tables/stage.MemorialHermann_152 Charts in Issue Log.sql
+new file mode 100644
+index 0000000..7b49844
+--- /dev/null
++++ b/Tables/stage.MemorialHermann_152 Charts in Issue Log.sql
+@@ -0,0 +1,83 @@
++CREATE TABLE [stage].[MemorialHermann_152 Charts in Issue Log]
++(
++[clcl_id] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberNumber] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[LowDateOfService] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Paid_Dt] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BIRTH_DT] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SEX_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PRODUCTPLAN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PRODUCTNAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Admit Date] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Discharge Date] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[CLASS_PLAN_ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberFullName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberFirstName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberLastName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderUniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderUniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_UniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Primary1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Primary2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Primary3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Secondary1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Secondary2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Secondary3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_Specialty_Desc1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_Specialty_Desc2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_Specialty_Desc3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim Category] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MHMD?] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_UniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Unique Chart ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ChaseID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.MemorialHermann_27 Charts - Sent not in Issue.sql b/Tables/stage.MemorialHermann_27 Charts - Sent not in Issue.sql
+new file mode 100644
+index 0000000..62fa2c0
+--- /dev/null
++++ b/Tables/stage.MemorialHermann_27 Charts - Sent not in Issue.sql
+@@ -0,0 +1,83 @@
++CREATE TABLE [stage].[MemorialHermann_27 Charts - Sent not in Issue]
++(
++[clcl_id] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberNumber] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[LowDateOfService] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Paid_Dt] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BIRTH_DT] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SEX_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PRODUCTPLAN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PRODUCTNAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Admit Date] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Discharge Date] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[CLASS_PLAN_ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberFullName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberFirstName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberLastName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderUniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderUniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_UniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Primary1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Primary2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Primary3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Secondary1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Secondary2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Secondary3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_Specialty_Desc1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_Specialty_Desc2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_Specialty_Desc3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim Category] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MHMD?] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_UniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Unique Chart ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ChaseID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.MemorialHermann_CommercialClaimRiskAdj20170214.sql b/Tables/stage.MemorialHermann_CommercialClaimRiskAdj20170214.sql
+new file mode 100644
+index 0000000..3e20794
+--- /dev/null
++++ b/Tables/stage.MemorialHermann_CommercialClaimRiskAdj20170214.sql
+@@ -0,0 +1,11 @@
++CREATE TABLE [stage].[MemorialHermann_CommercialClaimRiskAdj20170214]
++(
++[clcl_id] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[LowDateOfService] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberNumber] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member_PK] [bigint] NULL,
++[Provider_PK] [bigint] NULL,
++[Suspect_PK] [bigint] NULL,
++[ProviderMaster_PK] [bigint] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.MemorilaHermannChaseCommerical2016_12_15.sql b/Tables/stage.MemorilaHermannChaseCommerical2016_12_15.sql
+new file mode 100644
+index 0000000..3a626be
+--- /dev/null
++++ b/Tables/stage.MemorilaHermannChaseCommerical2016_12_15.sql
+@@ -0,0 +1,97 @@
++CREATE TABLE [stage].[MemorilaHermannChaseCommerical2016_12_15]
++(
++[clcl_id] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberNumber] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[LowDateOfService] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Paid_Dt] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BIRTH_DT] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SEX_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PRODUCTPLAN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PRODUCTNAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Admit Date] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Discharge Date] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[CLASS_PLAN_ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberFullName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberFirstName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberLastName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderUniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[BillingProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PAYEE_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderUniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ServiceProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SVC_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_UniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_ProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAC_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Primary1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Primary2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Primary3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Secondary1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Secondary2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim_Category_Secondary3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_Specialty_Desc1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_Specialty_Desc2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Provider_Specialty_Desc3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Claim Category] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MHMD?] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderNPI] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_UniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderTIN] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_ProviderTinName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_ADDR_LN_1] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_ADDR_LN_2] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_ADDR_LN_3] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_CITY_NAME] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_STATE_CD] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_POSTAL] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_PHONE_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PrimaryProvider_PRIM_FAX_NUM] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Unique Chart ID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[hash] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[NewAddress] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[NewZip] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[RawAddresstoUse] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[RawZIPtoUse] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PhoneUSed] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FAXUSed] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[NPIUsed] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[CentuariProviderID] [bigint] NULL,
++[Member_PK] [bigint] NULL,
++[Provider_PK] [bigint] NULL,
++[ProviderMaster_PK] [bigint] NULL,
++[ProviderOffice_PK] [bigint] NULL,
++[Omit] [char] (1) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[UniqueChart] [char] (1) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.ProviderMasterConsolidated.sql b/Tables/stage.ProviderMasterConsolidated.sql
+new file mode 100644
+index 0000000..703a5f2
+--- /dev/null
++++ b/Tables/stage.ProviderMasterConsolidated.sql
+@@ -0,0 +1,14 @@
++CREATE TABLE [stage].[ProviderMasterConsolidated]
++(
++[ProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Lastname] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Firstname] [varchar] (75) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[NPI] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Address] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Zip] [int] NULL,
++[ContactNumber] [varchar] (120) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FaxNumber] [varchar] (120) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.badProviders.sql b/Tables/stage.badProviders.sql
+new file mode 100644
+index 0000000..bbd9c33
+--- /dev/null
++++ b/Tables/stage.badProviders.sql
+@@ -0,0 +1,10 @@
++CREATE TABLE [stage].[badProviders]
++(
++[PrimaryProvider_ProviderName] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderMaster_PK] [bigint] NULL,
++[PrimaryProvider_UniqueID] [nvarchar] (255) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[pin] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Firstname] [varchar] (75) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
++[Lastname] [varchar] (75) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.tblClaimData.sql b/Tables/stage.tblClaimData.sql
+new file mode 100644
+index 0000000..153d00e
+--- /dev/null
++++ b/Tables/stage.tblClaimData.sql
+@@ -0,0 +1,14 @@
++CREATE TABLE [stage].[tblClaimData]
++(
++[MemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[ChaseID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[DiagnosisCode] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_From] [smalldatetime] NULL,
++[DOS_Thru] [smalldatetime] NULL,
++[CPT] [varchar] (12) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[IsICD10] [bit] NULL,
++[Claim_ID] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ClientProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.tblMember.sql b/Tables/stage.tblMember.sql
+new file mode 100644
+index 0000000..d58bb05
+--- /dev/null
++++ b/Tables/stage.tblMember.sql
+@@ -0,0 +1,13 @@
++CREATE TABLE [stage].[tblMember]
++(
++[HICNumber] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Member_ID] [varchar] (22) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Lastname] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Firstname] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOB] [date] NULL,
++[Gender] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Eff_Date] [date] NULL,
++[Exp_Date] [date] NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.tblProject.sql b/Tables/stage.tblProject.sql
+new file mode 100644
+index 0000000..d446a61
+--- /dev/null
++++ b/Tables/stage.tblProject.sql
+@@ -0,0 +1,5 @@
++CREATE TABLE [stage].[tblProject]
++(
++[Project_Name] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.tblProviderMaster.sql b/Tables/stage.tblProviderMaster.sql
+new file mode 100644
+index 0000000..9e9cd0c
+--- /dev/null
++++ b/Tables/stage.tblProviderMaster.sql
+@@ -0,0 +1,12 @@
++CREATE TABLE [stage].[tblProviderMaster]
++(
++[Provider_ID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Lastname] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Firstname] [varchar] (75) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[NPI] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[TIN] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[PIN] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ClientProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ConsolidatedProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.tblProviderOffice.sql b/Tables/stage.tblProviderOffice.sql
+new file mode 100644
+index 0000000..cab6d22
+--- /dev/null
++++ b/Tables/stage.tblProviderOffice.sql
+@@ -0,0 +1,15 @@
++CREATE TABLE [stage].[tblProviderOffice]
++(
++[ProviderOfficeID] [int] NOT NULL,
++[ClientProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[Address] [varchar] (250) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Zip] [int] NULL,
++[ContactPerson] [varchar] (150) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ContactNumber] [varchar] (120) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[FaxNumber] [varchar] (120) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Email_Address] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[EMR_Type] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[GroupName] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.tblSuspect.sql b/Tables/stage.tblSuspect.sql
+new file mode 100644
+index 0000000..2671f35
+--- /dev/null
++++ b/Tables/stage.tblSuspect.sql
+@@ -0,0 +1,14 @@
++CREATE TABLE [stage].[tblSuspect]
++(
++[Project_Name] [varchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MemberID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ChaseID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[REN_PROVIDER_SPECIALTY] [varchar] (50) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ContractCode] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ChasePriority] [varchar] (2) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[MedicalRecordID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ClientProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[ConsolidatedProviderID] [varchar] (20) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/stage.tblSuspectDOS.sql b/Tables/stage.tblSuspectDOS.sql
+new file mode 100644
+index 0000000..f6b71d1
+--- /dev/null
++++ b/Tables/stage.tblSuspectDOS.sql
+@@ -0,0 +1,7 @@
++CREATE TABLE [stage].[tblSuspectDOS]
++(
++[ChaseID] [varchar] (15) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_FromDate] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[DOS_ToDate] [varchar] (10) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY]
++GO
+diff --git a/Tables/tSQLt.CaptureOutputLog.sql b/Tables/tSQLt.CaptureOutputLog.sql
+new file mode 100644
+index 0000000..f672bcc
+--- /dev/null
++++ b/Tables/tSQLt.CaptureOutputLog.sql
+@@ -0,0 +1,8 @@
++CREATE TABLE [tSQLt].[CaptureOutputLog]
++(
++[Id] [int] NOT NULL IDENTITY(1, 1),
++[OutputText] [nvarchar] (max) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
++GO
++ALTER TABLE [tSQLt].[CaptureOutputLog] ADD CONSTRAINT [PK__CaptureO__3214EC0788358A50] PRIMARY KEY CLUSTERED  ([Id]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/tSQLt.Private_Configurations.sql b/Tables/tSQLt.Private_Configurations.sql
+new file mode 100644
+index 0000000..4abd5ee
+--- /dev/null
++++ b/Tables/tSQLt.Private_Configurations.sql
+@@ -0,0 +1,8 @@
++CREATE TABLE [tSQLt].[Private_Configurations]
++(
++[Name] [nvarchar] (100) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[Value] [sql_variant] NULL
++) ON [PRIMARY]
++GO
++ALTER TABLE [tSQLt].[Private_Configurations] ADD CONSTRAINT [PK__Private___737584F7AEC3D058] PRIMARY KEY CLUSTERED  ([Name]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO
+diff --git a/Tables/tSQLt.Run_LastExecution.sql b/Tables/tSQLt.Run_LastExecution.sql
+new file mode 100644
+index 0000000..e44868f
+--- /dev/null
++++ b/Tables/tSQLt.Run_LastExecution.sql
+@@ -0,0 +1,7 @@
++CREATE TABLE [tSQLt].[Run_LastExecution]
++(
++[TestName] [nvarchar] (max) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[SessionId] [int] NULL,
++[LoginTime] [datetime] NULL
++) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
++GO
+diff --git a/Tables/tSQLt.TestMessage.sql b/Tables/tSQLt.TestMessage.sql
+new file mode 100644
+index 0000000..c79106d
+--- /dev/null
++++ b/Tables/tSQLt.TestMessage.sql
+@@ -0,0 +1,5 @@
++CREATE TABLE [tSQLt].[TestMessage]
++(
++[Msg] [nvarchar] (max) COLLATE SQL_Latin1_General_CP437_CI_AI NULL
++) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
++GO
+diff --git a/Tables/tSQLt.TestResult.sql b/Tables/tSQLt.TestResult.sql
+new file mode 100644
+index 0000000..f8a0e7a
+--- /dev/null
++++ b/Tables/tSQLt.TestResult.sql
+@@ -0,0 +1,15 @@
++CREATE TABLE [tSQLt].[TestResult]
++(
++[Id] [int] NOT NULL IDENTITY(1, 1),
++[Class] [nvarchar] (max) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[TestCase] [nvarchar] (max) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[Name] AS ((quotename([Class])+'.')+quotename([TestCase])),
++[TranName] [nvarchar] (max) COLLATE SQL_Latin1_General_CP437_CI_AI NOT NULL,
++[Result] [nvarchar] (max) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[Msg] [nvarchar] (max) COLLATE SQL_Latin1_General_CP437_CI_AI NULL,
++[TestStartTime] [datetime] NOT NULL CONSTRAINT [DF:TestResult(TestStartTime)] DEFAULT (getdate()),
++[TestEndTime] [datetime] NULL
++) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
++GO
++ALTER TABLE [tSQLt].[TestResult] ADD CONSTRAINT [PK__TestResu__3214EC07BB8C5B5A] PRIMARY KEY CLUSTERED  ([Id]) WITH (FILLFACTOR=80) ON [PRIMARY]
++GO

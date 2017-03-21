@@ -1,0 +1,321 @@
+{
+  "Id": "046f70dd-0f2e-4785-9953-d7d3656826cc",
+  "Name": "Script created at 2017-03-21 10:43.",
+  "ObjectIds": [
+    {
+      "Name": "ChaseFiles",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "StagingHash",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "YHA_20151218_RAPS",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblClaimData",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblCodedData",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblExtractionQueue",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblHccCategory",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblMember",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblModelCode",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblNPL2Validate",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblNoteText",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblNoteType",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblProject",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblRAPSData",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblSuspect",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpChartLog",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpDeletesAnalysis",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtenaNoClaimID",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtenaNoClaimID_bak_500",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtenaNoClaimID_bak_Catchup",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtenaNoClaimID_bak_Prod",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtenaProvMemb",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtenaProvMemb_bak_500",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtenaProvMemb_bak_Catchup",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtenaProvMemb_bak_Prod",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtena",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtena_bak_500",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtena_bak_Catchup",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportAtena_bak_Prod",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportChartStaging",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExportChases",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpExport",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpInvoices1",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpInvoices2",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tmpInvoices3",
+      "Owner": "dbo",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "Chases13Add",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "Chases20Add",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "Chases35Add",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "Chases",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "ClaimLineDetail",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "MHHS-HIX1603 move to CHASE LIST 02 - DNC (002)",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "MemberHCC",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "MemorialHermann436NewHighPriorityCharts",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "MemorialHermann_152 Charts in Issue Log",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "MemorialHermann_27 Charts - Sent not in Issue",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "MemorialHermann_CommercialClaimRiskAdj20170214",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "MemorilaHermannChaseCommerical2016_12_15",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "ProviderMasterConsolidated",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "badProviders",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblClaimData",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblMember",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblProject",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblProviderMaster",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblProviderOffice",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblSuspectDOS",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "tblSuspect",
+      "Owner": "stage",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "CaptureOutputLog",
+      "Owner": "tSQLt",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "Private_Configurations",
+      "Owner": "tSQLt",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "Run_LastExecution",
+      "Owner": "tSQLt",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "TestMessage",
+      "Owner": "tSQLt",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "TestResult",
+      "Owner": "tSQLt",
+      "ObjectType": "Table"
+    },
+    {
+      "Name": "qa_getMemberDetail",
+      "Owner": "dbo",
+      "ObjectType": "StoredProcedure"
+    },
+    {
+      "Name": "sr_getExportSummary",
+      "Owner": "dbo",
+      "ObjectType": "StoredProcedure"
+    }
+  ]
+}
