@@ -6,13 +6,15 @@ GO
 rdb_getRetroBurndownDrill 0,1,'0',1,'08/26/2015',0
 */
 CREATE PROCEDURE [dbo].[rdb_getRetroBurndownDrill]
-	@Projects varchar(20),
+	@Channel VARCHAR(1000),
+	@Projects varchar(1000),
+	@ProjectGroup varchar(1000),
+	@Status1 varchar(1000),
+	@Status2 varchar(1000),
 	@User int,
-	@ProjectGroup varchar(10),
 	@DrillType int,
-	@Dt date,
-	@Export int,
-	@Channel int
+	@Dt date, 
+	@Export int
 AS
 BEGIN
 	SET @Dt = DateAdd(day,1,@Dt);
@@ -22,6 +24,9 @@ BEGIN
 
 	CREATE TABLE #tmpChannel (Channel_PK INT)
 	CREATE INDEX idxChannelPK ON #tmpChannel (Channel_PK)
+
+	CREATE TABLE #tmpChaseStatus (ChaseStatus_PK INT, ChaseStatusGroup_PK INT)
+	CREATE INDEX idxChaseStatusPK ON #tmpChaseStatus (ChaseStatus_PK)
 
 	IF Exists (SELECT * FROM tblUser WHERE IsAdmin=1 AND User_PK=@User)	--For Admins
 	BEGIN
@@ -33,15 +38,24 @@ BEGIN
 		INSERT INTO #tmpProject(Project_PK) SELECT DISTINCT Project_PK FROM tblUserProject WHERE User_PK=@User
 		INSERT INTO #tmpChannel(Channel_PK) SELECT DISTINCT Channel_PK FROM tblUserChannel WHERE User_PK=@User
 	END
+	INSERT INTO #tmpChaseStatus(ChaseStatus_PK,ChaseStatusGroup_PK) SELECT DISTINCT ChaseStatus_PK,ChaseStatusGroup_PK FROM tblChaseStatus
+
+	
 
 	IF (@Projects<>'0')
 		EXEC ('DELETE FROM #tmpProject WHERE Project_PK NOT IN ('+@Projects+')')
 		
 	IF (@ProjectGroup<>'0')
-		DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK<>@ProjectGroup
+		EXEC ('DELETE T FROM #tmpProject T INNER JOIN tblProject P ON P.Project_PK = T.Project_PK WHERE ProjectGroup_PK NOT IN ('+@ProjectGroup+')')
 		
-	IF (@Channel<>0)
-		DELETE T FROM #tmpChannel T WHERE Channel_PK<>@Channel				 
+	IF (@Channel<>'0')
+		EXEC ('DELETE T FROM #tmpChannel T WHERE Channel_PK NOT IN ('+@Channel+')')	
+		
+	IF (@Status1<>'0')
+		EXEC ('DELETE T FROM #tmpChaseStatus T WHERE ChaseStatusGroup_PK NOT IN ('+@Status1+')')	
+		
+	IF (@Status2<>'0')
+		EXEC ('DELETE T FROM #tmpChaseStatus T WHERE ChaseStatus_PK NOT IN ('+@Status2+')')						 
 	-- PROJECT/Channel SELECTION
 
 	--Schedule Info
@@ -51,6 +65,7 @@ BEGIN
 	FROM tblSuspect S WITH (NOLOCK)
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
+			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
 	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL)
@@ -69,6 +84,7 @@ BEGIN
 		FROM tblSuspect S WITH (NOLOCK) 
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
+			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 			INNER JOIN tblProject Pr WITH (NOLOCK) ON Pr.Project_PK = S.Project_PK
 			LEFT JOIN #tmp T ON T.Suspect_PK = S.Suspect_PK
@@ -89,19 +105,18 @@ BEGIN
 				S.ChaseID,M.Member_ID,M.Lastname+IsNull(', '+M.Firstname,'') Member,
 				PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider,
 				PO.Address,ZC.ZipCode [Zip Code],ZC.City,ZC.State,
-				POB.Bucket [Office Status],
 				T.Sch_Date Scheduled,
 				S.Scanned_Date Extracted,
-				CNA_Date CNA,
+				CASE WHEN S.Scanned_Date IS NULL THEN S.CNA_Date ELSE NULL END CNA,
 				Coded_Date Coded
 			FROM tblSuspect S WITH (NOLOCK) 
 				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
+				INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
 				INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 				INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
 				INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
-				LEFT JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON PO.ProviderOfficeBucket_PK = POB.ProviderOfficeBucket_PK
 				LEFT JOIN tblZipCode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK
 				LEFT JOIN #tmp T ON T.Suspect_PK = S.Suspect_PK
 				WHERE (

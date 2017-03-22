@@ -43,6 +43,6 @@ BEGIN
 -----------Transaction Starts-------------------
 
 	--Calling SP to add note to newly created office
-	EXEC sch_saveOfficeContactNote @project,@office,@note,@aditionaltext,@User_PK,@contact_num,@Followup
+	EXEC sch_saveOfficeContactNote @project,@office,@note,@aditionaltext,@User_PK,@contact_num,@Followup,0
 END
 GO
