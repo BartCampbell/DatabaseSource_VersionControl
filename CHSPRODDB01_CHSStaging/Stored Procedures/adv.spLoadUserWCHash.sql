@@ -62,9 +62,8 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(a.IsSchedulerManager, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.[IsInvoiceAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.[IsBillingAccountant], ''))), ':',
-                                                                       RTRIM(LTRIM(COALESCE(a.[IsManagementUser], '')))
-																	   --, ':',
-																	   --RTRIM(LTRIM(COALESCE(a.IsCoderOnsite, '')))
+                                                                       RTRIM(LTRIM(COALESCE(a.[IsManagementUser], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(a.IsCoderOnsite, '')))
 																	   ))), 2)) ,
                         @CCI ,
                         'tblUser' ,
@@ -120,9 +119,8 @@ AS
                                                                                                             ':',
                                                                                                             RTRIM(LTRIM(COALESCE(a.[IsBillingAccountant], ''))),
                                                                                                             ':',
-                                                                                                            RTRIM(LTRIM(COALESCE(a.[IsManagementUser], '')))
-																											--, ':',
-																											--RTRIM(LTRIM(COALESCE(a.IsCoderOnsite, '')))
+                                                                                                            RTRIM(LTRIM(COALESCE(a.[IsManagementUser], ''))), ':',
+																											RTRIM(LTRIM(COALESCE(a.IsCoderOnsite, '')))
 																											))), 2)) = b.HashDiff
                                                              AND b.ClientID = @CCI
                                                              AND b.TableName = 'tblUser'

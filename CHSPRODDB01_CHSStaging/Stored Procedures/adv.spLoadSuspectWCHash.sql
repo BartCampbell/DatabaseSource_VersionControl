@@ -60,10 +60,9 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(a.ChartRec_Date, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.InvoiceExt_Date, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(a.[Channel_PK], ''))), ':',
-                                                                       RTRIM(LTRIM(COALESCE(a.EDGEMemberID, '')))
-																	   --, ':',
-                    --                                                   RTRIM(LTRIM(COALESCE(a.LastContacted, ''))), ':',
-                    --                                                   RTRIM(LTRIM(COALESCE(a.FollowUp, '')))
+                                                                       --RTRIM(LTRIM(COALESCE(a.EDGEMemberID, ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(a.LastContacted, ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(a.FollowUp, '')))
 																	   
 																	   ))), 2)) ,
                         @CCI ,
@@ -112,10 +111,9 @@ AS
                                                                                                             ':', RTRIM(LTRIM(COALESCE(a.ChartRec_Date, ''))),
                                                                                                             ':', RTRIM(LTRIM(COALESCE(a.InvoiceExt_Date, ''))),
                                                                                                             ':', RTRIM(LTRIM(COALESCE(a.[Channel_PK], ''))), ':',
-                                                                                                            RTRIM(LTRIM(COALESCE(a.EDGEMemberID, '')))
-																											--, ':',
-                           --                                            RTRIM(LTRIM(COALESCE(a.LastContacted, ''))), ':',
-                           --                                            RTRIM(LTRIM(COALESCE(a.FollowUp, '')))
+                                                                                                            --RTRIM(LTRIM(COALESCE(a.EDGEMemberID, ''))),':',
+                                                                       RTRIM(LTRIM(COALESCE(a.LastContacted, ''))), ':',
+                                                                       RTRIM(LTRIM(COALESCE(a.FollowUp, '')))
 						   ))), 2)) = b.HashDiff
                                                              AND b.ClientID = @CCI
                                                              AND b.TableName = 'tblSuspect'

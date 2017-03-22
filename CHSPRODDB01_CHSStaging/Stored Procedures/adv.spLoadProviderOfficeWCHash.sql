@@ -60,10 +60,10 @@ AS
                                                               RTRIM(LTRIM(COALESCE(a.AssignedUser_PK,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.AssignedDate,
-                                                              --''))), ':',
-                                                              --RTRIM(LTRIM(COALESCE(a.hasPriorityNote,
-                                                              --''))), ':',
-                                                              --RTRIM(LTRIM(COALESCE(a.ProviderOfficeSubBucket_PK,
+                                                              ''))), ':',
+                                                              RTRIM(LTRIM(COALESCE(a.hasPriorityNote,
+                                                              ''))), ':',
+                                                              RTRIM(LTRIM(COALESCE(a.ProviderOfficeSubBucket_PK,
                                                               '')))
 															  ))), 2)) ,
                         @CCI ,
@@ -101,10 +101,10 @@ AS
                                                               RTRIM(LTRIM(COALESCE(a.AssignedUser_PK,
                                                               ''))), ':',
                                                               RTRIM(LTRIM(COALESCE(a.AssignedDate,
-                                                              --''))), ':',
-                                                              --RTRIM(LTRIM(COALESCE(a.hasPriorityNote,
-                                                              --''))), ':',
-                                                              --RTRIM(LTRIM(COALESCE(a.ProviderOfficeSubBucket_PK,
+                                                              ''))), ':',
+                                                              RTRIM(LTRIM(COALESCE(a.hasPriorityNote,
+                                                              ''))), ':',
+                                                              RTRIM(LTRIM(COALESCE(a.ProviderOfficeSubBucket_PK,
                                                               '')))
 															  ))), 2)) = b.HashDiff
                                                              AND b.ClientID = @CCI
