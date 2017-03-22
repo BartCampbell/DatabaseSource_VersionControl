@@ -10,7 +10,14 @@ CREATE TABLE [dbo].[tblChaseStatus]
 [ContactNote] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Active] [bit] NULL,
 [ChaseStatusGroup_PK] [tinyint] NULL,
-[IsIssue] [bit] NULL
+[IsIssue] [bit] NULL,
+[IsNotContacted] [tinyint] NULL,
+[IsSchedulingInProgress] [tinyint] NULL,
+[IsScheduled] [tinyint] NULL,
+[IsExtracted] [tinyint] NULL,
+[IsCNA] [tinyint] NULL,
+[IsCoded] [tinyint] NULL,
+[ProviderOfficeBucket_PK] [tinyint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblChaseStatus] ADD CONSTRAINT [PK_tblChaseStatus] PRIMARY KEY CLUSTERED  ([ChaseStatus_PK]) ON [PRIMARY]
