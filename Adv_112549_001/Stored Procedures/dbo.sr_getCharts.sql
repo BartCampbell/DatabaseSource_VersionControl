@@ -57,7 +57,7 @@ BEGIN
 			--,cPO.office_status OfficeStatus
 			,S.Suspect_PK,M.Member_ID,M.Lastname+IsNull(', '+M.Firstname,'') Member,M.DOB
 			,S.IsScanned Scanned,Scanned_Date
-			,S.IsCNA CNA,CNA_Date
+			,CASE WHEN S.Scanned_Date IS NULL THEN S.IsCNA ELSE 0 END CNA,CASE WHEN S.Scanned_Date IS NULL THEN S.CNA_Date ELSE NULL END CNA_Date
 			--,IsNull(IsNull(SN.Note_Text+' by Scan Tech',OCNA.CNA_Note+' by Scheduler'),'') [CNA Note]
 			--,IsNull(IsNull(' by Scan Tech',OCNA.CNA_Note+' by Scheduler'),'') [CNA Note]
 			,'' [CNA Note]

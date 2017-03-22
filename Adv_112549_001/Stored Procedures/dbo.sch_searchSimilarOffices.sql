@@ -9,11 +9,11 @@ GO
 -- =============================================
 --	sch_searchSimilarOffices 7,1,0,0,0
 CREATE PROCEDURE [dbo].[sch_searchSimilarOffices] 
-	@OFFICE BIGINT,
-	@user int,
+	@Channel VARCHAR(1000),
 	@Projects varchar(1000),
 	@ProjectGroup varchar(1000),
-	@Channel varchar(1000)
+	@OFFICE BIGINT,
+	@user int
 AS
 BEGIN
 	-- PROJECT/Channel SELECTION
@@ -45,38 +45,30 @@ BEGIN
 	-- PROJECT/Channel SELECTION
 	
 	--Office can merge
-	SELECT LEFT(PO.Address,5)+'%',0 Project_PK,cPO.ProviderOffice_PK,IsNull(PO.GroupName+' ','')+PO.Address [Address],PO.ZipCode_PK,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,PO.EMR_Type
+	SELECT LEFT(PO.Address,5)+'%',0 Project_PK,PO.ProviderOffice_PK,IsNull(PO.GroupName+' ','')+PO.Address [Address],PO.ZipCode_PK,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,PO.EMR_Type
 			,COUNT(DISTINCT P.Provider_PK) Providers
 			,COUNT(DISTINCT CASE WHEN IsScanned=1 OR S.IsCNA=1 THEN NULL ELSE S.Suspect_PK END) Charts
-			,CASE WHEN COUNT(DISTINCT CASE WHEN IsScanned=1 OR S.IsCNA=1 THEN NULL ELSE S.Suspect_PK END)=0 THEN 9999 ELSE MIN(DATEDIFF(day,GetDate(),follow_up)) END followup_days
---			,schedule_type,
-			,POB.Bucket OfficeStatus
-		FROM 
-			cacheProviderOffice cPO WITH (NOLOCK)
-			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON cPO.ProviderOffice_PK=PO.ProviderOffice_PK
+		FROM tblProviderOffice PO WITH (NOLOCK)
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
-			INNER JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON POB.ProviderOfficeBucket_PK = PO.ProviderOfficeBucket_PK
 			INNER JOIN tblProviderOffice PO2 WITH (NOLOCK) ON 
 				(RTRIM(PO.ContactNumber)<>'' AND (Replace(Replace(Replace(Replace(PO2.ContactNumber,' ',''),'-',''),')',''),'(','') LIKE Replace(Replace(Replace(Replace(PO.ContactNumber,' ',''),'-',''),')',''),'(',''))
 				OR (RTRIM(PO2.Address)=RTRIM(PO.Address))
 				OR (PO2.GroupName = PO.GroupName AND IsNull(PO2.GroupName,'') NOT LIKE ''))
 				AND PO2.ProviderOffice_PK = @OFFICE AND PO.ProviderOffice_PK <> @OFFICE
-	GROUP BY cPO.ProviderOffice_PK,IsNull(PO.GroupName+' ',''),PO.Address,PO.ZipCode_PK,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,PO.EMR_Type,POB.Bucket
+	GROUP BY PO.ProviderOffice_PK,IsNull(PO.GroupName+' ',''),PO.Address,PO.ZipCode_PK,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,PO.EMR_Type
 
 	--Linked Office
-	SELECT COUNT(DISTINCT P.Provider_PK) Providers,COUNT(DISTINCT S.Suspect_PK) Charts, COUNT(DISTINCT CASE WHEN IsScanned=1 OR S.IsCNA=1 THEN NULL ELSE S.Suspect_PK END) Remaining,Min(dtLastContact) LastContact,MIN(follow_up) follow_up,POB.Bucket OfficeStatus,Pr.Project_Name,Pr.ProjectGroup
-	FROM cacheProviderOffice tPO WITH (NOLOCK) 
-			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON tPO.ProviderOffice_PK=PO.ProviderOffice_PK
-			INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = tPO.ProviderOffice_PK
+	SELECT COUNT(DISTINCT P.Provider_PK) Providers,COUNT(DISTINCT S.Suspect_PK) Charts, COUNT(DISTINCT CASE WHEN IsScanned=1 OR S.IsCNA=1 THEN NULL ELSE S.Suspect_PK END) Remaining,Min(S.LastContacted) LastContact,MIN(FollowUp) follow_up,Pr.Project_Name,Pr.ProjectGroup
+	FROM tblProviderOffice PO WITH (NOLOCK)
+			INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
-			INNER JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON POB.ProviderOfficeBucket_PK = PO.ProviderOfficeBucket_PK
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN tblProject Pr ON Pr.Project_PK = S.Project_PK
-	WHERE tPO.ProviderOffice_PK = @OFFICE
-	GROUP BY Pr.Project_Name,Pr.ProjectGroup,POB.Bucket
+	WHERE PO.ProviderOffice_PK = @OFFICE
+	GROUP BY Pr.Project_Name,Pr.ProjectGroup
 END
 GO

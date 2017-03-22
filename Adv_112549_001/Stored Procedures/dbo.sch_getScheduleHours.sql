@@ -54,11 +54,13 @@ BEGIN
 			AND CAST(CONVERT(VARCHAR,Sch_Start,102) AS SMALLDATETIME)>=D.dt		
 	WHERE ProviderOffice_PK=@office  AND Sch_Type=0 --AND Project_PK=@project
 
-	SELECT DISTINCT TOP 25  Lastname+', '+Firstname ScanTech,Sch_Start,Sch_End,MAX(ProviderOfficeSchedule_PK) ProviderOfficeSchedule_PK,Sch_Type
-	FROM tblProviderOfficeSchedule S WITH (NOLOCK) INNER JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Sch_User_PK
+	SELECT DISTINCT TOP 25  IsNull(Lastname+', '+Firstname,'') ScanTech,Sch_Start,Sch_End,MAX(ProviderOfficeSchedule_PK) ProviderOfficeSchedule_PK,Sch_Type
+	FROM tblProviderOfficeSchedule S WITH (NOLOCK) LEFT JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Sch_User_PK
 	WHERE S.ProviderOffice_PK=@office --AND S.Project_PK=@project --AND S.Sch_Type=0
 	GROUP BY Lastname+', '+Firstname,Sch_Start,Sch_End,Sch_Type
 	ORDER BY Sch_Start DESC
+
+	--DELETE FROM tblProviderOfficeSchedule WHERE Sch_Type IS NULL
 
 	SELECT DISTINCT U.User_PK,Lastname,Firstname
 		FROM tblUser U WITH (NOLOCK) INNER JOIN #tmp T ON T.User_PK = U.User_PK	

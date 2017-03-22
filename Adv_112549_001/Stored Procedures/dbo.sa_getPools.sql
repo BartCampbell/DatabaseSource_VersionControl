@@ -23,12 +23,26 @@ BEGIN
 			  ,IsProjectRule,Projects,ProjectGroups
 			  ,SchedulerTeam_PK,Pool_Priority,IsAutoRefreshPool,PriorityWithinPool
 			  ,IsForcedAllocationAllowed
-			  ,Offices,P.Channel_PK
+			  ,X.Offices,P.Channel_PK
 		  FROM dbo.tblPool P with (nolock)
-			Outer Apply (SELECT count(1) Offices FROM tblProviderOffice PO with (nolock) WHERE PO.Pool_PK = P.Pool_PK AND ProviderOfficeBucket_PK<>0) X
+			Outer Apply (
+					SELECT COUNT(DISTINCT PP.ProviderOffice_PK) Offices 
+					FROM tblProviderOffice PO WITH (NOLOCK)
+						INNER JOIN tblProvider PP WITH (NOLOCK) ON PP.ProviderOffice_PK = PO.ProviderOffice_PK
+						INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = PP.Provider_PK
+						--INNER JOIN tblChaseStatus CS WITH (NOLOCK) ON CS.ChaseStatus_PK = S.ChaseStatus_PK
+					WHERE S.IsScanned=0 AND S.IsCNA=0 AND S.IsCoded=0 AND PO.Pool_PK = P.Pool_PK --CS.ProviderOfficeBucket_PK<>5 AND 
+			) X			
+			--SELECT count(1) Offices FROM tblProviderOffice PO with (nolock) WHERE PO.Pool_PK = P.Pool_PK AND ProviderOfficeBucket_PK<>0
 		ORDER BY P.Pool_Priority
 
-	SELECT count(1) Offices FROM tblProviderOffice PO with (nolock) WHERE PO.Pool_PK IS NULL AND ProviderOfficeBucket_PK<>0
+	SELECT count(DISTINCT PO.ProviderOffice_PK) Offices 
+		FROM tblProviderOffice PO with (nolock) 
+			INNER JOIN tblProvider P with (nolock) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
+			INNER JOIN tblSuspect S with (nolock) ON P.Provider_PK = S.Provider_PK
+			--INNER JOIN tblChaseStatus CS WITH (NOLOCK) ON CS.ChaseStatus_PK = S.ChaseStatus_PK
+		WHERE PO.Pool_PK IS NULL --AND CS.ProviderOfficeBucket_PK<>5
+		AND S.IsCNA=0 AND S.IsScanned=0 AND S.IsCoded=0
 
 		IF (@type=1)
 			return ;

@@ -26,7 +26,7 @@ BEGIN
 	END
 	-- PROJECT/Channel
 
-	SELECT DISTINCT S.Channel_PK,S.Project_PK INTO #tmpChannelProject FROM tblSuspect S WITH (NOLOCK) 
+	SELECT DISTINCT S.Channel_PK,S.Project_PK INTO #tmpChannelProject FROM tblSuspect S WITH (NOLOCK)
 	CREATE INDEX idxChannelProjectPK ON #tmpChannelProject (Channel_PK,Project_PK)
 
 	SELECT P.* FROM tblProject P WITH (NOLOCK) 
@@ -37,10 +37,17 @@ BEGIN
 		INNER JOIN #tmpProject tP ON tP.Project_PK = P.Project_PK 
 	ORDER BY ProjectGroup;
 
-	SELECT DISTINCT C.Channel_PK, C.Channel_Name,S.Project_PK FROM tblSuspect S WITH (NOLOCK) 
+	SELECT DISTINCT C.Channel_PK, C.Channel_Name,S.Project_PK,Pr.ProjectGroup_PK FROM tblSuspect S WITH (NOLOCK) 
 		INNER JOIN tblChannel C ON C.Channel_PK = S.Channel_PK
+		INNER JOIN tblProject Pr ON Pr.Project_PK = S.Project_PK
 		INNER JOIN #tmpProject P ON P.Project_PK = S.Project_PK
 		INNER JOIN #tmpChannel tC ON tC.Channel_PK = S.Channel_PK
 	ORDER BY C.Channel_Name
+
+	SELECT DISTINCT CS.ChaseStatusGroup_PK, CS.ChaseStatus, CS.ChaseStatus_PK,CS.ChartResolutionCode FROM tblSuspect S WITH (NOLOCK) 
+		INNER JOIN tblChaseStatus CS ON CS.ChaseStatus_PK = S.ChaseStatus_PK
+		INNER JOIN #tmpProject P ON P.Project_PK = S.Project_PK
+		INNER JOIN #tmpChannel tC ON tC.Channel_PK = S.Channel_PK
+	ORDER BY CS.ChaseStatus,CS.ChartResolutionCode
 END
 GO
