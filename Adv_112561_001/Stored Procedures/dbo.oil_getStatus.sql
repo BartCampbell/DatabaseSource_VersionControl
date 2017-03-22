@@ -8,7 +8,7 @@ GO
 --		3	Scheduled
 --		4	Removed from Chase list
 -- =============================================
---	oil_getStatus 0,0,0,0,0,1
+--	oil_getStatus 4,0,0,0,0,1
 CREATE PROCEDURE [dbo].[oil_getStatus]
 	@Channel VARCHAR(1000),
 	@Projects varchar(1000),
@@ -55,23 +55,22 @@ BEGIN
 	IF (@Status2<>'0')
 		EXEC ('DELETE T FROM #tmpChaseStatus T WHERE ChaseStatus_PK NOT IN ('+@Status2+')')						 
 	-- PROJECT/Channel SELECTION
-		
-	--SELECT POS.OfficeIssueStatus [status], COUNT(DISTINCT POS.ProviderOffice_PK) Cnt
-	SELECT POS.OfficeIssueStatus,POS.ProviderOffice_PK INTO #tbl
+	;
+	WITH Offices AS (
+	SELECT PO.ProviderOffice_PK,CASE WHEN S.FollowUp IS NULL THEN 0 ELSE 1 END AwaitingScheduler 
 			FROM tblProviderOffice PO WITH (NOLOCK) 
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
+				INNER JOIN tblChaseStatus CS WITH (NOLOCK) ON S.ChaseStatus_PK = CS.ChaseStatus_PK
 				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 				INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
-				INNER JOIN tblProviderOfficeStatus POS ON POS.ProviderOffice_PK = PO.ProviderOffice_PK
-				--LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
-	GROUP BY POS.OfficeIssueStatus,POS.ProviderOffice_PK
+	WHERE CS.ProviderOfficeBucket_PK=5 AND (PO.ProviderOfficeSubBucket_PK IS NULL OR PO.ProviderOfficeSubBucket_PK<>3)
+	GROUP BY PO.ProviderOffice_PK,CASE WHEN S.FollowUp IS NULL THEN 0 ELSE 1 END
 	Having COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END)>0
-
-	SELECT OfficeIssueStatus [status], COUNT(DISTINCT ProviderOffice_PK) Cnt
-	FROM #tbl
-	WHERE OfficeIssueStatus NOT IN (3,5)
-	GROUP BY OfficeIssueStatus
+	)
+	SELECT COUNT(1) IssueOffices, 'Pending Feedback' Bucket FROM Offices WHERE AwaitingScheduler=0
+	UNION
+	SELECT COUNT(1) IssueOffices, 'Awaiting Scheduler' Bucket FROM Offices WHERE AwaitingScheduler=1 ORDER BY Bucket
 END
 GO

@@ -2,8 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-
---	dc_getMemberDetail 5325,13661,31156,0,0,'NPL',1,0
+--	dc_getMemberDetail 0,13661,5197,0,0,'NPL',1,0
 CREATE PROCEDURE [dbo].[dc_getMemberDetail]  
 	@Provider BigInt,
 	@Member BigInt,
@@ -15,8 +14,8 @@ CREATE PROCEDURE [dbo].[dc_getMemberDetail]
 	@IsBlindCoding tinyint
 AS
 BEGIN
-	DECLARE @ProviderMaster_PK AS BIGINT
-	SELECT TOP 1 @ProviderMaster_PK=ProviderMaster_PK FROM tblProvider WHERE Provider_PK=@Provider
+--	DECLARE @ProviderMaster_PK AS BIGINT
+--	SELECT TOP 1 @ProviderMaster_PK=ProviderMaster_PK FROM tblProvider WHERE Provider_PK=@Provider
 
 	DECLARE @level AS tinyint
 	SELECT @level=CoderLevel FROM tblUser WHERE User_PK=@UserPK
@@ -61,7 +60,7 @@ BEGIN
 		INNER JOIN tblHEDIS_Measure HM ON HM.Measure_PK = HS.Measure_PK
 		INNER JOIN tblSuspect S ON S.Suspect_PK = HS.Suspect_PK
 	WHERE S.Member_PK=@Member
-
+/*
 	if (@Provider=0)
 	BEGIN 
 		SELECT P.Provider_PK,PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider_Name
@@ -70,10 +69,14 @@ BEGIN
 				INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
 			WHERE S.Suspect_PK = @Suspect
 	END
+*/
+
+	SELECT IsQA FROM tblSuspect WHERE Suspect_PK=@Suspect
 
 	IF (@ValidateType='HCC')
 		SELECT DISTINCT V.HCC Code,H.HCC_Desc Code_Desc FROM tblHCC2Validate V INNER JOIN tblHCC H ON H.HCC = V.HCC AND H.PaymentModel = V.PaymentModel WHERE V.Member_PK = @Member
 	ELSE IF (@ValidateType='NLP')
 		SELECT DISTINCT MC.DiagnosisCode Code,MC.Code_Description Code_Desc FROM tblNPL2Validate V INNER JOIN tblModelCode MC ON MC.DiagnosisCode = V.DiagnosisCode WHERE V.Suspect_PK = @Suspect
+
 END
 GO

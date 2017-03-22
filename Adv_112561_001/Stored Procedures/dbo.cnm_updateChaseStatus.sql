@@ -2,7 +2,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
---	cnm_updateChaseStatus '0','0','0',1,'0',1,1
+--	cnm_updateChaseStatus '0','0','0','0','0',1,1
 Create PROCEDURE [dbo].[cnm_updateChaseStatus] 
 	@Channel VARCHAR(1000),
 	@Projects varchar(1000),
@@ -93,6 +93,33 @@ BEGIN
 
 	EXEC (@SQL);
 
+	DECLARE @IsNotContacted AS TinyInt
+	DECLARE @IsSchedulingInProgress AS TinyInt
+	DECLARE @IsScheduled AS TinyInt
+	DECLARE @IsExtracted AS TinyInt
+	DECLARE @IsCNA AS TinyInt
+	DECLARE @IsCoded AS TinyInt
+	DECLARE @IsOverwriteSchedule AS TinyInt 
+	DECLARE @ChartResolutionCode AS VARCHAR(200)
+	DECLARE @IsOverwriteCNA AS TinyInt = 0
+
+	SELECT @IsOverwriteSchedule = CASE WHEN ProviderOfficeBucket_PK = 5 THEN 1 ELSE 0 END, @ChartResolutionCode = ChartResolutionCode, @IsNotContacted = IsNotContacted, @IsSchedulingInProgress = IsSchedulingInProgress, @IsScheduled = IsScheduled, @IsExtracted = IsExtracted, @IsCNA = IsCNA, @IsCoded = IsCoded FROM tblChaseStatus WHERE ChaseStatus_PK = @ChaseStatus
+	IF (@ChartResolutionCode='Project Change')
+		SET @IsOverwriteCNA = 1
+
+	DELETE tS FROM #tmpSuspect tS 
+		INNER JOIN tblSuspect S ON S.Suspect_PK = tS.Suspect_PK
+		INNER JOIN tblChaseStatus CS ON CS.ChaseStatus_PK = S.ChaseStatus_PK
+	WHERE NOT (		--To make sure only correct chase status can be set
+			@IsCoded=1 OR	--Coder flag can overwrite any other status
+			(@IsExtracted = 1 AND CS.IsCoded=0) OR	--Extracted flag can overwrite any other status except for Codeded
+			(@IsCNA = 1 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR --IsCNA flag can overwrite any other status except for Codeded and Extracted
+			(@IsOverwriteCNA = 1 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR --@IsOverwriteCNA flag can overwrite any other status except for Codeded and Extracted
+			((@IsScheduled = 1 OR @IsOverwriteSchedule=1) AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR
+			(@IsSchedulingInProgress = 1 AND CS.IsScheduled = 0 AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR
+			(@IsNotContacted=1 AND CS.IsSchedulingInProgress = 0 AND CS.IsScheduled = 0 AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0)
+		)
+
 	INSERT INTO tblContactNotesOffice(Project_PK, Office_PK, ContactNote_PK, ContactNoteText, LastUpdated_User_PK, LastUpdated_Date,contact_num)
 	SELECT 0, P.ProviderOffice_PK, 1 ContactNote_PK, CAST(COUNT(DISTINCT CL.Suspect_PK) AS VARCHAR)+' Chases from '+C_From.ChaseStatus+' to '+C_To.ChaseStatus ContactNoteText, @User LastUpdated_User_PK, GetDate() LastUpdated_Date,0 contac_num 
 	FROM tblProvider P WITH (NOLOCK)
@@ -105,6 +132,25 @@ BEGIN
 	INSERT INTO tblChaseStatusLog(Suspect_PK,From_ChaseStatus_PK,To_ChaseStatus_PK,User_PK,dtUpdate)
 	SELECT S.Suspect_PK,ChaseStatus_PK,@ChaseStatus,@User,GetDate() FROM #tmpSuspect tS INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Suspect_PK = tS.Suspect_PK
 
-	Update S SET ChaseStatus_PK = @ChaseStatus FROM #tmpSuspect tS INNER JOIN tblSuspect S ON S.Suspect_PK = tS.Suspect_PK
+	Update S SET ChaseStatus_PK = @ChaseStatus, 
+			IsCoded = CASE WHEN @IsCoded=1 AND S.IsCoded=0 THEN 1 ELSE S.IsCoded END,
+			Coded_Date = CASE WHEN @IsCoded=1 AND S.IsCoded=0 THEN GetDate() ELSE S.Coded_Date END,
+			Coded_User_PK = CASE WHEN @IsCoded=1 AND S.IsCoded=0 THEN 1 ELSE S.Coded_User_PK END,
+			IsScanned = CASE WHEN @IsExtracted=1 AND S.IsScanned=0 THEN 1 ELSE S.IsScanned END,
+			Scanned_Date = CASE WHEN @IsExtracted=1 AND S.IsScanned=0 THEN GetDate() ELSE S.Scanned_Date END,
+			Scanned_User_PK = CASE WHEN @IsExtracted=1 AND S.IsScanned=0 THEN 1 ELSE S.Scanned_User_PK END,
+			IsCNA = CASE WHEN @IsOverwriteCNA=1 THEN 0 WHEN @IsCNA=1 AND S.IsCNA=0 THEN 1 ELSE S.IsCNA END,
+			CNA_Date = CASE WHEN @IsOverwriteCNA=1 THEN NULL WHEN @IsCNA=1 AND S.IsCNA=0 THEN GetDate() ELSE S.CNA_Date END,
+			CNA_User_PK = CASE WHEN @IsOverwriteCNA=1 THEN NULL WHEN @IsCNA=1 AND S.IsCNA=0 THEN 1 ELSE S.CNA_User_PK END
+		FROM #tmpSuspect tS 
+		INNER JOIN tblSuspect S ON S.Suspect_PK = tS.Suspect_PK
+/*
+	WHERE @IsCoded=1 OR
+		(@IsExtracted = 1 AND CS.IsCoded=0) OR
+		(@IsCNA = 1 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR 
+		(@IsScheduled = 1 AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR
+		(@IsSchedulingInProgress = 1 AND CS.IsScheduled = 0 AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR
+		(@IsNotContacted=1 AND CS.IsSchedulingInProgress = 0 AND CS.IsScheduled = 0 AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0)
+		*/
 END
 GO
