@@ -30,7 +30,7 @@ BEGIN
 			,linked_provider_id,IsNull(linked_provider_pk,0) linked_provider_pk
 			,sch_name,sch_tel,sch_fax
 			,isScanTechSV, isSchedulerSV,IsChangePasswordOnFirstLogin,IsNull(Location_PK,0) Location_PK, isQCC, isAllowDownload, IsSchedulerManager
-			,IsInvoiceAccountant, IsBillingAccountant, IsManagementUser
+			,IsInvoiceAccountant, IsBillingAccountant, IsManagementUser, IsCoderOnsite
 		FROM tblUser
 		WHERE Username Like @Alpha+'%'
 		AND (
@@ -56,5 +56,4 @@ BEGIN
 		GROUP BY LEFT(Username,1), RIGHT(LEFT(Username,2),1)			
 		ORDER BY alpha1, alpha2
 END    
-
 GO
