@@ -12,7 +12,7 @@ CREATE PROCEDURE [dbo].[sch_getAssignment]
 	@Office bigint
 AS
 BEGIN
-	SELECT IsNull(POAU.Lastname+IsNull(','+POAU.Firstname,''),'') AssignedScheduler	
+	SELECT IsNull(POAU.User_PK,0) User_PK,IsNull(POAU.Lastname+IsNull(','+POAU.Firstname,''),'') AssignedScheduler	
 	FROM tblProviderOffice PO WITH (NOLOCK) INNER JOIN tblUser POAU WITH (NOLOCK) ON PO.AssignedUser_PK = POAU.User_PK
 	WHERE PO.ProviderOffice_PK = @Office
 END

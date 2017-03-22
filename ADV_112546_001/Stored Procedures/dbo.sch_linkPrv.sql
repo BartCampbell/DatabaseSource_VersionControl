@@ -24,12 +24,12 @@ BEGIN
 			INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date) 
 			VALUES(@project, @office, 4,'Added provider: ('+@ProviderID+') '+@ProviderName,@user,GETDATE())
 
-			UPDATE tblProviderOffice SET [Address]='Unknown Address: ('+@ProviderID+') '+@ProviderName,ProviderOfficeBucket_PK=1 WHERE ProviderOffice_pk=@office AND [Address]='NewAddressCreated'
+			UPDATE tblProviderOffice SET [Address]='Unknown Address: ('+@ProviderID+') '+@ProviderName WHERE ProviderOffice_pk=@office AND [Address]='NewAddressCreated'
 		--END
-		
+		/*
 		IF NOT EXISTS (SELECT * FROM cacheProviderOffice WITH (NOLOCK) WHERE Project_PK=@project AND ProviderOffice_PK=@office)
 			INSERT INTO cacheProviderOffice(Project_PK,ProviderOffice_PK,charts,providers) VALUES(@project,@office,0,0)
-	
+
 		--Update Cache
 		UPDATE cPO SET providers=o_provider, charts = o_charts
 		FROM cacheProviderOffice cPO WITH (ROWLOCK) 
@@ -39,5 +39,6 @@ BEGIN
 		WHERE cPO.Project_PK=@project AND cPO.ProviderOffice_PK IN (@office,@ProviderOffice)	
 
 		DELETE FROM cacheProviderOffice WITH (ROWLOCK) WHERE charts = 0
+			*/
 END
 GO

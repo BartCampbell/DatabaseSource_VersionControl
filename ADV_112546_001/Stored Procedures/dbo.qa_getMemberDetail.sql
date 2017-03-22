@@ -36,12 +36,15 @@ BEGIN
 		SELECT MAX(Data_PK) Data_PK,DiagnosisCode,DOS_From DOS_From,DOS_Thru,MIN(DataType) DataType,Year(DOS_Thru) DOS_Year,MAX(CodedSource_PK) CodedSource_PK INTO #tmpData FROM (
 			SELECT CD.CodedData_PK Data_PK,CD.DiagnosisCode,DOS_From DOS_From,DOS_Thru,1 DataType,Year(DOS_Thru) DOS_Year,CD.CodedSource_PK
 				FROM tblCodedData CD WITH (NOLOCK)
-				WHERE Suspect_PK=@Suspect AND IsNull(CD.Is_Deleted,0)=0
+					LEFT JOIN tblCodedDataQA QA WITH (NOLOCK) ON QA.CodedData_PK = CD.CodedData_PK
+				WHERE Suspect_PK=@Suspect AND (CD.Is_Deleted IS NULL OR CD.Is_Deleted=0 OR QA.IsRemoved=1)
+/*
 			UNION
 			SELECT -1 Data_PK,DiagnosisCode,DOS_From,DOS_Thru,3 DataType,Year(DOS_Thru) DOS_Year,0 CodedSource_PK
 				FROM tblClaimData CD WITH (NOLOCK) 
 				INNER JOIN #Prv P ON P.ProviderMaster_PK = CD.ProviderMaster_PK 
 				WHERE Member_PK=@Member AND Year(DOS_Thru)>=Year(GetDate())-2 AND DiagnosisCode<>''
+				*/
 		) T GROUP BY DiagnosisCode,DOS_From,DOS_Thru
 
 		SELECT CD.Data_PK,CD.DiagnosisCode,DOS_From DOS_From,DOS_Thru,DataType,Year(DOS_Thru) DOS_Year, NoteType
@@ -59,7 +62,7 @@ BEGIN
 	--Captured Source
 	SELECT * FROM tblCodedSource WITH (NOLOCK) ORDER BY sortOrder
 	
-	SELECT COUNT(*) FROM tblScannedData WITH (NOLOCK) WHERE Suspect_PK=@Suspect
+	SELECT TOP 1 * FROM tblScannedData WITH (NOLOCK) WHERE Suspect_PK=@Suspect
 	
 	SELECT NoteText_PK FROM tblSuspectNote WITH (NOLOCK) WHERE Suspect_PK = @Suspect
 	SELECT Note_Text FROM tblSuspectNoteText WITH (NOLOCK) WHERE Suspect_PK = @Suspect
