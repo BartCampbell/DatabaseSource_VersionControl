@@ -124,7 +124,7 @@ BEGIN
 			(@search_type=201 AND PM.ProviderGroup Like '%'+@search_value+'%') OR
 			(@search_type=202 AND PM.Provider_ID Like '%'+@search_value+'%') OR
 			(@search_type=203 AND PM.NPI Like '%'+@search_value+'%') OR
-			(@search_type=204 AND PM.Lastname+IsNull(' '+PM.Firstname,'') Like '%'+@search_value+'%') OR
+			(@search_type=204 AND PM.Lastname+IsNull(', '+PM.Firstname,'') Like '%'+@search_value+'%') OR
 			(@search_type=205 AND PM.PIN Like '%'+@search_value+'%')
 		GROUP BY PM.Provider_ID,PM.Lastname,PM.Firstname,PM.NPI,PM.PIN
 				,S.Provider_PK,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,PM.ProviderGroup,P.ProviderMaster_PK
@@ -138,15 +138,15 @@ BEGIN
 		SELECT	S.Suspect_PK,				
 				ROW_NUMBER() OVER(
 				ORDER BY 
-					CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'MID' THEN M.Member_ID WHEN 'HN' THEN M.HICNumber WHEN 'M' THEN M.Lastname+IsNull(', '+M.Firstname,'') WHEN 'CPI' THEN PM.Provider_ID WHEN 'P' THEN PM.Lastname+IsNull(', '+PM.Firstname,'') WHEN 'NPI' THEN PM.NPI WHEN 'A' THEN PO.Address WHEN 'PG' THEN PM.ProviderGroup WHEN 'CS' THEN CS.ChaseStatus WHEN 'LOB' THEN Pr.Project_Name WHEN 'Pr' THEN C.Channel_Name ELSE NULL END END ASC,
-					CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'MID' THEN M.Member_ID WHEN 'HN' THEN M.HICNumber WHEN 'M' THEN M.Lastname+IsNull(', '+M.Firstname,'') WHEN 'CPI' THEN PM.Provider_ID WHEN 'P' THEN PM.Lastname+IsNull(', '+PM.Firstname,'') WHEN 'NPI' THEN PM.NPI WHEN 'A' THEN PO.Address WHEN 'PG' THEN PM.ProviderGroup WHEN 'CS' THEN CS.ChaseStatus WHEN 'LOB' THEN Pr.Project_Name WHEN 'Pr' THEN C.Channel_Name ELSE NULL END END DESC,
-					CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'DOB' THEN M.DOB ELSE NULL END END ASC,
-					CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'DOB' THEN M.DOB ELSE NULL END END DESC 
+					CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'MID' THEN M.Member_ID WHEN 'HN' THEN M.HICNumber WHEN 'M' THEN M.Lastname+IsNull(', '+M.Firstname,'') WHEN 'CPI' THEN PM.Provider_ID WHEN 'P' THEN PM.Lastname+IsNull(', '+PM.Firstname,'') WHEN 'NPI' THEN PM.NPI WHEN 'A' THEN PO.Address WHEN 'PG' THEN PM.ProviderGroup WHEN 'CS' THEN CS.ChaseStatus WHEN 'CRC' THEN CS.ChartResolutionCode WHEN 'LOB' THEN Pr.Project_Name WHEN 'Pr' THEN C.Channel_Name ELSE NULL END END ASC,
+					CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'MID' THEN M.Member_ID WHEN 'HN' THEN M.HICNumber WHEN 'M' THEN M.Lastname+IsNull(', '+M.Firstname,'') WHEN 'CPI' THEN PM.Provider_ID WHEN 'P' THEN PM.Lastname+IsNull(', '+PM.Firstname,'') WHEN 'NPI' THEN PM.NPI WHEN 'A' THEN PO.Address WHEN 'PG' THEN PM.ProviderGroup WHEN 'CS' THEN CS.ChaseStatus WHEN 'CRC' THEN CS.ChartResolutionCode WHEN 'LOB' THEN Pr.Project_Name WHEN 'Pr' THEN C.Channel_Name ELSE NULL END END DESC,
+					CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'DOB' THEN M.DOB WHEN 'EX' THEN S.Scanned_Date WHEN 'CD' THEN S.Coded_Date ELSE NULL END END ASC,
+					CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'DOB' THEN M.DOB WHEN 'EX' THEN S.Scanned_Date WHEN 'CD' THEN S.Coded_Date ELSE NULL END END DESC 
 				) AS RowNumber
-				,S.ChaseID,M.Member_ID,M.HICNumber,M.Lastname+IsNull(', '+M.Firstname,'') Member,M.DOB
+				,S.ChaseID,M.Member_ID,M.HICNumber,M.Lastname+IsNull(', '+M.Firstname,'') Member,M.DOB,S.Scanned_Date Extracted,S.Coded_Date Coded
 				,PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider,PM.NPI,PM.PIN [Plan Provider ID],PM.ProviderGroup [Provider Group]
 				,S.PlanLID [Plan Location ID]
-				,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,CS.ChaseStatus [Chase Status]
+				,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,CS.ChaseStatus [Chase Status],CS.ChartResolutionCode [Chase Resolution Code]
 				,Pr.Project_Name LOB,C.Channel_Name Project
 			FROM tblProviderOffice PO WITH (NOLOCK) 
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
@@ -162,7 +162,7 @@ BEGIN
 				LEFT JOIN tblChannel C WITH (NOLOCK) ON C.Channel_PK = S.Channel_PK
 		WHERE 
 			(@search_type=301 AND M.Member_ID Like '%'+@search_value+'%') OR
-			(@search_type=302 AND M.Lastname+IsNull(' '+M.Firstname,'') Like '%'+@search_value+'%') OR
+			(@search_type=302 AND M.Lastname+IsNull(', '+M.Firstname,'') Like '%'+@search_value+'%') OR
 			(@search_type=303 AND M.HICNumber Like '%'+@search_value+'%') OR
 			(@search_type=304 AND S.ChaseID Like '%'+@search_value+'%')
 

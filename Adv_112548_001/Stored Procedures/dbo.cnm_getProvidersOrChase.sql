@@ -86,18 +86,25 @@ BEGIN
 	END
 	ELSE
 	BEGIN
+		IF (@ChartStatus>-1)
+		BEGIN
+			Truncate Table #tmpChaseStatus
+			INSERT INTO #tmpChaseStatus(ChaseStatus_PK,ChaseStatusGroup_PK) 
+				SELECT DISTINCT T.ChaseStatus_PK,T.ChaseStatusGroup_PK FROM tblChaseStatus X INNER JOIN tblChaseStatus T ON T.ChaseStatus = X.ChaseStatus WHERE IsNull(X.ChaseStatus_PK,0)=@ChartStatus
+		END
+		
 		SELECT S.Suspect_PK,
 				ROW_NUMBER() OVER(
 				ORDER BY 
-					CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'MID' THEN M.Member_ID WHEN 'HN' THEN M.HICNumber WHEN 'M' THEN M.Lastname+IsNull(', '+M.Firstname,'') WHEN 'CPI' THEN PM.Provider_ID WHEN 'P' THEN PM.Lastname+IsNull(', '+PM.Firstname,'') WHEN 'NPI' THEN PM.NPI WHEN 'A' THEN PO.Address WHEN 'PG' THEN PM.ProviderGroup WHEN 'CS' THEN CS.ChaseStatus WHEN 'LOB' THEN Pr.Project_Name WHEN 'Pr' THEN C.Channel_Name WHEN 'PG' THEN PM.ProviderGroup ELSE NULL END END ASC,
-					CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'MID' THEN M.Member_ID WHEN 'HN' THEN M.HICNumber WHEN 'M' THEN M.Lastname+IsNull(', '+M.Firstname,'') WHEN 'CPI' THEN PM.Provider_ID WHEN 'P' THEN PM.Lastname+IsNull(', '+PM.Firstname,'') WHEN 'NPI' THEN PM.NPI WHEN 'A' THEN PO.Address WHEN 'PG' THEN PM.ProviderGroup WHEN 'CS' THEN CS.ChaseStatus WHEN 'LOB' THEN Pr.Project_Name WHEN 'Pr' THEN C.Channel_Name WHEN 'PG' THEN PM.ProviderGroup ELSE NULL END END DESC,
-					CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'DOB' THEN M.DOB ELSE NULL END END ASC,
-					CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'DOB' THEN M.DOB ELSE NULL END END DESC 
+					CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'MID' THEN M.Member_ID WHEN 'HN' THEN M.HICNumber WHEN 'M' THEN M.Lastname+IsNull(', '+M.Firstname,'') WHEN 'CPI' THEN PM.Provider_ID WHEN 'P' THEN PM.Lastname+IsNull(', '+PM.Firstname,'') WHEN 'NPI' THEN PM.NPI WHEN 'A' THEN PO.Address WHEN 'PG' THEN PM.ProviderGroup WHEN 'CS' THEN CS.ChaseStatus WHEN 'CRC' THEN CS.ChartResolutionCode WHEN 'LOB' THEN Pr.Project_Name WHEN 'Pr' THEN C.Channel_Name WHEN 'PG' THEN PM.ProviderGroup ELSE NULL END END ASC,
+					CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'MID' THEN M.Member_ID WHEN 'HN' THEN M.HICNumber WHEN 'M' THEN M.Lastname+IsNull(', '+M.Firstname,'') WHEN 'CPI' THEN PM.Provider_ID WHEN 'P' THEN PM.Lastname+IsNull(', '+PM.Firstname,'') WHEN 'NPI' THEN PM.NPI WHEN 'A' THEN PO.Address WHEN 'PG' THEN PM.ProviderGroup WHEN 'CS' THEN CS.ChaseStatus WHEN 'CRC' THEN CS.ChartResolutionCode WHEN 'LOB' THEN Pr.Project_Name WHEN 'Pr' THEN C.Channel_Name WHEN 'PG' THEN PM.ProviderGroup ELSE NULL END END DESC,
+					CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'DOB' THEN M.DOB WHEN 'EX' THEN S.Scanned_Date WHEN 'CD' THEN S.Coded_Date ELSE NULL END END ASC,
+					CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'DOB' THEN M.DOB WHEN 'EX' THEN S.Scanned_Date WHEN 'CD' THEN S.Coded_Date ELSE NULL END END DESC 
 				) AS RowNumber,
-				S.ChaseID,M.Member_ID,M.HICNumber,M.Lastname+IsNull(', '+M.Firstname,'') Member,M.DOB
+				S.ChaseID,M.Member_ID,M.HICNumber,M.Lastname+IsNull(', '+M.Firstname,'') Member,M.DOB,M.DOB,S.Scanned_Date Extracted,S.Coded_Date Coded
 				,PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider,PM.NPI,PM.PIN [Plan Provider ID],PM.ProviderGroup [Provider Group]
 				,S.PlanLID [Plan Location ID]
-				,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,CS.ChaseStatus [Chase Status]
+				,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,CS.ChaseStatus [Chase Status],CS.ChartResolutionCode [Chase Resolution Code]
 				,Pr.Project_Name LOB,C.Channel_Name Project
 			FROM tblProviderOffice PO WITH (NOLOCK) 
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
@@ -114,8 +121,8 @@ BEGIN
 		WHERE (
 			(@office>0 AND PO.ProviderOffice_PK = @office) OR 
 			(@provider>0 AND P.Provider_PK = @provider) 
-			) AND
-			(@ChartStatus=-1 OR IsNull(S.ChaseStatus_PK,0)=@ChartStatus)
+			) --AND
+			--(@ChartStatus=-1 OR IsNull(S.ChaseStatus_PK,0)=@ChartStatus)
 	END
 END
 GO

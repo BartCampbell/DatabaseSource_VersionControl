@@ -52,34 +52,19 @@ BEGIN
 		EXEC ('DELETE T FROM #tmpChaseStatus T WHERE ChaseStatus_PK NOT IN ('+@Status2+')')						 
 	-- PROJECT/Channel SELECTION
 
-	--Schedule Info
-	CREATE TABLE #tmp(Project_PK [int] NOT NULL,Provider_PK bigint NOT NULL) --,Sch_Date DateTime
-	--PRINT 'INSERT INTO #tmp'
-	INSERT INTO #tmp
-	SELECT DISTINCT S.Project_PK,S.Provider_PK
-	FROM tblSuspect S WITH (NOLOCK)
-			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
-			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
-			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
-			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
-			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
-	WHERE PO.ProviderOffice_PK IS NOT NULL
-	CREATE CLUSTERED INDEX  idxTProjectPK ON #tmp (Project_PK,Provider_PK)
-
 	--Overall Progress
 	SELECT IsNULL(S.ChartPriority,'X') ChartPriority, COUNT(*) Chases
-		,COUNT(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 AND T.Provider_PK IS NULL		THEN S.Suspect_PK ELSE NULL END) NotScheduled 
-		,COUNT(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 AND T.Provider_PK IS NOT NULL	THEN S.Suspect_PK ELSE NULL END) Scheduled
-		,COUNT(CASE WHEN S.IsScanned=1 AND S.IsCoded=0								THEN S.Suspect_PK ELSE NULL END) Extracted
-		,COUNT(CASE WHEN S.IsScanned=0 AND S.IsCNA=1								THEN S.Suspect_PK ELSE NULL END) CNA
-		,COUNT(CASE WHEN S.IsCoded=1 AND S.IsScanned=1								THEN S.Suspect_PK ELSE NULL END) Coded
+		,SUM(CS.IsNotContacted + CS.IsSchedulingInProgress) NotScheduled 
+		,SUM(CS.IsScheduled) Scheduled
+		,SUM(CS.IsExtracted) Extracted
+		,SUM(CS.IsCNA) CNA
+		,SUM(CS.IsCoded) Coded
 	INTO #tmpX
 	FROM tblSuspect S WITH (NOLOCK) 
 		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 		INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
-		INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
-		LEFT JOIN #tmp T ON S.Project_PK = T.Project_PK AND S.Provider_PK = T.Provider_PK
+		INNER JOIN tblChaseStatus CS ON CS.ChaseStatus_PK = S.ChaseStatus_PK
 	GROUP BY S.ChartPriority --ORDER BY ChartPriority
 	UNION
 	SELECT '' ChartPriority, 0 Chases
