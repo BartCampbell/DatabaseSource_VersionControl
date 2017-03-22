@@ -3,7 +3,7 @@ GO
 SET ANSI_NULLS ON
 GO
 /* Sample Executions
-rdb_getQAStatusDrill 1,1,5,0 
+rdb_getQAStatusDrill @Channel='0',	@Projects='0',	@ProjectGroup ='0',	@Status1 ='0',	@Status2 ='0',	@User =1,	@DrillType =1,	@Export =0
 */
 CREATE PROCEDURE [dbo].[rdb_getQAStatusDrill]
 	@Channel VARCHAR(1000),

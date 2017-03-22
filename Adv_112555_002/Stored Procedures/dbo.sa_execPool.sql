@@ -103,24 +103,25 @@ BEGIN
 			CROSS APPLY (SELECT TOP 1 *  FROM tblProviderOfficeSchedule POS WITH (NOLOCK) WHERE POS.ProviderOffice_PK = PO.ProviderOffice_PK ORDER BY LastUpdated_Date DESC) X
 	END
 
-	--Get Eligible Offices using Channel, Project, Project Group and Remaining filters
-	SELECT PO.ProviderOffice_PK,Sum(CASE WHEN IsScanned=0 AND IsCNA=0 THEN 1 ELSE 0 END) RemainingCharts,MIN(follow_up) FollowUpDate INTO #EligibleOffices
+	SELECT P.ProviderOffice_PK
+		,CASE WHEN SUM(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN 1 ELSE 0 END)=0 THEN 6 ELSE MAX(CS.ProviderOfficeBucket_PK) END ProviderOfficeBucket_PK
+		,MIN(S.FollowUp) FollowUpDate, SUM(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN 1 ELSE 0 END) RemainingCharts
+	INTO #EligibleOffices
 	FROM tblProviderOffice PO WITH (NOLOCK)
-		INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON cPO.ProviderOffice_PK = PO.ProviderOffice_PK
 		INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 		INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
+		INNER JOIN tblChaseStatus CS WITH (NOLOCK) ON CS.ChaseStatus_PK = S.ChaseStatus_PK
 		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
-	GROUP BY PO.ProviderOffice_PK
+	GROUP BY P.ProviderOffice_PK		
 	CREATE INDEX idxElgProviderOffice_PK ON #EligibleOffices (ProviderOffice_PK)
-	
 
 	UPDATE PO SET Pool_PK = @PoolPK
-	FROM tblProviderOffice PO WITH (ROWLOCK)
-		INNER JOIN #EligibleOffices E WITH (NOLOCK) ON E.ProviderOffice_PK = PO.ProviderOffice_PK
-		LEFT JOIN #tmpSchedule tS ON tS.ProviderOffice_PK = PO.ProviderOffice_PK
-		LEFT JOIN #tmpZone Z ON tS.ProviderOffice_PK = PO.ProviderOffice_PK
-		LEFT JOIN tblPoolBucket PB ON PO.ProviderOfficeBucket_PK = PB.ProviderOfficeBucket_PK AND PB.Pool_PK = @PoolPK
+	FROM #EligibleOffices E WITH (ROWLOCK)
+		INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK = E.ProviderOffice_PK
+		LEFT JOIN #tmpSchedule tS ON tS.ProviderOffice_PK = E.ProviderOffice_PK
+		LEFT JOIN #tmpZone Z ON tS.ProviderOffice_PK = E.ProviderOffice_PK
+		LEFT JOIN tblPoolBucket PB ON E.ProviderOfficeBucket_PK = PB.ProviderOfficeBucket_PK AND PB.Pool_PK = @PoolPK
 		WHERE IsNull(E.RemainingCharts,0)>0
 			AND (PO.Pool_PK IS NULL OR @IsForcedAllocationAllowed=1)
 			AND (@IsBucketRule=0 OR PB.Pool_PK IS NOT NULL)
