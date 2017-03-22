@@ -80,5 +80,16 @@ BEGIN
 		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 		INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
 	WHERE P.ProviderOffice_PK=@Office
+
+	--
+	SELECT Count(Distinct S.Suspect_PK) IssueCharts 
+			FROM tblProviderOffice PO WITH (NOLOCK) 
+				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
+				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
+				INNER JOIN tblChaseStatus CS WITH (NOLOCK) ON S.ChaseStatus_PK = CS.ChaseStatus_PK
+				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
+				INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
+	WHERE PO.ProviderOffice_PK=@Office AND CS.ProviderOfficeBucket_PK=5 AND (PO.ProviderOfficeSubBucket_PK IS NULL OR PO.ProviderOfficeSubBucket_PK<>3) AND S.IsCNA=0 AND S.IsScanned=0
 END
 GO

@@ -8,7 +8,7 @@ GO
 -- Create date: Mar-12-2014
 -- Description:	RA Coder will use this sp to pull list of members in a project
 -- =============================================
---	qa_getMembers 0,0,0,1,100,1,'','','0','',1
+--	qa_getMembers 0,0,0,263,'','1','','','0','0',1
 --	qa_getMembers 0,0,100,1,'','','1,2,3,4,5,6,7,8,9,10','3','''25000'''
 CREATE PROCEDURE [dbo].[qa_getMembers] 
 	@Projects varchar(100),
@@ -87,7 +87,7 @@ BEGIN
 		
 	SET @SQL = @SQL + ' ORDER BY NEWID()'
 	
-	PRINT @SQL;
+	--PRINT @SQL;
 	EXEC (@SQL);
 END
 GO
