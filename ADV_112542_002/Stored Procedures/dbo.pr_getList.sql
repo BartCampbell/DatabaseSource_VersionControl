@@ -9,7 +9,7 @@ GO
 -- Description:	To get Finance Report Summary for Dashboad
 -- =============================================
 /* Sample Executions
-pr_getList '0','0',1,0,2,5,'1/1/2014','1/1/2017',0
+pr_getList '0','0',1,0,5,5,'11/1/2016','11/30/2016',0
 */
 CREATE PROCEDURE [dbo].[pr_getList]
 	@Projects varchar(100),
@@ -238,10 +238,67 @@ BEGIN
 	END		
 	ELSE IF (@UserType=4)		--PDF Inventory
 	BEGIN
-		SELECT COUNT(*) Files,'PDFs Assigned To Scan Techs' [Description] FROM tblExtractionQueue WHERE AssignedUser_PK IS NOT NULL UNION
-		SELECT COUNT(*),'Pending PDFs still to be attached by Scan Techs.' + IsNull(' Oldest pending date '+CAST(Min(UploadDate) AS VARCHAR),'') X FROM tblExtractionQueue WHERE AssignedUser_PK IS NULL UNION
-		SELECT COUNT(*),'Total PDFs received' FROM tblExtractionQueue  ORDER BY [Description]		
+		SELECT COUNT(*) Files,'PDFs Assigned To Scan Techs' [Description],0 User_PK FROM tblExtractionQueue WHERE AssignedUser_PK IS NOT NULL UNION
+		SELECT COUNT(*),'Pending PDFs still to be attached by Scan Techs.' + IsNull(' Oldest pending date '+CAST(Min(UploadDate) AS VARCHAR),'') X,0 FROM tblExtractionQueue WHERE AssignedUser_PK IS NULL UNION
+		SELECT COUNT(*),'Total PDFs received',0 FROM tblExtractionQueue  ORDER BY [Description]		
 	END
+	ELSE IF (@UserType=5)		--Coder	Summary
+	BEGIN
+		SET @SQL = '	
+
+			SELECT S.User_PK User_PK,COUNT(DISTINCT S.Suspect_PK) Coded, 0 Assigned INTO #tmp FROM tblSuspectLevelCoded S
+					INNER JOIN tblSuspect SC ON SC.Suspect_PK = S.Suspect_PK
+					INNER JOIN #tmpProject Pr ON SC.Project_PK = Pr.Project_PK
+			WHERE S.IsCompleted=1 ';
+--SELECT * FROM tblSuspectLevelCoded	
+		IF @User<>0
+			SET @SQL = @SQL + ' AND S.User_PK=' + CAST(@User AS VARChar);			
+		IF @DateType = 1
+			SET @SQL = @SQL + ' AND DATEPART(wk, S.dtInserted) = DATEPART(wk, GETDATE()-7) AND DATEPART(yy, S.dtInserted) = DATEPART(yy, GETDATE()-7)'
+		ELSE IF @DateType = 2
+			SET @SQL = @SQL + ' AND DATEPART(wk, S.dtInserted) = DATEPART(wk, GETDATE()) AND DATEPART(yy, S.dtInserted) = DATEPART(yy, GETDATE())'
+		ELSE IF @DateType = 3
+			SET @SQL = @SQL + ' AND Month(S.dtInserted) = Month(GETDATE()) AND Year(S.dtInserted) = Year(GETDATE())'
+		ELSE IF @DateType = 4
+			SET @SQL = @SQL + ' AND Month(S.dtInserted) = Month(DateAdd(month,-1,getdate())) AND Year(S.dtInserted) = Year(DateAdd(month,-1,getdate()))'
+		ELSE IF @DateType = 5
+			SET @SQL = @SQL + ' AND S.dtInserted>= '''+ @startDate +''' AND S.dtInserted < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
+						
+		SET @SQL = @SQL + '
+			GROUP BY S.User_PK;
+
+			CREATE INDEX idxtmp ON #tmp (User_PK);
+			INSERT INTO #tmp
+			SELECT User_PK,0 Coded, COUNT(DISTINCT S.Suspect_PK) Assigned FROM tblSuspect S 
+				INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
+				INNER JOIN tblCoderAssignment PA ON PA.Suspect_PK = S.Suspect_PK
+			WHERE S.IsScanned=1 '
+		IF @User<>0
+			SET @SQL = @SQL + ' AND PA.LastUpdated_User_PK=' + CAST(@User AS VARChar);
+		IF @DateType = 1
+			SET @SQL = @SQL + ' AND DATEPART(wk, PA.LastUpdated_Date) = DATEPART(wk, GETDATE()-7) AND Year(PA.LastUpdated_Date) = Year(GETDATE()-7)'
+		ELSE IF @DateType = 2
+			SET @SQL = @SQL + ' AND DATEPART(wk, PA.LastUpdated_Date) = DATEPART(wk, GETDATE()) AND Year(PA.LastUpdated_Date) = Year(GETDATE())'
+		ELSE IF @DateType = 3
+			SET @SQL = @SQL + ' AND Month(PA.LastUpdated_Date) = Month(GETDATE()) AND Year(PA.LastUpdated_Date) = Year(GETDATE())'
+		ELSE IF @DateType = 4
+			SET @SQL = @SQL + ' AND Month(PA.LastUpdated_Date) = Month(DateAdd(month,-1,getdate())) AND Year(PA.LastUpdated_Date) = Year(DateAdd(month,-1,getdate()))'
+		ELSE IF @DateType = 5
+			SET @SQL = @SQL + ' AND PA.LastUpdated_Date>= '''+ @startDate +''' AND PA.LastUpdated_Date < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
+
+		SET @SQL = @SQL + '					
+			GROUP BY User_PK
+		
+		SELECT ROW_NUMBER() OVER(ORDER BY L.Location) AS RowNumber, L.Location
+			,SUM(Assigned) Assigned, SUM(Coded) Coded, 0 User_PK
+		FROM #tmp T INNER JOIN tblUser U ON U.User_PK = T.User_PK
+			INNER JOIN tblLocation L ON L.Location_PK = U.Location_PK 
+		'
+		IF @location <> 0
+			SET @SQL = @SQL + ' WHERE U.Location_PK=' + CAST(@location AS VARCHAR)
+		SET @SQL = @SQL + ' GROUP BY L.Location_PK,L.Location
+		'		
+	END		
 	
 	EXEC (@SQL);
 END 

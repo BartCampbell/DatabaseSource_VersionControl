@@ -56,7 +56,9 @@ BEGIN
 			RETRY_Suspect: -- Transaction RETRY
 			BEGIN TRANSACTION
 			BEGIN TRY
-				Update tblSuspect SET IsScanned=1, Scanned_Date=GETDATE(), Scanned_User_PK = @user WHERE Suspect_PK=@id
+				DECLARE @ChaseStatusPK AS INT = 1
+				SELECT TOP 1 @ChaseStatusPK = ChaseStatus_PK FROM tblChaseStatus WHERE IsExtracted=1
+				Update tblSuspect SET IsScanned=1, Scanned_Date=GETDATE(), Scanned_User_PK = @user, ChaseStatus_PK=@ChaseStatusPK,IsCNA=0,CNA_Date=NULL,CNA_User_PK=NULL,FollowUp=NULL WHERE Suspect_PK=@id
 				COMMIT TRANSACTION
 			END TRY
 			BEGIN CATCH

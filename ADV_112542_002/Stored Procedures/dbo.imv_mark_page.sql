@@ -34,6 +34,7 @@ BEGIN
 		END
 	END CATCH
 -----------Transaction Starts-------------------
+
 	--Updating Coding Status
 	DECLARE @IsCompleted AS bit
 	IF EXISTS(SELECT 1 FROM tblScannedData SD WITH (NOLOCK) LEFT JOIN tblScannedDataPageStatus SDPS WITH (NOLOCK) ON SD.ScannedData_PK = SDPS.ScannedData_PK AND SDPS.CoderLevel=@level
@@ -60,7 +61,7 @@ BEGIN
 			GOTO RETRY2 -- Go to Label RETRY
 		END
 	END CATCH
-
+/*
 	--To Update tblSuspect with Coded info
 	DECLARE @UpdateSuspectTable AS BIT = 0
 	IF @IsCompleted=1 AND (@ConfigLevels=1 OR @IsBlindCoding=1)	--WHEN there is only one level or Blind is enabled then simply update the tblSuspect. Because any level is completed, we count the chart as coded on main grid
@@ -73,13 +74,18 @@ BEGIN
 		RETRY3: -- Transaction RETRY to Updating Overall Member Status
 		BEGIN TRANSACTION
 		BEGIN TRY
+			DECLARE @ChaseStatusPK AS INT = 1
+			SELECT TOP 1 @ChaseStatusPK = ChaseStatus_PK FROM tblChaseStatus WHERE IsCoded=1
+
 			UPDATE tblSuspect WITH (ROWLOCK) SET 
 			MemberStatus=1,
 			IsCoded=1,
 			Coded_Date= CASE WHEN Coded_User_PK IS NULL THEN GetDate() ELSE Coded_Date END,
 			Coded_User_PK=CASE WHEN Coded_User_PK IS NULL THEN @User_PK ELSE Coded_User_PK END,
 			LastAccessed_Date = GetDate(),
-			LastUpdated = GetDate()
+			LastUpdated = GetDate(),
+			ChaseStatus_PK = @ChaseStatusPK,
+			FollowUp = NULL
 			WHERE SUSPECT_PK=@Suspect_PK
 
 			COMMIT TRANSACTION
@@ -93,5 +99,6 @@ BEGIN
 			END
 		END CATCH
 	END
+*/
 END
 GO

@@ -14,7 +14,7 @@ BEGIN
 	DECLARE @level AS tinyint
 	SELECT @level=CoderLevel FROM tblUser WITH (NOLOCK) WHERE User_PK=@User
 
-	SELECT S.Suspect_PK,M.Member_ID,M.Lastname+', '+M.Firstname MemberName,DOB,S.Scanned_Date,S.Scanned_User_PK
+	SELECT S.Suspect_PK,M.Member_ID,M.Lastname+', '+M.Firstname MemberName,DOB,S.ChaseID,S.Scanned_Date,S.Scanned_User_PK
 	FROM tblMember M INNER JOIN tblSuspect S ON S.Member_PK=M.Member_PK
 	WHERE S.Suspect_PK=@Suspect
 
