@@ -55,15 +55,27 @@ BEGIN
 	RETRY_UpdateChase: -- Transaction RETRY
 	BEGIN TRANSACTION
 	BEGIN TRY
-		UPDATE S SET FollowUp = @FollowDate, ChaseStatus_PK = @ChaseStatusPK, LastContacted=GetDate()
-			,IsCNA=@IsCNA
-			,CNA_User_PK=CASE WHEN @IsCNA=1 THEN @User_PK ELSE NULL END
-			,CNA_Date=CASE WHEN @IsCNA=1 THEN GetDate() ELSE NULL END
-		FROM tblProvider P WITH (NOLOCK)
-			INNER JOIN tblSuspect S WITH (ROWLOCK) ON S.Provider_PK = P.Provider_PK
-			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
-			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
-		WHERE P.ProviderOffice_PK=@office AND S.IsScanned=0 AND S.IsCNA=0 AND @IsContact=1
+		IF (@IsContact=0)
+		BEGIN
+			UPDATE S SET FollowUp = @FollowDate, LastContacted=GetDate()
+			FROM tblProvider P WITH (NOLOCK)
+				INNER JOIN tblSuspect S WITH (ROWLOCK) ON S.Provider_PK = P.Provider_PK
+				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
+			WHERE P.ProviderOffice_PK=@office AND S.IsScanned=0 AND S.IsCNA=0
+		END
+		ELSE
+		BEGIN
+			UPDATE S SET FollowUp = @FollowDate, ChaseStatus_PK = @ChaseStatusPK, LastContacted=GetDate()
+				,IsCNA=@IsCNA
+				,CNA_User_PK=CASE WHEN @IsCNA=1 THEN @User_PK ELSE NULL END
+				,CNA_Date=CASE WHEN @IsCNA=1 THEN GetDate() ELSE NULL END
+			FROM tblProvider P WITH (NOLOCK)
+				INNER JOIN tblSuspect S WITH (ROWLOCK) ON S.Provider_PK = P.Provider_PK
+				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
+			WHERE P.ProviderOffice_PK=@office AND S.IsScanned=0 AND S.IsCNA=0
+		END 
 
 		COMMIT TRANSACTION
 	END TRY
