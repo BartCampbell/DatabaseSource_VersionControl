@@ -14,7 +14,9 @@ CREATE TABLE [dbo].[tblProviderOffice]
 [ProviderOfficeBucket_PK] [smallint] NULL,
 [Pool_PK] [smallint] NULL,
 [AssignedUser_PK] [smallint] NULL,
-[AssignedDate] [smalldatetime] NULL
+[AssignedDate] [smalldatetime] NULL,
+[hasPriorityNote] [bit] NULL,
+[ProviderOfficeSubBucket_PK] [tinyint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblProviderOffice] ADD CONSTRAINT [PK_tblProviderOffice] PRIMARY KEY CLUSTERED  ([ProviderOffice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
@@ -24,4 +26,6 @@ GO
 CREATE NONCLUSTERED INDEX [idxPOPoolPK] ON [dbo].[tblProviderOffice] ([Pool_PK]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [idxPOBucket] ON [dbo].[tblProviderOffice] ([ProviderOfficeBucket_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [idxProviderOffice_ProviderOfficeSubBucket] ON [dbo].[tblProviderOffice] ([ProviderOfficeSubBucket_PK]) ON [PRIMARY]
 GO

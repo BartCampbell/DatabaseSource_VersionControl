@@ -62,7 +62,7 @@ BEGIN
 	--Captured Source
 	SELECT * FROM tblCodedSource WITH (NOLOCK) ORDER BY sortOrder
 	
-	SELECT COUNT(*) FROM tblScannedData WITH (NOLOCK) WHERE Suspect_PK=@Suspect
+	SELECT TOP 1 * FROM tblScannedData WITH (NOLOCK) WHERE Suspect_PK=@Suspect
 	
 	SELECT NoteText_PK FROM tblSuspectNote WITH (NOLOCK) WHERE Suspect_PK = @Suspect
 	SELECT Note_Text FROM tblSuspectNoteText WITH (NOLOCK) WHERE Suspect_PK = @Suspect
