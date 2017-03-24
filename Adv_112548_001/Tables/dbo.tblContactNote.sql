@@ -14,12 +14,12 @@ CREATE TABLE [dbo].[tblContactNote]
 [IsProspective] [bit] NULL,
 [IsDataIssue] [bit] NULL,
 [AllowedAttempts] [tinyint] NULL,
-[ChaseStatus_PK] [int] NULL,
+[ChaseStatus_PK] [tinyint] NULL,
 [IsContact] [bit] NULL,
-[ContactNoteID] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ContactNoteID] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [IsIssueLogResponse] [bit] NULL,
 [ProviderOfficeSubBucket_PK] [tinyint] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[tblContactNote] ADD CONSTRAINT [PK_tblContactNote] PRIMARY KEY CLUSTERED  ([ContactNote_PK]) ON [PRIMARY]
+ALTER TABLE [dbo].[tblContactNote] ADD CONSTRAINT [PK__tblConta__F78ED006D2106B20] PRIMARY KEY CLUSTERED  ([ContactNote_PK]) ON [PRIMARY]
 GO
