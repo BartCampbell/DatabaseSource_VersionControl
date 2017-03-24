@@ -107,6 +107,6 @@ BEGIN
 	INSERT INTO tblChannelLog(Suspect_PK,From_Channel_PK,To_Channel_PK,User_PK,dtUpdate)
 	SELECT S.Suspect_PK,Channel_PK,@ChannelTo,@User,GetDate() FROM #tmpSuspect tS INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Suspect_PK = tS.Suspect_PK WHERE @IsAllCharts=1 OR S.IsScanned=0
 
-	Update S SET Channel_PK = @ChannelTo,FollowUp=GetDate() FROM #tmpSuspect tS INNER JOIN tblSuspect S ON S.Suspect_PK = tS.Suspect_PK WHERE @IsAllCharts=1 OR S.IsScanned=0
+	Update S SET Channel_PK = @ChannelTo,FollowUp=GetDate(),ChaseStatus_PK = CASE WHEN IsScanned=1 OR IsCNA=1 THEN ChaseStatus_PK ELSE 81 END FROM #tmpSuspect tS INNER JOIN tblSuspect S ON S.Suspect_PK = tS.Suspect_PK WHERE @IsAllCharts=1 OR S.IsScanned=0
 END
 GO

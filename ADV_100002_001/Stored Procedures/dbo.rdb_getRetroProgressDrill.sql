@@ -81,12 +81,17 @@ BEGIN
 	DECLARE @Records AS INT = 25
 	IF (@Export=1)
 		SET @Records = 10000000
-
+	;
+	--SELECT * FROM tblScheduleType
+	WITH SCH AS (
+		SELECT DISTINCT ProviderOffice_PK,MAX(Sch_Start) ScheduleDate,MIN(sch_type) ScheduleType_PK FROM tblProviderOfficeSchedule PO WITH (NOLOCK) GROUP BY ProviderOffice_PK
+	)
 	SELECT TOP (@Records)
 		C.Channel_Name Project,PR.Project_Name LOB,
 		S.ChaseID,M.Member_ID,M.HICNumber,M.Lastname+IsNull(', '+M.Firstname,'') Member,
 		PM.Provider_ID [Centauri Provider ID],PM.PIN [Plan Provider ID], PM.Lastname+IsNull(', '+PM.Firstname,'') Provider,PM.ProviderGroup [Group Name],
 		PO.LocationID [Centauri Location ID],S.PlanLID [Plan Location ID],PO.Address,ZC.ZipCode [Zip Code],ZC.City,ZC.State,
+		SCH.ScheduleDate, ST.ScheduleType,
 		S.Scanned_Date Extracted,
 		CASE WHEN S.Scanned_Date IS NULL THEN S.CNA_Date ELSE NULL END CNA,
 		Coded_Date Coded,
@@ -102,7 +107,8 @@ BEGIN
 		INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 		INNER JOIN tblProject PR WITH (NOLOCK) ON PR.Project_PK = S.Project_PK
 		INNER JOIN tblChannel C WITH (NOLOCK) ON C.Channel_PK = S.Channel_PK
---		LEFT JOIN #tmp T ON S.Project_PK = T.Project_PK AND S.Provider_PK = T.Provider_PK
+		LEFT JOIN SCH ON SCH.ProviderOffice_PK = PO.ProviderOffice_PK
+		LEFT JOIN tblScheduleType ST ON ST.ScheduleType_PK = SCH.ScheduleType_PK
 		LEFT JOIN tblChaseStatus CS WITH (NOLOCK) ON CS.ChaseStatus_PK = S.ChaseStatus_PK
 		LEFT JOIN tblZipCode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK
 		WHERE (
