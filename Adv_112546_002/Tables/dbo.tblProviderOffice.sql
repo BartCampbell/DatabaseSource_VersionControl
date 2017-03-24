@@ -14,7 +14,9 @@ CREATE TABLE [dbo].[tblProviderOffice]
 [ProviderOfficeBucket_PK] [smallint] NULL,
 [Pool_PK] [smallint] NULL,
 [AssignedUser_PK] [smallint] NULL,
-[AssignedDate] [smalldatetime] NULL
+[AssignedDate] [smalldatetime] NULL,
+[ProviderOfficeSubBucket_PK] [smallint] NULL,
+[hasPriorityNote] [smallint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblProviderOffice] ADD CONSTRAINT [PK_tblProviderOffice] PRIMARY KEY CLUSTERED  ([ProviderOffice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
