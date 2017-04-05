@@ -1,0 +1,7 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+
+CREATE VIEW [ChartNet].[MeasureResults] AS SELECT * FROM IMITest_QINET_STAGING.[ChartNet].[MeasureResults];
+GO

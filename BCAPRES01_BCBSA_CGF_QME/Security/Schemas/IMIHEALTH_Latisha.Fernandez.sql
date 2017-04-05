@@ -1,0 +1,3 @@
+CREATE SCHEMA [IMIHEALTH\Latisha.Fernandez]
+AUTHORIZATION [IMIHEALTH\Latisha.Fernandez]
+GO

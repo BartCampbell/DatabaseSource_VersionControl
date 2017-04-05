@@ -1,0 +1,6 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+CREATE VIEW [dbo].[LabResult] AS SELECT * FROM [BCBSA_CGF_Staging].[dbo].[LabResult];
+GO

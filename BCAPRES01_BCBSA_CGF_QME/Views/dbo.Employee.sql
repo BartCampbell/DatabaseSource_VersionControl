@@ -1,0 +1,6 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+CREATE VIEW [dbo].[Employee] AS SELECT * FROM [BCBSA_CGF_Staging].[dbo].[Employee];
+GO

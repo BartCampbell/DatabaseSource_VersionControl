@@ -1,0 +1,3 @@
+CREATE SCHEMA [Random]
+AUTHORIZATION [dbo]
+GO
