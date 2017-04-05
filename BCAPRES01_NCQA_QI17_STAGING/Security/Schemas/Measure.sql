@@ -1,0 +1,3 @@
+CREATE SCHEMA [Measure]
+AUTHORIZATION [dbo]
+GO
