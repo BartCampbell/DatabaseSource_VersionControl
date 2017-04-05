@@ -1,0 +1,2 @@
+CREATE SYNONYM [BCBSA].[Provider] FOR [BCBSA_GDIT2017].[Provider]
+GO
