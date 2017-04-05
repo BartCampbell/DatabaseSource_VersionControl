@@ -1,0 +1,3 @@
+CREATE SCHEMA [ProvChase]
+AUTHORIZATION [dbo]
+GO

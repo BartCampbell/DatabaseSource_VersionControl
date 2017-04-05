@@ -1,0 +1,2 @@
+CREATE SYNONYM [RDSM].[Member] FOR [BCBSA_RDSM].[BCBSA_Tst_T100].[Member]
+GO
