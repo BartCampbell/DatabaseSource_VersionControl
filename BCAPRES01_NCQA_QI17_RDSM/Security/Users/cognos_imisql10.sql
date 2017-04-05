@@ -1,0 +1,2 @@
+CREATE USER [cognos_imisql10] WITHOUT LOGIN
+GO
