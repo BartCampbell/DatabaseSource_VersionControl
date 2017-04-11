@@ -105,7 +105,6 @@ BEGIN
 				S.ChaseID,M.Member_ID,M.Lastname+IsNull(', '+M.Firstname,'') Member,
 				PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider,
 				PO.Address,ZC.ZipCode [Zip Code],ZC.City,ZC.State,
-				POB.Bucket [Office Status],
 				T.Sch_Date Scheduled,
 				S.Scanned_Date Extracted,
 				CASE WHEN S.Scanned_Date IS NULL THEN S.CNA_Date ELSE NULL END CNA,
@@ -118,7 +117,6 @@ BEGIN
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 				INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
 				INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
-				LEFT JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON PO.ProviderOfficeBucket_PK = POB.ProviderOfficeBucket_PK
 				LEFT JOIN tblZipCode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK
 				LEFT JOIN #tmp T ON T.Suspect_PK = S.Suspect_PK
 				WHERE (
