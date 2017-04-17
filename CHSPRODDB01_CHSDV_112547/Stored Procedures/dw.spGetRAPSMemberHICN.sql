@@ -15,10 +15,14 @@ AS
 
     SELECT DISTINCT
             h.Member_BK AS CentauriMemberID ,
-		  s.HICNumber
+		  s.HICNumber ,
+		  s.RecordSource ,
+		  c.Client_BK AS CentauriClientID ,
+		  s.LoadDate
     FROM    dbo.H_Member h
             INNER JOIN dbo.L_MemberRAPSResponse l ON l.H_Member_RK = h.H_Member_RK
 		  INNER JOIN dbo.S_MemberHICN s ON s.H_Member_RK = h.H_Member_RK
+		  CROSS JOIN dbo.H_Client c
     WHERE   s.RecordEndDate IS NULL AND s.LoadDate > @LastLoadTime;
 
 GO

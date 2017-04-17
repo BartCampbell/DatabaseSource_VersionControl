@@ -36,14 +36,14 @@ AS
             pvt.ClusterGrouping ,
             a.TransactionDate ,
             a.FileDiagType ,
-            CASE WHEN COALESCE(REPLACE(c.DOBErrorCode, '500', ''),
-                               REPLACE(c.HicErrorCode, '500', ''),
-                               REPLACE(pvt.ErrorA, '500', ''),
-                               REPLACE(pvt.ErrorB, '500', ''), '') <> ''
-                 THEN 0
-                 ELSE 1
-            END AS Accepted,
-		  c.RecordSource AS FileName
+            CASE WHEN REPLACE(c.DOBErrorCode, '500', '') <> ''
+                  OR REPLACE(c.HICErrorCode, '500', '') <> ''
+                  OR REPLACE(pvt.ErrorA, '500', '') <> ''
+                  OR REPLACE(pvt.ErrorB, '500', '') <> '' THEN 0
+             ELSE 1
+        END AS Accepted,
+		  c.RecordSource AS FileName ,
+		  c.LoadDate
     FROM    dbo.S_RAPS_Response_CCC c
             INNER JOIN dbo.S_RAPS_Response_AAA a ON a.H_RAPS_Response_RK = c.H_RAPS_Response_RK
             INNER JOIN dbo.S_RAPS_Response_BBB b ON b.H_RAPS_Response_RK = a.H_RAPS_Response_RK

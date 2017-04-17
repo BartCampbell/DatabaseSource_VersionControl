@@ -9,7 +9,8 @@ CREATE TABLE [dbo].[S_MemberDemo]
 [DOB] [datetime] NULL,
 [HashDiff] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RecordSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[RecordEndDate] [datetime] NULL
+[RecordEndDate] [datetime] NULL,
+[MiddleInitial] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[S_MemberDemo] ADD CONSTRAINT [PK_S_MemberDemo_1] PRIMARY KEY CLUSTERED  ([S_MemberDemo_RK]) ON [PRIMARY]
