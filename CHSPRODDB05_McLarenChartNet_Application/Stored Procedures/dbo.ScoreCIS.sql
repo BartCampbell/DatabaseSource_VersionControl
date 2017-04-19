@@ -18,7 +18,6 @@ GO
 --**************************************************************************************
 --sample execution:
 --exec ScoreAWC '78551528'
-
 CREATE PROCEDURE [dbo].[ScoreCIS] @MemberID int
 AS 
 
@@ -39,54 +38,31 @@ DECLARE @HEDISSubMetricComponent TABLE
  UNIQUE NONCLUSTERED (HEDISSubMetricComponentCode)
 );
 
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('DTP', 'Diphtheria, Tetanus, and Acellular pertussis', 'CISDTP')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('DIPTH', 'Diphtheria', 'CISDTP')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('TET', 'Tetanus', 'CISDTP')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('AP', 'Acellular pertussis', 'CISDTP')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('HEPB', 'Hepatitis B', 'CISHEPB')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('HEPB_Evidence', 'Hepatitis B Evidence', 'CISHEPB')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('VZV', 'VZV', 'CISVZV')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('VZV_Evidence', 'VZV Evidence', 'CISVZV')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('PNEU', 'PNEU', 'CISPNEU')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('IPV', 'IPV', 'CISOPV')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('HIB', 'HIB', 'CISHIB')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('MMR', 'MMR', 'CISMMR')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('MEAS', 'Measles', 'CISMMR')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('MEAS_Evidence', 'Measles Evidence', 'CISMMR')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('MUMPS', 'Mumps', 'CISMMR')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('MUMPS_Evidence', 'Mumps Evidence', 'CISMMR')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('RUB', 'Rubella', 'CISMMR')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('RUB_Evidence', 'Rubella Evidence', 'CISMMR')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('MMR_Evidence', 'MMR Evidence', 'CISMMR')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('HEPA', 'Hepatitis A', 'CISHEPA')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('HEPA_Evidence', 'Hepatitis A Evidence', 'CISHEPA')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('ROTA2', 'Rotavirus 2 Dose', 'CISROTA')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('ROTA3', 'Rotavirus 3 Dose', 'CISROTA')
-INSERT  INTO @HEDISSubMetricComponent
-VALUES  ('INFL', 'Influenza', 'CISINFL')
+INSERT  INTO @HEDISSubMetricComponent VALUES  
+('DTP', 'Diphtheria, Tetanus, and Acellular pertussis', 'CISDTP')
+,('DIPTH', 'Diphtheria', 'CISDTP')
+,('TET', 'Tetanus', 'CISDTP')
+,('AP', 'Acellular pertussis', 'CISDTP')
+,('HEPB', 'Hepatitis B', 'CISHEPB')
+,('HEPB_Evidence', 'Hepatitis B Evidence', 'CISHEPB')
+,('VZV', 'VZV', 'CISVZV')
+,('VZV_Evidence', 'VZV Evidence', 'CISVZV')
+,('PNEU', 'PNEU', 'CISPNEU')
+,('IPV', 'IPV', 'CISOPV')
+,('HIB', 'HIB', 'CISHIB')
+,('MMR', 'MMR', 'CISMMR')
+,('MEAS', 'Measles', 'CISMMR')
+,('MEAS_Evidence', 'Measles Evidence', 'CISMMR')
+,('MUMPS', 'Mumps', 'CISMMR')
+,('MUMPS_Evidence', 'Mumps Evidence', 'CISMMR')
+,('RUB', 'Rubella', 'CISMMR')
+,('RUB_Evidence', 'Rubella Evidence', 'CISMMR')
+,('MMR_Evidence', 'MMR Evidence', 'CISMMR')
+,('HEPA', 'Hepatitis A', 'CISHEPA')
+,('HEPA_Evidence', 'Hepatitis A Evidence', 'CISHEPA')
+,('ROTA2', 'Rotavirus 2 Dose', 'CISROTA')
+,('ROTA3', 'Rotavirus 3 Dose', 'CISROTA')
+,('INFL', 'Influenza', 'CISINFL')
 
 IF @debug = 1 
     SELECT  *
@@ -99,94 +75,52 @@ DECLARE @HEDISSubMetricComponent_ProcCode_xref TABLE
  PRIMARY KEY CLUSTERED (ProcCode, HEDISSubMetricComponentCode)
 );
 
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90698', 'DTP')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90700', 'DTP')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90721', 'DTP')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90723', 'DTP')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90702', 'DIPTH')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90719', 'DIPTH')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90702', 'TET')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90698', 'IPV')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90713', 'IPV')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90723', 'IPV')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90707', 'MMR')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90710', 'MMR')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90708', 'MEAS')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90705', 'MEAS')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90708', 'RUB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90706', 'RUB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90704', 'MUMPS')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90645', 'HIB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90646', 'HIB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90647', 'HIB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90648', 'HIB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90698', 'HIB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90721', 'HIB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90748', 'HIB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90723', 'HEPB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90740', 'HEPB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90744', 'HEPB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90747', 'HEPB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90748', 'HEPB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('G0010', 'HEPB')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('3E0234Z', 'HEPB') --ICD10
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90710', 'VZV')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90716', 'VZV')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90669', 'PNEU')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90670', 'PNEU')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('G0009', 'PNEU')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90633', 'HEPA')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90681', 'ROTA2')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90680', 'ROTA3')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90655', 'INFL')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90657', 'INFL')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90661', 'INFL')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('90662', 'INFL')
-INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref
-VALUES  ('G0008', 'INFL')
+INSERT  INTO @HEDISSubMetricComponent_ProcCode_xref VALUES  
+('90698', 'DTP')
+,('90700', 'DTP')
+,('90721', 'DTP')
+,('90723', 'DTP')
+,('90698', 'IPV')
+,('90713', 'IPV')
+,('90723', 'IPV')
+,('90705', 'MMR')
+,('90707', 'MMR')
+,('90710', 'MMR')
+,('90708', 'MMR')
+,('90704', 'MMR')
+,('90706', 'MMR')
+,('90644', 'HIB')
+,('90645', 'HIB')
+,('90646', 'HIB')
+,('90647', 'HIB')
+,('90648', 'HIB')
+,('90698', 'HIB')
+,('90721', 'HIB')
+,('90748', 'HIB')
+,('90723', 'HEPB')
+,('90740', 'HEPB')
+,('90744', 'HEPB')
+,('90747', 'HEPB')
+,('90748', 'HEPB')
+,('G0010', 'HEPB')
+,('3E0234Z', 'HEPB')
+,('99.55', 'HEPB')
+,('90710', 'VZV')
+,('90716', 'VZV')
+,('90669', 'PNEU')
+,('90670', 'PNEU')
+,('G0009', 'PNEU')
+,('90633', 'HEPA')
+,('90681', 'ROTA2')
+,('90680', 'ROTA3')
+,('90655', 'INFL')
+,('90657', 'INFL')
+,('90661', 'INFL')
+,('90662', 'INFL')
+,('90673', 'INFL')
+,('90685', 'INFL')
+,('90687', 'INFL')
+,('G0008', 'INFL')
 
 IF @debug = 1 
     SELECT  *
@@ -200,34 +134,20 @@ DECLARE @HEDISSubMetricComponent_DiagCode3_xref TABLE
  PRIMARY KEY CLUSTERED (HEDISSubMetricComponentCode, DiagCode3)
 )
 
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('055', 'MEAS') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('B05', 'MEAS') --ICD10
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('072', 'MUMPS') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('B26', 'MUMPS') --ICD10
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('056', 'RUB') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('B06', 'RUB') --ICD10
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('B19', 'HEPB') --ICD10
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('Z22', 'HEPB') --ICD10
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('V02', 'HEPB') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('B15', 'HEPA') --ICD10
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('052', 'VZV') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('053', 'VZV') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('B01', 'VZV') --ICD10
-INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref
-VALUES  ('B02', 'VZV') --ICD10
+INSERT  INTO @HEDISSubMetricComponent_DiagCode3_xref VALUES  
+('B15', 'HEPA')
+,('B16', 'HEPB')
+,('B17', 'HEPB')
+,('B18', 'HEPB')
+,('B19', 'HEPB')
+,('Z22', 'HEPB')
+,('B05', 'MMR')
+,('B06', 'MMR')
+,('B26', 'MMR')
+,('B01', 'VZV')
+,('B02', 'VZV')
+
+
 
 IF @debug = 1 
     SELECT  *
@@ -240,14 +160,42 @@ DECLARE @HEDISSubMetricComponent_DiagCode5_xref TABLE
  PRIMARY KEY CLUSTERED (HEDISSubMetricComponentCode, DiagCode5)
 )
 
-INSERT  INTO @HEDISSubMetricComponent_DiagCode5_xref
-VALUES  ('070.2', 'HEPB') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_DiagCode5_xref
-VALUES  ('070.3', 'HEPB') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_DiagCode5_xref
-VALUES  ('070.0', 'HEPA') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_DiagCode5_xref
-VALUES  ('070.1', 'VZV') --ICD9
+INSERT  INTO @HEDISSubMetricComponent_DiagCode5_xref VALUES  
+('070.0', 'HEPA')
+,('070.1', 'HEPA')
+,('070.2', 'HEPB')
+,('070.3', 'HEPB')
+,('V02.6', 'HEPB')
+,('055.0', 'MMR')
+,('055.1', 'MMR')
+,('055.2', 'MMR')
+,('055.7', 'MMR')
+,('055.8', 'MMR')
+,('055.9', 'MMR')
+,('056.0', 'MMR')
+,('056.7', 'MMR')
+,('056.8', 'MMR')
+,('056.9', 'MMR')
+,('072.0', 'MMR')
+,('072.1', 'MMR')
+,('072.2', 'MMR')
+,('072.3', 'MMR')
+,('072.7', 'MMR')
+,('072.8', 'MMR')
+,('072.9', 'MMR')
+,('052.0', 'VZV')
+,('052.1', 'VZV')
+,('052.2', 'VZV')
+,('052.7', 'VZV')
+,('052.8', 'VZV')
+,('052.9', 'VZV')
+,('053.0', 'VZV')
+,('053.1', 'VZV')
+,('053.2', 'VZV')
+,('053.7', 'VZV')
+,('053.8', 'VZV')
+,('053.9', 'VZV')
+
 
 IF @debug = 1 
     SELECT  *
@@ -261,26 +209,9 @@ DECLARE @HEDISSubMetricComponent_ICD9Proc_xref TABLE
  PRIMARY KEY CLUSTERED (HEDISSubMetricComponentCode, ICD9Proc)
 )
 
-INSERT  INTO @HEDISSubMetricComponent_ICD9Proc_xref
-VALUES  ('99.39', 'DTP') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_ICD9Proc_xref
-VALUES  ('99.36', 'DIPTH') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_ICD9Proc_xref
-VALUES  ('99.38', 'TET') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_ICD9Proc_xref
-VALUES  ('99.41', 'IPV') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_ICD9Proc_xref
-VALUES  ('99.48', 'MMR') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_ICD9Proc_xref
-VALUES  ('99.45', 'MEAS') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_ICD9Proc_xref
-VALUES  ('99.46', 'MUMPS') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_ICD9Proc_xref
-VALUES  ('99.47', 'RUB') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_ICD9Proc_xref
-VALUES  ('99.52', 'INFL') --ICD9
-INSERT  INTO @HEDISSubMetricComponent_ICD9Proc_xref
-VALUES  ('3E0234Z', 'HEPB') --ICD10
+INSERT  INTO @HEDISSubMetricComponent_ICD9Proc_xref VALUES  
+('3E0234Z', 'HEPB')
+,('99.55', 'HEPB')
 
 
 IF @debug = 1 
@@ -2524,11 +2455,4 @@ IF OBJECT_ID('tempdb..#SubMetricRuleComponents') is not null
 IF OBJECT_ID('tempdb..#SubMetricRuleComponentsTotal') is not null
     DROP TABLE #SubMetricRuleComponentsTotal
 
-
-
-
-
-
-GO
-GRANT EXECUTE ON  [dbo].[ScoreCIS] TO [Support]
 GO
