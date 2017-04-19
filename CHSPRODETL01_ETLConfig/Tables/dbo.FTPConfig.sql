@@ -14,7 +14,8 @@ CREATE TABLE [dbo].[FTPConfig]
 [AdvanceIntakeDumpDir] [varchar] (1000) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ClientID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [IsExternal] [int] NOT NULL,
-[UseSubFolder] [int] NOT NULL CONSTRAINT [DF__FTPConfig__UseSu__7C6F7215] DEFAULT ((0))
+[UseSubFolder] [int] NOT NULL CONSTRAINT [DF__FTPConfig__SubFo__004002F9] DEFAULT ((0)),
+[AppendName] [int] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[FTPConfig] ADD CONSTRAINT [PK_FTPConfig] PRIMARY KEY CLUSTERED  ([FTPConfigID]) ON [PRIMARY]

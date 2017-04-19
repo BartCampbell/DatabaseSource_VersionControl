@@ -8,7 +8,9 @@ CREATE TABLE [dbo].[FTPExternalOutboundParameters]
 [ConnectType] [int] NULL,
 [PORT] [int] NULL,
 [SubFolder] [varchar] (150) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CreatedDate] [datetime] NULL CONSTRAINT [DF__FTPExtern__Creat__74CE504D] DEFAULT (getdate())
+[CreatedDate] [datetime] NULL CONSTRAINT [DF__FTPExtern__Creat__7B7B4DDC] DEFAULT (getdate()),
+[MAXSSL] [int] NULL,
+[SSL] [int] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[FTPExternalOutboundParameters] ADD CONSTRAINT [PK_FTPEOutboundID] PRIMARY KEY CLUSTERED  ([FTPEOutboundID]) ON [PRIMARY]
