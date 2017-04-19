@@ -22,15 +22,15 @@ BEGIN
 		ORDER BY 
 			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'UN' THEN Username WHEN 'NAME' THEN Lastname+', '+Firstname WHEN 'EMAIL' THEN Email_Address ELSE NULL END END ASC,
 			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'UN' THEN Username WHEN 'NAME' THEN Lastname+', '+Firstname WHEN 'EMAIL' THEN Email_Address ELSE NULL END END DESC,
-			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'AC' THEN IsActive WHEN 'C' THEN IsClient WHEN 'A' THEN IsAdmin WHEN 'ST' THEN IsScanTech WHEN 'S' THEN IsScheduler WHEN 'R' THEN IsReviewer WHEN 'QA' THEN IsQA WHEN 'HRA' THEN IsHRA ELSE NULL END END ASC,
-			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'AC' THEN IsActive WHEN 'C' THEN IsClient WHEN 'A' THEN IsAdmin WHEN 'ST' THEN IsScanTech WHEN 'S' THEN IsScheduler WHEN 'R' THEN IsReviewer WHEN 'QA' THEN IsQA WHEN 'HRA' THEN IsHRA ELSE NULL END END DESC
+			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'AC' THEN IsActive WHEN 'C' THEN IsClient WHEN 'A' THEN IsAdmin WHEN 'ST' THEN IsScanTech WHEN 'S' THEN IsScheduler WHEN 'R' THEN IsCoderOffsite WHEN 'QA' THEN IsQACoder WHEN 'HRA' THEN IsHRA ELSE NULL END END ASC,
+			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'AC' THEN IsActive WHEN 'C' THEN IsClient WHEN 'A' THEN IsAdmin WHEN 'ST' THEN IsScanTech WHEN 'S' THEN IsScheduler WHEN 'R' THEN IsCoderOffsite WHEN 'QA' THEN IsQACoder WHEN 'HRA' THEN IsHRA ELSE NULL END END DESC
 		) AS RowNumber
-			,User_PK,IsActive,Username,Lastname+', '+Firstname Fullname,Email_Address,IsClient,IsAdmin,IsScanTech,IsScheduler,IsReviewer,IsQA,IsHRA 
+			,User_PK,IsActive,Username,Lastname+', '+Firstname Fullname,Email_Address,IsClient,IsAdmin,IsScanTech,IsScheduler,IsCoderOffsite,IsQACoder,IsHRA 
 			,only_work_selected_hours, only_work_selected_zipcodes
 			,linked_provider_id,IsNull(linked_provider_pk,0) linked_provider_pk
 			,sch_name,sch_tel,sch_fax
 			,isScanTechSV, isSchedulerSV,IsChangePasswordOnFirstLogin,IsNull(Location_PK,0) Location_PK, isQCC, isAllowDownload, IsSchedulerManager
-			,IsInvoiceAccountant, IsBillingAccountant, IsManagementUser, IsCoderOnsite
+			,IsInvoiceAccountant, IsBillingAccountant, IsQAManager, IsCoderOnsite,IsCodingManager
 		FROM tblUser
 		WHERE Username Like @Alpha+'%'
 		AND (

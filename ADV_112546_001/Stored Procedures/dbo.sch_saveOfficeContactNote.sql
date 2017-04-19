@@ -46,36 +46,35 @@ BEGIN
 	DECLARE @ProviderOfficeSubBucketPK AS TINYINT
 	SELECT @ContactNote_Text=ContactNote_Text, @IsCNA=IsCNA, @FollowupDays=Followup_days, @IsIssue=IsIssue, @IsDataIssue=IsDataIssue, @IsCopyCenter=IsCopyCenter, @IsContact=IsContact, @ChaseStatusPK=ChaseStatus_PK, @ProviderOfficeSubBucketPK=ProviderOfficeSubBucket_PK FROM tblContactNote WHERE ContactNote_PK=@note
 
-	IF (@IsIssue=1 OR @IsDataIssue=1 OR @IsCopyCenter=1 OR @IsCNA=1 OR @FollowupDays=0)
+	DECLARE @IsFollowUp AS BIT = 0
+	IF (@IsIssue=1 OR @IsDataIssue=1 OR @IsCNA=1)
+	BEGIN
 		SET @FollowDate = NULL
-	ELSE
+		SET @IsFollowUp = 1
+	END
+	ELSE IF (@FollowupDays>0)
+	BEGIN
 		SET @FollowDate = DATEADD(day,@FollowupDays,GETDATE())
+		SET @IsFollowUp = 1
+	END
 
 -----------Transaction Starts-------------------
 	RETRY_UpdateChase: -- Transaction RETRY
 	BEGIN TRANSACTION
 	BEGIN TRY
-		IF (@IsContact=0)
-		BEGIN
-			UPDATE S SET FollowUp = @FollowDate, LastContacted=GetDate()
-			FROM tblProvider P WITH (NOLOCK)
-				INNER JOIN tblSuspect S WITH (ROWLOCK) ON S.Provider_PK = P.Provider_PK
-				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
-				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
-			WHERE P.ProviderOffice_PK=@office AND S.IsScanned=0 AND S.IsCNA=0
-		END
-		ELSE
-		BEGIN
-			UPDATE S SET FollowUp = @FollowDate, ChaseStatus_PK = @ChaseStatusPK, LastContacted=GetDate()
-				,IsCNA=@IsCNA
-				,CNA_User_PK=CASE WHEN @IsCNA=1 THEN @User_PK ELSE NULL END
-				,CNA_Date=CASE WHEN @IsCNA=1 THEN GetDate() ELSE NULL END
-			FROM tblProvider P WITH (NOLOCK)
-				INNER JOIN tblSuspect S WITH (ROWLOCK) ON S.Provider_PK = P.Provider_PK
-				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
-				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
-			WHERE P.ProviderOffice_PK=@office AND S.IsScanned=0 AND S.IsCNA=0
-		END 
+		UPDATE S SET FollowUp = CASE WHEN @IsFollowUp=0 THEN FollowUp ELSE @FollowDate END, 
+			LastContacted=CASE WHEN @IsContact=0 THEN LastContacted ELSE GetDate() END
+			,IsCNA=@IsCNA
+			,CNA_User_PK=CASE WHEN @IsCNA=1 THEN @User_PK ELSE NULL END
+			,CNA_Date=CASE WHEN @IsCNA=1 THEN GetDate() ELSE NULL END
+		FROM tblProvider P WITH (NOLOCK)
+			INNER JOIN tblSuspect S WITH (ROWLOCK) ON S.Provider_PK = P.Provider_PK
+			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
+			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
+		WHERE P.ProviderOffice_PK=@office AND S.IsScanned=0 AND S.IsCNA=0
+
+		IF (@ChaseStatusPK IS NOT NULL)
+			EXEC cnm_updateChaseStatus @Channel=0 , @Projects=0 , @ProjectGroup=0 , @Status1=0 , @Status2=0 , @updateType='o' , @IDs=@office , @User=@User_PK , @ChaseStatus=@ChaseStatusPK
 
 		COMMIT TRANSACTION
 	END TRY
