@@ -336,6 +336,49 @@ BEGIN
 
 	SELECT @CountSource AS [Source File Count], @CountDestination AS [Destination File Count];
 	EXEC ('SELECT CreatedDate, [FileName], Name, OriginalPath, [Path], Size FROM ' + @DestinationTable + ' WHERE (CreatedDate IN (SELECT MAX(CreatedDate) FROM ' + @DestinationTable + '));');
+
+
+	/******************************************************
+		Unsupported File Email
+
+	******************************************************/
+
+	IF OBJECT_ID('tempdb..#UnsupportedFiles') IS NOT NULL	
+	DROP TABLE #UnsupportedFiles;
+
+	CREATE TABLE #UnsupportedFiles
+	(
+		FileName VARCHAR(1000)
+		,Depth INT
+		,IsFile INT
+	)
+
+	INSERT INTO #UnsupportedFiles (FileName, DeptH, IsFile)
+	EXEC xp_dirtree @SourcePath, 1, 1
+
+	DECLARE @tableHTML  NVARCHAR(MAX) ;  
+	SET @tableHTML =  
+		N'<H1>ChartNet: Import Chart Images</H1>' + 
+		N'<table border="1">' +  
+		N'<tr><th>Unsupported Files</th>'  +
+		CAST ( ( SELECT td = FileName, ''
+				  FROM  #UnsupportedFiles
+				  FOR XML PATH('tr'), TYPE   
+		) AS NVARCHAR(MAX) ) + 
+		N'</table>' ;  
+  
+	IF EXISTS (SELECT TOP 1 1 FROM #UnsupportedFiles)
+	EXEC msdb.dbo.sp_send_dbmail 
+		@profile_name = 'CHSMail',  
+		@recipients = 'Gina.Frank@centaurihs.com', 
+		@copy_recipients = 'Michael.Wu@Centaurihs.com',   
+		@subject = 'Import Chart Images: Unsupported Files: MNCM ',  
+		@body = @tableHTML,  
+		@body_format = 'HTML' ;  
+
+	/******************************************************/
+
+
 END
 
 
