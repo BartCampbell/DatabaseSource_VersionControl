@@ -68,11 +68,11 @@ BEGIN
 
 	--Office location is scheduled for total xx charts. 31 charts recieved correctly. 10 charts recieved incomplete. 5 charts invoices recieved
 	SELECT COUNT(DISTINCT S.Suspect_PK) Charts
-		,COUNT(DISTINCT CASE WHEN Scanned_Date IS NOT NULL OR ChartRec_Date IS NOT NULL THEN S.Suspect_PK ELSE NULL END) ChartRec
-		,COUNT(DISTINCT CASE WHEN Scanned_Date IS NULL AND InvoiceRec_Date IS NULL AND ChartRec_Date IS NULL AND ChartRec_InComp_Date IS NOT NULL THEN S.Suspect_PK ELSE NULL END) ChartRec_InComp
-		,COUNT(DISTINCT CASE WHEN Scanned_Date IS NULL AND ChartRec_Date IS NULL AND InvoiceRec_Date IS NOT NULL THEN S.Suspect_PK ELSE NULL END) InvoiceRec
-		,COUNT(DISTINCT CASE WHEN Scanned_Date IS NULL AND InvoiceRec_Date IS NULL AND ChartRec_Date IS NULL AND IsCNA=1 THEN S.Suspect_PK ELSE NULL END) CNA
-		,COUNT(DISTINCT CASE WHEN Scanned_Date IS NULL AND S.CNA_Date IS NULL THEN S.Suspect_PK ELSE NULL END) Remaining
+		,COUNT(DISTINCT CASE WHEN IsScanned=1 OR ChartRec_Date IS NOT NULL THEN S.Suspect_PK ELSE NULL END) ChartRec
+		,COUNT(DISTINCT CASE WHEN IsScanned=0 AND InvoiceRec_Date IS NULL AND ChartRec_Date IS NULL AND ChartRec_InComp_Date IS NOT NULL THEN S.Suspect_PK ELSE NULL END) ChartRec_InComp
+		,COUNT(DISTINCT CASE WHEN ChartRec_Date IS NULL AND InvoiceRec_Date IS NOT NULL AND IsCNA=0 AND IsScanned=0 AND IsCoded=0 THEN S.Suspect_PK ELSE NULL END) InvoiceRec
+		,COUNT(DISTINCT CASE WHEN IsCNA=1 AND IsScanned=0 AND IsCoded=0 THEN S.Suspect_PK ELSE NULL END) CNA
+		,COUNT(DISTINCT CASE WHEN IsCNA=0 AND IsScanned=0 AND IsCoded=0 THEN S.Suspect_PK ELSE NULL END) Remaining
 	FROM tblProvider P
 		INNER JOIN tblSuspect S ON S.Provider_PK = P.Provider_PK 
 		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK

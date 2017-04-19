@@ -58,15 +58,16 @@ BEGIN
 	CREATE TABLE #tmp(Project_PK [int] NOT NULL,Provider_PK bigint NOT NULL,Sch_Date DateTime)
 	--PRINT 'INSERT INTO #tmp'
 	INSERT INTO #tmp
-	SELECT DISTINCT S.Project_PK,S.Provider_PK,MIN(IsNull(PO.LastUpdated_Date,S.Scanned_Date)) Sch_Date	
+	SELECT DISTINCT 0 Project_PK,S.Provider_PK,MIN(IsNull(PO.LastUpdated_Date,S.Scanned_Date)) Sch_Date	
 	FROM tblSuspect S WITH (NOLOCK)
+			INNER JOIN tblChaseStatus CS ON CS.ChaseStatus_PK = S.ChaseStatus_PK
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
-			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
-	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL)
-	GROUP BY S.Project_PK,S.Provider_PK
+			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK --AND S.Project_PK = PO.Project_PK
+	WHERE (CS.IsScheduled=1 OR S.Scanned_Date IS NOT NULL)
+	GROUP BY S.Provider_PK --S.Project_PK,
 	CREATE CLUSTERED INDEX  idxTProjectPK ON #tmp (Project_PK,Provider_PK)
 
 	--Print '--BURN DOWN'
@@ -77,7 +78,7 @@ BEGIN
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
-			LEFT JOIN #tmp T ON S.Project_PK = T.Project_PK AND S.Provider_PK = T.Provider_PK	
+			LEFT JOIN #tmp T ON S.Provider_PK = T.Provider_PK	--S.Project_PK = T.Project_PK AND 
 		WHERE T.Sch_Date IS NOT NULL
 		GROUP BY Year(T.Sch_Date),DATEPART(WK,T.Sch_Date)
 		UNION
@@ -86,7 +87,7 @@ BEGIN
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
-			INNER JOIN #tmp T ON S.Project_PK = T.Project_PK AND S.Provider_PK = T.Provider_PK
+			INNER JOIN #tmp T ON S.Provider_PK = T.Provider_PK --S.Project_PK = T.Project_PK AND 
 		WHERE Scanned_Date IS NOT NULL
 		GROUP BY Year(Scanned_Date),DATEPART(WK,Scanned_Date)
 		UNION
@@ -95,7 +96,7 @@ BEGIN
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
-			INNER JOIN #tmp T ON S.Project_PK = T.Project_PK AND S.Provider_PK = T.Provider_PK
+			INNER JOIN #tmp T ON S.Provider_PK = T.Provider_PK -- S.Project_PK = T.Project_PK AND 
 		WHERE Coded_Date IS NOT NULL
 		GROUP BY Year(Coded_Date),DATEPART(WK,Coded_Date)
 		UNION

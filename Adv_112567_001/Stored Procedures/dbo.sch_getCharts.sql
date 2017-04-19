@@ -84,17 +84,17 @@ BEGIN
             SET @SQL = @SQL + ' WHERE P.ProviderOffice_PK=' + CAST(@office AS VARCHAR);
 
             if (@drill_type = 1) --Chart Rec
-                SET @SQL = @SQL + ' AND (Scanned_Date IS NOT NULL OR ChartRec_Date IS NOT NULL)'
+                SET @SQL = @SQL + ' AND (S.IsScanned=1 OR ChartRec_Date IS NOT NULL)'
             else if (@drill_type = 2) --ChartRec_InComp
-                SET @SQL = @SQL + ' AND (Scanned_Date IS NULL AND InvoiceRec_Date IS NULL AND ChartRec_Date IS NULL AND ChartRec_InComp_Date IS NOT NULL)';
+                SET @SQL = @SQL + ' AND (S.IsScanned=0 AND InvoiceRec_Date IS NULL AND ChartRec_Date IS NULL AND ChartRec_InComp_Date IS NOT NULL)';
             else if (@drill_type = 3) --Invoice Rec
-                SET @SQL = @SQL + ' AND (Scanned_Date IS NULL AND ChartRec_Date IS NULL AND InvoiceRec_Date IS NOT NULL)';
+                SET @SQL = @SQL + ' AND (ChartRec_Date IS NULL AND InvoiceRec_Date IS NOT NULL AND S.IsCNA=0 AND S.IsScanned=0 AND S.IsCoded=0)';
             else if (@drill_type = 4) --CNA
-                SET @SQL = @SQL + ' AND (Scanned_Date IS NULL AND InvoiceRec_Date IS NULL AND ChartRec_Date IS NULL AND S.IsCNA=1)';
+                SET @SQL = @SQL + ' AND (S.IsCNA=1 AND S.IsScanned=0 AND S.IsCoded=0)';
             else if (@drill_type = 5) --Remaining
-                SET @SQL = @SQL + ' AND (Scanned_Date IS NULL AND S.CNA_Date IS NULL)';
+                SET @SQL = @SQL + ' AND (S.IsCNA=0 AND S.IsScanned=0 AND S.IsCoded=0)';
 			else if (@drill_type = 6) --ISSUE
-				SET @SQL = @SQL + ' AND CS.ProviderOfficeBucket_PK=5 AND (PO.ProviderOfficeSubBucket_PK IS NULL OR PO.ProviderOfficeSubBucket_PK<>3) AND S.IsCNA=0 AND S.IsScanned=0';
+				SET @SQL = @SQL + ' AND CS.ProviderOfficeBucket_PK=5 AND (PO.ProviderOfficeSubBucket_PK IS NULL OR PO.ProviderOfficeSubBucket_PK<>3) AND S.IsCNA=0 AND S.IsScanned=0 AND S.IsCoded=0';
 
 		EXEC  (@SQL)
 END
