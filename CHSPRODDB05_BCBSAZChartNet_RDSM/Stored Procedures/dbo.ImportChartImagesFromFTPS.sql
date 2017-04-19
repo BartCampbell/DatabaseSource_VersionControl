@@ -376,7 +376,8 @@ BEGIN
 	IF EXISTS (SELECT TOP 1 1 FROM #UnsupportedFiles)
 	EXEC msdb.dbo.sp_send_dbmail 
 		@profile_name = 'CHSMail',  
-		@recipients = 'Michael.Wu@Centaurihs.com',  
+		@recipients = 'Michelle.Piccininni@centaurihs.com', 
+		@copy_recipients = 'Michael.Wu@Centaurihs.com', 
 		@subject = 'Import Chart Images: Unsupported Files: BCBSAZ ',  
 		@body = @tableHTML,  
 		@body_format = 'HTML' ;  

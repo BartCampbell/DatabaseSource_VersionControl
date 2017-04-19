@@ -50,7 +50,7 @@ BEGIN
 
 	UPDATE dbo.ChartImageFileImport
 	SET Xref = 'ERROR'
-	WHERE SUBSTRING(Xref, 1, 5) NOT LIKE '[A-Z][A-Z][A-Z]-[0-9]';
+	WHERE SUBSTRING(Xref, 1, 5) NOT LIKE '[A-Z][A-Z,0-9][A-Z,0-9]-[0-9]';
 
 /**	
 -------Legacy Code Pre 20170315---------
@@ -135,8 +135,9 @@ BEGIN
 	IF EXISTS (SELECT TOP 1 1 FROM dbo.ChartImageFileImport WHERE XREF = 'ERROR' AND ISNULL(ErrorEmailSent, 0) = 0)
 	EXEC msdb.dbo.sp_send_dbmail 
 		@profile_name = 'CHSMail',  
-		@recipients = 'Michael.Wu@Centaurihs.com',  
-		@subject = 'Import Chart Images: Naming Convention Issues: McLaren ',  
+		@recipients = 'Michelle.Piccininni@centaurihs.com', 
+		@copy_recipients = 'Michael.Wu@Centaurihs.com', 
+		@subject = 'Import Chart Images: Naming Convention Issues: BCBSAZ ',  
 		@body = @tableHTML,  
 		@body_format = 'HTML' ;  
 
