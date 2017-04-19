@@ -23,7 +23,8 @@ AS
     
         MERGE INTO fact.RAPSResponse AS t
         USING
-            ( SELECT    r.FileID ,
+            ( SELECT    DISTINCT
+		              r.FileID ,
                         r.SeqNo ,
                         c.ClientID ,
                         m.MemberID ,
