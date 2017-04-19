@@ -5,7 +5,7 @@ GO
 /* Sample Executions
 rdb_retroValidation 0,1,0
 */
-CREATE PROCEDURE [dbo].[rdb_retroValidation]
+Create PROCEDURE [dbo].[rdb_retroValidation]
 	@Channel VARCHAR(1000),
 	@Projects varchar(1000),
 	@ProjectGroup varchar(1000),
@@ -61,6 +61,7 @@ BEGIN
 		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 		INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
+	WHERE (CD.Is_Deleted IS NULL OR CD.Is_Deleted=0)
 	GROUP BY NT.NoteType_PK,NT.NoteType ORDER BY NT.NoteType
 
 	--Validation Status
@@ -72,6 +73,7 @@ BEGIN
 		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK	
 		INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
+	WHERE (CD.Is_Deleted IS NULL OR CD.Is_Deleted=0)
 	GROUP BY NTy.NoteType,NT.NoteText_PK,NT.NoteText ORDER BY NTy.NoteType DESC,Diags DESC
 END
 GO

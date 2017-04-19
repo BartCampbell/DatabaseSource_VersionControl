@@ -87,6 +87,7 @@ BEGIN
 			(@DrillType=0 AND CD.CodedSource_PK=@ID)
 				OR (@DrillType=1 AND CDN.NoteText_PK=@ID)
 				)
+				AND (CD.Is_Deleted IS NULL OR CD.Is_Deleted=0)
 	)
 	SELECT * FROM tbl WHERE [#]<=25 OR @Export=1 ORDER BY [#]
 	/*
