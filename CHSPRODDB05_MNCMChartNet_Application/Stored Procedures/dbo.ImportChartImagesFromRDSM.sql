@@ -6,7 +6,8 @@ GO
 -- =============================================
 -- Author:		Kriz, Mike
 -- Create date: 9/10/2012
--- adding Adstraction status change 3/11/2017 Paul Johnson
+-- 03/11/2017 Paul Johnson adding Adstraction status change 
+-- 04/7/2017 Michael Wu add archive to stop charts deleted on the front end from reloading.
 -- Description:	Imports chart images from RDSM.
 -- =============================================
 CREATE PROCEDURE [dbo].[ImportChartImagesFromRDSM]
@@ -32,7 +33,6 @@ BEGIN
 	WHERE	(CIFI.Xref IS NOT NULL) AND
 			(RVCI.PursuitEventChartImageID IS NULL) AND
 			(CIFI.Ignore = 0);
-
     
     INSERT INTO dbo.PursuitEventChartImage
 			(PursuitEventID,
@@ -63,19 +63,54 @@ BEGIN
 			LEFT OUTER JOIN dbo.PursuitEventChartImage AS NC --NameCheck
 					ON RV.PursuitEventID = RVCI.PursuitEventID AND
 						CIFI.Name = RVCI.ImageName
+			LEFT JOIN dbo.PursuitEventChartImageArchive ARC --Check Archive for previous load. Only loads if it has never been loaded previously 
+					ON CIFI.Name = ARC.ImageName 
+					AND CIFI.FileData = ARC.ImageData
 	WHERE	(CIFI.Xref IS NOT NULL) AND
 			(RVCI.PursuitEventChartImageID IS NULL) AND
-			(CIFI.Ignore = 0);
-   
-   --Added 03/11/2017
-		UPDATE	RV
-		SET		AbstractionStatusID = 30
-		FROM	dbo.PursuitEvent AS RV
-				INNER JOIN  #pur CI ON CI.PursuitEventID = RV.PursuitEventID
-		WHERE 	RV.AbstractionStatusID <30   
-	
+			(CIFI.Ignore = 0) AND
+			(ARC.ImageName IS NULL);
 
+	--Added 03/11/2017
+	UPDATE	RV
+	SET		AbstractionStatusID = 30
+	FROM	dbo.PursuitEvent AS RV
+			INNER JOIN  #pur CI ON CI.PursuitEventID = RV.PursuitEventID
+	WHERE 	RV.AbstractionStatusID <30   
+    
+	/*Insert new records into Archive*/
+	SET IDENTITY_INSERT [dbo].[PursuitEventChartImageArchive] ON
+
+	INSERT INTO [dbo].[PursuitEventChartImageArchive] ([PursuitEventChartImageID]
+      ,[PursuitEventID]
+      ,[ImageOrdinal]
+      ,[ImageName]
+      ,[MimeType]
+      ,[ImageData]
+      ,[AnnotationContent]
+      ,[AnnotationData]
+      ,[CreatedDate]
+      ,[CreatedUser]
+      ,[LastChangedDate]
+      ,[LastChangedUser])
+	SELECT a.[PursuitEventChartImageID]
+		  ,a.[PursuitEventID]
+		  ,a.[ImageOrdinal]
+		  ,a.[ImageName]
+		  ,a.[MimeType]
+		  ,a.[ImageData]
+		  ,a.[AnnotationContent]
+		  ,a.[AnnotationData]
+		  ,a.[CreatedDate]
+		  ,a.[CreatedUser]
+		  ,a.[LastChangedDate]
+		  ,a.[LastChangedUser]
+	FROM [dbo].[PursuitEventChartImage] a
+	LEFT JOIN [dbo].[PursuitEventChartImageArchive]  b
+		ON a.PursuitEventChartImageID = b.PursuitEventChartImageID
+	WHERE b.PursuitEventChartImageID IS NULL
+
+	SET IDENTITY_INSERT [dbo].[PursuitEventChartImageArchive] OFF
 
 END
-
 GO
