@@ -76,8 +76,8 @@ BEGIN
 			(@search_filter=102 AND IsNull(SLC.IsCompleted,0)=0) OR
 			(@search_filter=103 AND S.IsScanned=1) OR
 			(@search_filter=104 AND S.IsScanned=0) OR
-			(@search_filter=105 AND SLC.IsCompleted=0) OR
-			SLC.CompletionStatus_PK=@search_filter
+			(@search_filter=105 AND SLC.IsCompleted=0 AND S.IsScanned=1) OR
+			(SLC.CompletionStatus_PK=@search_filter AND S.IsScanned=1)
 		) 
 		AND
 			(

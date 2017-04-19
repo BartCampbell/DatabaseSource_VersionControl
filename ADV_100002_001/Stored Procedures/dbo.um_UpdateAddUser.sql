@@ -2,7 +2,6 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-
 -- =============================================
 -- Author:		Sajid Ali
 -- Create date: Mar-12-2014
@@ -19,7 +18,7 @@ CREATE PROCEDURE [dbo].[um_UpdateAddUser]
 	@isScanTech bit, 
 	@isScheduler bit, 
 	@isCoder bit, 
-	@isQA bit, 
+	@IsQACoder bit, 
 	@isHRA bit, 
 	@isQCC bit, 
 	@isAdmin bit, 
@@ -42,7 +41,8 @@ CREATE PROCEDURE [dbo].[um_UpdateAddUser]
 	@IsSchedulerManager bit,
 	@IsInvoiceAccountant bit,
 	@IsBillingAccountant bit,
-	@IsManagementUser bit,
+	@IsQAManager bit,
+	@IsCodingManager bit,
 	@IsCoderOnsite bit
 AS
 BEGIN
@@ -89,21 +89,21 @@ BEGIN
 			
 	IF (@id=0)
 	BEGIN
-		INSERT INTO tblUser(Username,[Password],Lastname,Firstname,Email_Address,IsClient,IsAdmin,IsScanTech,IsScheduler,IsReviewer,IsQA,IsHRA,isQCC,IsActive,only_work_selected_hours,only_work_selected_zipcodes,linked_provider_id,linked_provider_pk,sch_name,sch_tel,sch_fax,isScanTechSV,isSchedulerSV,IsChangePasswordOnFirstLogin,location_pk,isAllowDownload,IsSchedulerManager,IsInvoiceAccountant, IsBillingAccountant, IsManagementUser,IsCoderOnsite,CoderLevel)
-		VALUES(@Username,@pwd,@Lastname,@Firstname,@email,@IsClient,@IsAdmin,@IsScanTech,@IsScheduler,@isCoder,@IsQA,@IsHRA,@isQCC,@IsActive,@only_work_selected_hours,@only_work_selected_zipcodes,@Provider_ID,@Provider_PK,@sch_name,@sch_tel,@sch_fax,@isScanTechSV,@isSchedulerSV,@IsChangePasswordOnFirstLogin,@location,@isAllowDownload,@IsSchedulerManager,@IsInvoiceAccountant, @IsBillingAccountant, @IsManagementUser, @IsCoderOnsite,1)
+		INSERT INTO tblUser(Username,[Password],Lastname,Firstname,Email_Address,IsClient,IsAdmin,IsScanTech,IsScheduler,IsCoderOffsite,IsQACoder,IsHRA,isQCC,IsActive,only_work_selected_hours,only_work_selected_zipcodes,linked_provider_id,linked_provider_pk,sch_name,sch_tel,sch_fax,isScanTechSV,isSchedulerSV,IsChangePasswordOnFirstLogin,location_pk,isAllowDownload,IsSchedulerManager,IsInvoiceAccountant, IsBillingAccountant, IsQAManager,IsCoderOnsite,CoderLevel,IsCodingManager)
+		VALUES(@Username,@pwd,@Lastname,@Firstname,@email,@IsClient,@IsAdmin,@IsScanTech,@IsScheduler,@isCoder,@IsQACoder,@IsHRA,@isQCC,@IsActive,@only_work_selected_hours,@only_work_selected_zipcodes,@Provider_ID,@Provider_PK,@sch_name,@sch_tel,@sch_fax,@isScanTechSV,@isSchedulerSV,@IsChangePasswordOnFirstLogin,@location,@isAllowDownload,@IsSchedulerManager,@IsInvoiceAccountant, @IsBillingAccountant, @IsQAManager, @IsCoderOnsite,1,@IsCodingManager)
 		
 		SELECT @id=@@IDENTITY;
 	END
 	ELSE
 	BEGIN
 		Update tblUser SET Lastname=@Lastname,Firstname=@Firstname,Email_Address=@email
-			,IsClient=@IsClient,IsAdmin=@IsAdmin,IsScanTech=@IsScanTech,IsScheduler=@IsScheduler,IsReviewer=@isCoder,IsQA=@IsQA,IsHRA=@IsHRA,isQCC=@isQCC,IsActive=@IsActive,only_work_selected_hours=@only_work_selected_hours,only_work_selected_zipcodes=@only_work_selected_zipcodes
+			,IsClient=@IsClient,IsAdmin=@IsAdmin,IsScanTech=@IsScanTech,IsScheduler=@IsScheduler,IsCoderOffsite=@isCoder,IsQACoder=@IsQACoder,IsHRA=@IsHRA,isQCC=@isQCC,IsActive=@IsActive,only_work_selected_hours=@only_work_selected_hours,only_work_selected_zipcodes=@only_work_selected_zipcodes
 			,linked_provider_id=@Provider_ID, linked_provider_pk=@Provider_PK
 			,sch_name=@sch_name,sch_tel=@sch_tel,sch_fax=@sch_fax
 			,isScanTechSV = @isScanTechSV, isSchedulerSV = @isSchedulerSV, IsSchedulerManager=@IsSchedulerManager
 			,IsChangePasswordOnFirstLogin=@IsChangePasswordOnFirstLogin
 			,location_pk = @location, isAllowDownload = @isAllowDownload
-			,IsInvoiceAccountant=@IsInvoiceAccountant, IsBillingAccountant=@IsBillingAccountant, IsManagementUser=@IsBillingAccountant
+			,IsInvoiceAccountant=@IsInvoiceAccountant, IsBillingAccountant=@IsBillingAccountant, IsQAManager=@IsQAManager, IsCodingManager=@IsCodingManager
 			,IsCoderOnsite = @IsCoderOnsite
 			,CoderLevel = CASE WHEN CoderLevel IS NULL THEN 1 ELSE CoderLevel END
 		WHERE User_PK=@id
