@@ -18,8 +18,9 @@ Notes:		None
 Process:	
 Change Log: Copied McLaren file as template and converted to BCBSA
 3/30/2017 Leon - Update for RDSM Schema
+4/7/2017  M Wu - remove unused fields
 Test Script:	
-	
+
 				exec dbo.etl_BCBSA_Eligibility 1
 
 ToDo:		
@@ -53,13 +54,15 @@ DECLARE @sysMe sysname
 SET @sysMe = OBJECT_NAME(@@PROCID)
 
 EXECUTE IMIAdmin..fxSetStatus @iLoadInstanceID, @sysMe, 'Started'
-        
+
 /*************************************************************************************
         2.  Delete temp tables if they already exist.
 *************************************************************************************/
 BEGIN 
-    DELETE FROM dbo.Eligibility
-        WHERE Client = 'BCBSA'
+
+	TRUNCATE TABLE dbo.Eligibility
+    --DELETE FROM dbo.Eligibility
+    --    WHERE Client = 'BCBSA'
 END
 
 /*************************************************************************************
@@ -67,7 +70,7 @@ END
 				Load BCBSA.MemberEligibility
 *************************************************************************************/
 BEGIN 
-	
+
 	IF NOT EXISTS (SELECT * FROM dbo.HealthPlan WHERE HealthPlanName = 'BCBSA')
 		INSERT INTO dbo.HealthPlan
 		        (Client,
@@ -87,9 +90,7 @@ BEGIN
 			 DateEffective,
 			 DateRowCreated,
 			 DateTerminated,
-			 HashValue,
 			 HealthPlanID,
-			 IsUpdated,
 			 MemberID,
 			 RowID,
 			 ProductType,
@@ -101,65 +102,12 @@ BEGIN
 			 CoverageMHDayNightFlag,
 			 CoverageMHInpatientFlag,
 			 CoveragePharmacyFlag,
-			 HealthPlanEmployeeFlag,
-			 HedisMeasureID,
 			 LoadInstanceFileID,
-			 Program,
 			 EmployerGroup,
-			 EmployerDivision,
-			 ihds_prov_id_pcp,
-			 MemberGroupID,
-			 BenefitPlanID,
-			 LineOfBusinessID,
-			 BenefitPlanCode,
-			 BenefitPlanDesc,
-			 EligRecordCreateDate,
-			 EligRecordCreateUser,
-			 EligRecordUpdateDate,
-			 EligRecordUpdateUser,
-			 TermReason,
-			 Relationship,
-			 RelationshipDesc,
-			 LineOfBusiness,
-			 CustomerPCPID,
-			 IPAID,
-			 IPADesc,
-			 PanelID,
-			 PanelDesc,
-			 CustomerEligibilityID,
-			 CustomerMemberGroupID,
 			 CoverageHospiceFlag,
-			 MedicareType,
-			 CustomerSubscriberSeqID,
-			 CopayCategory,
-			 LICSLevel,
-			 CustomerEligibilityStatus,
-			 HospitalPayorInsCode,
-			 SourceSystem,
-			 EnrollID,
-			 CustomerPlanID,
-			 EligibleOrigID,
-			 Carrierid,
-			 InsuredID,
-			 PlanDescription,
-			 PlanType,
-			 EligibleOrganizationName,
-			 EligibleOrganizationType,
-			 CarrierName,
-			 CarrierType,
-			 CarrierMemID,
-			 PlanID,
-			 InsuredMemberID,
-			 InsuredIHDS_Member_ID,
-			 RateCode,
-			 ProgramID,
-			 ProgramDescription,
-			 CustomerEligRatingCode,
-			 OrgPolicyID,
-			 policynum,
 			 ProductPriority
-			 
-			 
+
+
 			)
         SELECT DISTINCT
 			Client = 'BCBSA',
@@ -172,9 +120,7 @@ BEGIN
 								WHEN ISDATE(e.TerminationDate) = 0 THEN NULL		
 								WHEN CONVERT(VARCHAR(8),CONVERT(DATETIME,e.TerminationDate),112) >= '19000101' THEN e.TerminationDate
 								END,
-				HashValue = NULL,
 			HealthPlanID = (SELECT TOP 1 HealthPlanID FROM dbo.HealthPlan WHERE HealthPlanName = 'BCBSA'),
-				IsUpdated = NULL,
 			MemberID = m.MemberID,
 			RowID = e.RowID,
 			ProductType = 'PPO',
@@ -186,63 +132,10 @@ BEGIN
 			CoverageMHDayNightFlag = e.MentalHealthDayNightBenefit,
 			CoverageMHInpatientFlag = e.MentalHealthINPBenefit,
 			CoveragePharmacyFlag = e.PharmacyBenefit,
-				HealthPlanEmployeeFlag = NULL,
-				HedisMeasureID = NULL,
 			LoadInstanceFileID = e.LoadInstanceFileID,
-				Program = NULL,
 			EmployerGroup = e.GroupID,
-				EmployerDivision = NULL,
-				ihds_prov_id_pcp = NULL,
-				MemberGroupID = NULL,
-				BenefitPlanID = NULL,
-				LineOfBusinessID = NULL,
-				BenefitPlanCode = NULL,
-				BenefitPlanDesc = NULL,
-				EligRecordCreateDate = NULL,
-				EligRecordCreateUser = NULL,
-				EligRecordUpdateDate = NULL,
-				EligRecordUpdateUser = NULL,
-				TermReason = NULL,
-				Relationship = NULL,
-				RelationshipDesc = NULL,
-				LineOfBusiness = NULL,
-				CustomerPCPID = NULL,
-				IPAID = NULL,
-				IPADesc = NULL,
-				PanelID = NULL,
-				PanelDesc = NULL,
-				CustomerEligibilityID = NULL,
-				CustomerMemberGroupID = NULL,
 			CoverageHospiceFlag = e.HospiceBenefit,
-				MedicareType = NULL,
-				CustomerSubscriberSeqID = NULL,
-				CopayCategory = NULL,
-				LICSLevel = NULL,
-				CustomerEligibilityStatus = NULL,
-				HospitalPayorInsCode = NULL,
-				SourceSystem = NULL,
-				EnrollID = NULL,
-				CustomerPlanID = NULL,
-				EligibleOrigID = NULL,
-				Carrierid = NULL,
-				InsuredID = NULL,
-				PlanDescription = NULL,
-				PlanType = NULL,
-				EligibleOrganizationName = NULL,
-				EligibleOrganizationType = NULL,
-				CarrierName = NULL,
-				CarrierType = NULL,
-				CarrierMemID = NULL,
-				PlanID = NULL,
-				InsuredMemberID = NULL,
-				InsuredIHDS_Member_ID = NULL,
-				RateCode = NULL,
-				ProgramID = NULL,
-				ProgramDescription = NULL,
-				CustomerEligRatingCode = NULL,
-				OrgPolicyID = NULL,
-				policynum = NULL,
-				ProductPriority = 1
+			ProductPriority = 1
 		--select count(1)
 		FROM RDSM.Enrollment e
 			JOIN mpi_output_member mom
@@ -260,7 +153,7 @@ BEGIN
 
 
 END 
-		
+
 /*************************************************************************************
         4.  Delete temp tables if they already exist.
 *************************************************************************************/

@@ -118,7 +118,7 @@ Test Script:
 	EXEC prBuildMPIXrefProvider 1
 
 Change Log:
-
+20170405	CjC		Change tmp_mp_pre_load_prov and _mbr to dbo.tmp_mp_pre_load_ as it was causing invalid object errors
 *************************************************************************************/
 
 --/*
@@ -195,10 +195,10 @@ SELECT @iLoadInstanceID	= 1, -- IMIAdmin..ClientProcessInstance.LoadInstanceID
 					SourceDB = mplp.src_db_name,
 					SourceSchema = mplp.src_schema_name,
 					SystemProviderID = mplp.medical_provider_id,
-					ProviderFullName = mplp.prov_name,
-					ProviderLastName = mplp.last_name,
-					ProviderFirstName = mplp.first_name,
-					ProviderTaxID = mplp.prov_tax_id,
+					ProviderFullName = NULL,--mplp.prov_name,
+					ProviderLastName = NULL,--mplp.last_name,
+					ProviderFirstName = NULL,--mplp.first_name,
+					ProviderTaxID = NULL,--mplp.prov_tax_id,
 					MasterEntityID = NEWID(),
 					ProviderMatchLogic = 'Medical_provider_id'
 				FROM dbo.mpi_pre_load_prov mplp
@@ -250,10 +250,10 @@ SELECT @iLoadInstanceID	= 1, -- IMIAdmin..ClientProcessInstance.LoadInstanceID
 
 		-- Create Temp Tables for MPI_pre tables
 
-		IF object_id('tmp_mpi_pre_load_prov') IS NOT NULL
-			DROP TABLE tmp_mpi_pre_load_prov
+		IF object_id('dbo.tmp_mpi_pre_load_prov') IS NOT NULL
+			DROP TABLE dbo.tmp_mpi_pre_load_prov
 
-		CREATE TABLE tmp_mpi_pre_load_prov
+		CREATE TABLE dbo.tmp_mpi_pre_load_prov
 			(
 			[mpi_pre_load_prov_rowid] [bigint] NOT NULL,
 			[src_name] [varchar] (100) NULL,
@@ -264,7 +264,7 @@ SELECT @iLoadInstanceID	= 1, -- IMIAdmin..ClientProcessInstance.LoadInstanceID
 			[clientid] [varchar] (20) NOT NULL)
 
 
-		INSERT INTO tmp_mpi_pre_load_prov
+		INSERT INTO dbo.tmp_mpi_pre_load_prov
 		SELECT mpi_pre_load_prov_rowid,
 				src_name,
 				src_table_name,
@@ -275,16 +275,16 @@ SELECT @iLoadInstanceID	= 1, -- IMIAdmin..ClientProcessInstance.LoadInstanceID
 			FROM dbo.mpi_pre_load_prov
 			--WHERE ClientID = ISNULL(@vcClient,ClientID)
 
-		EXECUTE IMIAdmin..fxSetMetrics @iLoadInstanceID, 'Records Inserted', @@ROWCOUNT, 'tmp_mpi_pre_load_prov', 
+		EXECUTE IMIAdmin..fxSetMetrics @iLoadInstanceID, 'Records Inserted', @@ROWCOUNT, 'dbo.tmp_mpi_pre_load_prov', 
 			'FROM mpi_pre_load_prov', @@ROWCOUNT
 
-		CREATE INDEX fk ON tmp_mpi_pre_load_prov (mpi_pre_load_prov_rowid, src_name, char_mpi_pre_load_prov_rowid, ClientID, src_table_name, src_db_name, src_schema_name) 
-		CREATE STATISTICS sp ON tmp_mpi_pre_load_prov (mpi_pre_load_prov_rowid, src_name, char_mpi_pre_load_prov_rowid, ClientID, src_table_name, src_db_name, src_schema_name)		
+		CREATE INDEX fk ON dbo.tmp_mpi_pre_load_prov (mpi_pre_load_prov_rowid, src_name, char_mpi_pre_load_prov_rowid, ClientID, src_table_name, src_db_name, src_schema_name) 
+		CREATE STATISTICS sp ON dbo.tmp_mpi_pre_load_prov (mpi_pre_load_prov_rowid, src_name, char_mpi_pre_load_prov_rowid, ClientID, src_table_name, src_db_name, src_schema_name)		
 
-		IF object_id('tmp_mpi_pre_load_dtl_prov') IS NOT NULL
-			DROP TABLE tmp_mpi_pre_load_dtl_prov
+		IF object_id('dbo.tmp_mpi_pre_load_dtl_prov') IS NOT NULL
+			DROP TABLE dbo.tmp_mpi_pre_load_dtl_prov
 
-		CREATE TABLE tmp_mpi_pre_load_dtl_prov
+		CREATE TABLE dbo.tmp_mpi_pre_load_dtl_prov
 			(Src_rowID BIGINT,
 			[mpi_pre_load_prov_rowid] [bigint] NOT NULL,
 			[src_name] [varchar] (100) NULL,
@@ -296,7 +296,7 @@ SELECT @iLoadInstanceID	= 1, -- IMIAdmin..ClientProcessInstance.LoadInstanceID
 			[src_schema_name] [varchar] (100) NULL
 			)
 
-		INSERT INTO tmp_mpi_pre_load_dtl_prov 
+		INSERT INTO dbo.tmp_mpi_pre_load_dtl_prov 
 		SELECT a.src_rowid,
 				a.mpi_pre_load_prov_rowid,
 				b.src_name,
@@ -307,18 +307,18 @@ SELECT @iLoadInstanceID	= 1, -- IMIAdmin..ClientProcessInstance.LoadInstanceID
 				b.src_db_name,
 				b.src_schema_name
 			FROM mpi_pre_load_dtl_prov a
-				INNER JOIN tmp_mpi_pre_load_prov b
+				INNER JOIN dbo.tmp_mpi_pre_load_prov b
 					ON a.mpi_pre_load_prov_rowid = b.mpi_pre_load_prov_rowid 
 
 
 		EXECUTE IMIAdmin..fxSetMetrics @iLoadInstanceID, 'Records Inserted', @@ROWCOUNT, '#mpi_pre_load_dtl_prov', 
 			'FROM mpi_pre_load_dtl_prov', @@ROWCOUNT
 	
-		CREATE INDEX fk ON tmp_mpi_pre_load_dtl_prov  (mpi_pre_load_prov_rowid, src_rowid) 
-		CREATE STATISTICS sp ON tmp_mpi_pre_load_dtl_prov  (mpi_pre_load_prov_rowid, src_rowid)
+		CREATE INDEX fk ON dbo.tmp_mpi_pre_load_dtl_prov  (mpi_pre_load_prov_rowid, src_rowid) 
+		CREATE STATISTICS sp ON dbo.tmp_mpi_pre_load_dtl_prov  (mpi_pre_load_prov_rowid, src_rowid)
 
-		CREATE INDEX fk2 ON tmp_mpi_pre_load_dtl_prov (mpi_pre_load_prov_rowid, char_mpi_pre_load_prov_rowid, src_rowid) 
-		CREATE STATISTICS sp2 ON tmp_mpi_pre_load_dtl_prov (mpi_pre_load_prov_rowid, char_mpi_pre_load_prov_rowid, src_rowid) 
+		CREATE INDEX fk2 ON dbo.tmp_mpi_pre_load_dtl_prov (mpi_pre_load_prov_rowid, char_mpi_pre_load_prov_rowid, src_rowid) 
+		CREATE STATISTICS sp2 ON dbo.tmp_mpi_pre_load_dtl_prov (mpi_pre_load_prov_rowid, char_mpi_pre_load_prov_rowid, src_rowid) 
 
 		/*************************************************************************************
 			2.2	Remove MPI GUIDS that link to multiple providers in MPI staging 
@@ -359,8 +359,8 @@ SELECT @iLoadInstanceID	= 1, -- IMIAdmin..ClientProcessInstance.LoadInstanceID
 				to MPI master entity
 		************************************************************************************/
 		SELECT	@iRes = COUNT( * )
-			FROM	tmp_mpi_pre_load_dtl_prov a 
-				JOIN tmp_mpi_pre_load_prov prv
+			FROM	dbo.tmp_mpi_pre_load_dtl_prov a 
+				JOIN dbo.tmp_mpi_pre_load_prov prv
 					ON a.mpi_pre_load_prov_rowid = prv.mpi_pre_load_prov_rowid
 				LEFT JOIN #mpi_prv mpi
 					ON mpi.SourceName = prv.src_name
@@ -371,8 +371,8 @@ SELECT @iLoadInstanceID	= 1, -- IMIAdmin..ClientProcessInstance.LoadInstanceID
 			'records in mpi_pre_load_dtl_prov without link in #mpi_prv', @ires
 
 		SELECT	@iRes = COUNT(DISTINCT prv.mpi_pre_load_prov_rowid)
-			FROM	tmp_mpi_pre_load_dtl_prov a 
-				JOIN tmp_mpi_pre_load_prov prv
+			FROM	dbo.tmp_mpi_pre_load_dtl_prov a 
+				JOIN dbo.tmp_mpi_pre_load_prov prv
 					ON a.mpi_pre_load_prov_rowid = prv.mpi_pre_load_prov_rowid
 				LEFT JOIN #mpi_prv mpi
 					ON mpi.SourceName = prv.src_name
@@ -394,7 +394,7 @@ SELECT @iLoadInstanceID	= 1, -- IMIAdmin..ClientProcessInstance.LoadInstanceID
 		INSERT	INTO dbo.dw_xref_ihds_prov_id( ihds_mpi_id, create_datetime, update_datetime)
 		SELECT	DISTINCT mpi.MasterEntityID, GETDATE(), GETDATE()
 		FROM	#mpi_prv mpi 
-			JOIN tmp_mpi_pre_load_prov prv
+			JOIN dbo.tmp_mpi_pre_load_prov prv
 				ON prv.src_name = mpi.SourceName  
 				AND CONVERT( varchar( 20 ), prv.mpi_pre_load_prov_rowid ) = mpi.SourceEntityID
 			LEFT JOIN dbo.dw_xref_ihds_prov_id b
@@ -424,7 +424,7 @@ SELECT @iLoadInstanceID	= 1, -- IMIAdmin..ClientProcessInstance.LoadInstanceID
 				AND a.sourceentityid = b.SourceEntityID
 			JOIN dbo.dw_xref_ihds_prov_id c
 				ON b.MasterEntityID = c.ihds_mpi_id
-			JOIN tmp_mpi_pre_load_prov d
+			JOIN dbo.tmp_mpi_pre_load_prov d
 				ON a.sourceName = d.src_name
 				AND a.SourceEntityID = CONVERT( varchar( 20 ), d.mpi_pre_load_prov_rowid )
 			ORDER BY a.SourceEntityID, create_datetime
@@ -484,8 +484,8 @@ SELECT @iLoadInstanceID	= 1, -- IMIAdmin..ClientProcessInstance.LoadInstanceID
 					ihds_prov_id_pcp = 0,
 					ihds_prov_id_referring = 0,
 					ihds_prov_id_servicing = xrf.ihds_prov_id
-				FROM tmp_mpi_pre_load_dtl_prov a WITH (INDEX (fk2))
-					JOIN tmp_mpi_pre_load_prov prv WITH (INDEX (fk))
+				FROM dbo.tmp_mpi_pre_load_dtl_prov a WITH (INDEX (fk2))
+					JOIN dbo.tmp_mpi_pre_load_prov prv WITH (INDEX (fk))
 						ON a.mpi_pre_load_prov_rowid = prv.mpi_pre_load_prov_rowid
 						--AND prv.src_table_name NOT IN ('ct_claims_data')
 					JOIN #mpi_prv mpi-- pmd_mpi..vw_master_xref mpi 

@@ -19,6 +19,8 @@ Notes:		None
 Process:	
 Change Log:
 3/30/2017 Leon - Update for BCBSA Schema
+4/5/2017  M Wu - remove fields not used
+4/8/2017  Leon - updates for field length
 Test Script:	
 	
 				exec dbo.etl_BCBSA_Member 1
@@ -58,10 +60,10 @@ EXECUTE IMIAdmin..fxSetStatus @iLoadInstanceID, @sysMe, 'Started'
 IF OBJECT_ID('tempdb..#MaxMember') IS NOT NULL
     DROP TABLE #MaxMember
 
-DELETE FROM dbo.Member
-    WHERE Client = 'BCBSA'
+--DELETE FROM dbo.Member
+--    WHERE Client = 'BCBSA'
 
-
+TRUNCATE TABLE Member
 /*************************************************************************************
         3.  Populate Member.
 *************************************************************************************/
@@ -101,7 +103,6 @@ BEGIN
              Address2,
              City,
              CustomerMemberID,
-             CustomerSubscriberID,
              DateOfBirth,
              DateRowCreated,
              Gender,
@@ -109,20 +110,15 @@ BEGIN
              NameFirst,
              NameLast,
              NameMiddleInitial,
-             NamePrefix,
              NameSuffix,
              Phone,
-             RelationshipToSubscriber,
-             SSN,
              [State],
-             SubscriberID,
              ZipCode,
              Ethnicity,
              InterpreterFlag,
              MemberLanguage,
              Race,
              County,
-             RaceEthnicitySource,
              RaceSource,
              EthnicitySource,
              SpokenLanguage,
@@ -131,11 +127,6 @@ BEGIN
              WrittenLanguageSource,
              OtherLanguage,
              OtherLanguageSource,
-             CustomerPersonNo,
-             PhoneMobile,
-             PhoneWork,
-             PhoneHome,
-             MemberLanguageCode ,
 			 MedicareID                  
             )
         SELECT
@@ -146,7 +137,6 @@ BEGIN
                 Address2 = m.ContactAddress2,
                 City = m.ContactCity,
                 CustomerMemberID = m.MemberID,
-					CustomerSubscriberID = NULL,
                 DateOfBirth = m.DOB,
                 DateRowCreated = CONVERT(VARCHAR(8), GETDATE(), 112),
                 Gender = m.Gender,
@@ -154,20 +144,15 @@ BEGIN
                 NameFirst = m.NameFirst,
                 NameLast = m.NameLast,
                 NameMiddleInitial = LEFT(m.NameMiddleInitial,1),
-					NamePrefix = NULL,
 				NameSuffix = NameSuffix,
                 Phone = m.ContactTelephone,
-					RelationshipToSubscriber = NULL,
-					SSN = NULL,
-                [State] = m.ContactState,
-                SubscriberID = NULL,--e.SubscriberID,
-                ZipCode = m.ContactZipCode,
+                [State] = LEFT(m.ContactState,2),
+                ZipCode = LEFT(m.ContactZipCode,10),
                 Ethnicity = m.Hispanic,
                 InterpreterFlag = LEFT(m.Interpreter,1),
                 MemberLanguage = m.[Language],
                 Race = m.Race,
                 County = M.ContactCounty,
-					RaceEthnicitySource = NULL,
                 RaceSource = m.RaceSource,
                 EthnicitySource = m.EthnicitySource,
                 SpokenLanguage = m.[Language],
@@ -176,11 +161,6 @@ BEGIN
                 WrittenLanguageSource = m.WrittenLanguageSource,
                 OtherLanguage = m.OtherLanguage,
                 OtherLanguageSource = m.OtherLanguageSource,
-					CustomerPersonNo = NULL,
-					PhoneMobile = NULL,
-					PhoneWork = NULL,
-					PhoneHome = NULL,
-					MemberLanguageCode = NULL,
 				MedicareID = m.MedicareID
 			--SELECT COUNT(*)
             FROM RDSM.Member m

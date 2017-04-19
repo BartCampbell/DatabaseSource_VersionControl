@@ -1,2 +1,2 @@
-CREATE SYNONYM [RDSM].[ExternalEvent] FOR [BCBSA_RDSM].[BCBSA_Tst_T100].[ExternalEvent]
+CREATE SYNONYM [RDSM].[ExternalEvent] FOR [BCBSA_RDSM].[BCBSA_GDIT2017].[ExternalEvent]
 GO

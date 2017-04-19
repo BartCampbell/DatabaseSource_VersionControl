@@ -1,2 +1,2 @@
-CREATE SYNONYM [RDSM].[Enrollment] FOR [BCBSA_RDSM].[BCBSA_Tst_T100].[Enrollment]
+CREATE SYNONYM [RDSM].[Enrollment] FOR [BCBSA_RDSM].[BCBSA_GDIT2017].[Enrollment]
 GO

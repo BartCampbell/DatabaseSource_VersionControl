@@ -110,7 +110,7 @@ BEGIN TRY
 
 	IF @iLoadInstanceID IS NULL 
 		--DECLARE @iLoadInstanceID INT
-		EXECUTE IMIAdmin..prInitializeInstance 'VERISK', 'Staging Load', 0, NULL, NULL, @iLoadInstanceID OUTPUT 
+		EXECUTE IMIAdmin..prInitializeInstance 'BCBSA', 'Staging Load', 0, NULL, NULL, @iLoadInstanceID OUTPUT 
 	
 	
 

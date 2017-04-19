@@ -1,39 +1,17 @@
 CREATE TABLE [dbo].[Provider]
 (
 [ProviderID] [int] NOT NULL IDENTITY(100, 1),
-[BoardCertification1] [varchar] (12) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[BoardCertification2] [varchar] (12) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Client] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DataSource] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[DateOfBirth] [datetime] NULL,
 [DateRowCreated] [datetime] NULL,
-[DateValidBegin] [datetime] NULL,
-[DateValidEnd] [datetime] NULL,
-[DEANumber] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[EIN] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Gender] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[HashValue] [binary] (16) NULL,
-[HedisMeasureID] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ihds_prov_id] [int] NULL,
-[InstanceID] [int] NULL,
-[IsUpdated] [bit] NULL,
-[LicenseNumber] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MedicaidID] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [NameFirst] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [NameLast] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [NameMiddleInitial] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[NamePrefix] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [NameSuffix] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[NameTitle] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[NetworkID] [int] NULL,
 [NPI] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProviderType] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RowID] [int] NULL,
-[SpecialtyCode1] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[SpecialtyCode2] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[SSN] [char] (9) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[TaxID] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[UPIN] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProviderPrescribingPrivFlag] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CDProviderFlag] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DentistFlag] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -50,8 +28,6 @@ CREATE TABLE [dbo].[Provider]
 [ClinicalPharmacistFlag] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AnesthesiologistFlag] [char] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProviderFullName] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[SpecialtyCode1Desc] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[SpecialtyCode2Desc] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AmbulanceFlag] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DMEFlag] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [HospitalFlag] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -67,30 +43,13 @@ CREATE TABLE [dbo].[Provider]
 [RegisteredNurseFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SkilledNursingFacFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SurgeonFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Contracted] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CardiologistFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [GastroenterologistFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [EndocrinologistFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[LicenseNumberState] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MedicareID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[NetworkDesc] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProviderCounty] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProviderEmail] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[ProviderPracticeSite] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[TaxonomyCode] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[UserDefinedField] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[UserDefinedFieldDesc] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[HedisMeasureID] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Contracted] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[TaxID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [dbo_Provider]
-GO
-CREATE NONCLUSTERED INDEX [idxIHDS_Prov_id] ON [dbo].[Provider] ([ihds_prov_id], [ProviderID]) ON [dbo_Provider_IDX]
-GO
-CREATE NONCLUSTERED INDEX [idxNPI] ON [dbo].[Provider] ([NPI], [ProviderID]) ON [dbo_Provider_IDX]
-GO
-CREATE CLUSTERED INDEX [idxProviderID] ON [dbo].[Provider] ([ProviderID], [ihds_prov_id]) ON [dbo_Provider]
-GO
-CREATE STATISTICS [spidxIHDS_Prov_id] ON [dbo].[Provider] ([ihds_prov_id], [ProviderID])
-GO
-CREATE STATISTICS [spidxNPI] ON [dbo].[Provider] ([NPI], [ProviderID])
-GO
-CREATE STATISTICS [spidxProviderID] ON [dbo].[Provider] ([ProviderID], [ihds_prov_id])
 GO

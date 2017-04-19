@@ -14,10 +14,7 @@ CREATE TABLE [dbo].[Member]
 [NameLast] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [NameMiddleInitial] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Phone] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[RelationshipToSubscriber] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[SSN] [char] (9) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [State] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[SubscriberID] [int] NULL,
 [ZipCode] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RowID] [int] NULL,
 [Ethnicity] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -28,7 +25,6 @@ CREATE TABLE [dbo].[Member]
 [OtherLanguage] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [OtherLanguageSource] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [RaceSource] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[RaceEthnicitySource] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SpokenLanguage] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SpokenLanguageSource] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [WrittenLanguage] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -36,7 +32,6 @@ CREATE TABLE [dbo].[Member]
 [County] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [MedicareID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [HedisMeasureID] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CustomerSubscriberID] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DateRowCreated] [datetime] NULL,
 [DateValidBegin] [datetime] NULL,
 [DateValidEnd] [datetime] NULL,
@@ -44,24 +39,15 @@ CREATE TABLE [dbo].[Member]
 [IsEmployee] [bit] NULL,
 [IsRetired] [bit] NULL,
 [IsSubscriber] [bit] NULL,
-[NamePrefix] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [NameSuffix] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [IsUpdated] [bit] NULL,
 [MedicareNumber] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [MedicaidNumber] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [MedicaidID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CustomerPersonNo] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [MedicalRecordNumber] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PhoneMobile] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PhoneWork] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PhoneHome] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MemberLanguageCode] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AssignedClinic] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SourceSystem] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[EmployeeNo] [varchar] (30) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[EmployeeNo] [varchar] (30) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[SSN] [varchar] (9) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [dbo_member]
-GO
-CREATE CLUSTERED INDEX [idxMemberID] ON [dbo].[Member] ([MemberID], [ihds_member_id]) ON [dbo_member]
-GO
-CREATE STATISTICS [spidxMemberID] ON [dbo].[Member] ([MemberID], [ihds_member_id])
 GO

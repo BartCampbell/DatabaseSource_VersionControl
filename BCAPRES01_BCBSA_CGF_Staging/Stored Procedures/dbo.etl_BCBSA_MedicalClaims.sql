@@ -19,7 +19,7 @@ Returns:	None
 Notes:		None
 Process:	
 Change Log:
-
+4/12/2017 - Update cli servicedate, end date
 
 Test Script:	
 	
@@ -307,11 +307,7 @@ BEGIN
 
 
     INSERT INTO dbo.Claim (
-				BillingProviderID,
 				BillType,
-				ClaimDisallowReason,
-				ClaimType,
-				ClaimTypeIndicator,
 				ClaimStatus,
 				Client,
 				DataSource,
@@ -342,25 +338,11 @@ BEGIN
 				DiagnosisRelatedGroup,
 				DiagnosisRelatedGroupType,
 				HealthPlanID,
-				HedisMeasureID,
 				ihds_member_id,
-				ihds_prov_id_attending,
-				ihds_prov_id_billing,
-				ihds_prov_id_med_group,
-				ihds_prov_id_pcp,
-				ihds_prov_id_referring,
 				ihds_prov_id_servicing,
-				ihds_prov_id_vendor,
-				InstanceID,
-				MedicarePaidIndicator,
 				MemberID,
-				PatientStatus,
 				PayerClaimID,
-				PayerClaimIDSuffix,
-				PayerID,
 				PlaceOfService,
-				RecordType,
-				ReferringProviderID,
 				ServicingProviderID,
 				SurgicalProcedure1,
 				SurgicalProcedure2,
@@ -387,21 +369,14 @@ BEGIN
 				DateAdmitted,
 				DateDischarged,
 				rowid,
-				MemberAge,
 				CustomerMemberID,
-				CustomerBillingProvID,
 				CustomerServicingProvID,
 				SupplementalDataCategory,
 				SupplementalDataFlag,
-				ICDCodeType,
-				SupplementalDataCode
+				ICDCodeType
 			)
         SELECT 
-					BillingProviderID = NULL,
 				BillType = mc.TypeBillCode,
-					ClaimDisallowReason = NULL,
-					ClaimType = NULL,
-					ClaimTypeIndicator = NULL,
 				ClaimStatus = CASE WHEN ISNULL(mc.Denied,'') = '' THEN 1 ELSE 2 END, --TODO Needs Review
 				Client = 'BCBSA',
 				DataSource = 'BCBSA_GDIT.Claim',
@@ -432,25 +407,11 @@ BEGIN
 				DiagnosisRelatedGroup = mc.DRGCode,
 				DiagnosisRelatedGroupType = CASE mc.DRGVersion WHEN 32 THEN 'M' ELSE NULL END,
 				HealthPlanID = (SELECT HealthPlanID FROM dbo.HealthPlan WHERE HealthPlanName = 'BCBSA'),
-					HedisMeasureID = NULL,
 				ihds_member_id = m.ihds_member_id,
-					ihds_prov_id_attending = NULL,
-					ihds_prov_id_billing = NULL,
-					ihds_prov_id_med_group = NULL,
-					ihds_prov_id_pcp = NULL,
-					ihds_prov_id_referring = NULL,
 				ihds_prov_id_servicing = ISNULL(p.ihds_prov_id,1),
-					ihds_prov_id_vendor = NULL,
-					InstanceID = NULL,
-					MedicarePaidIndicator = NULL,
 				MemberID = m.MemberID,
-					PatientStatus = NULL,
 				PayerClaimID = mc.ClaimNumber,
-					PayerClaimIDSuffix = NULL,
-					PayerID = NULL,
 				PlaceOfService = mc.PlaceOfServiceCode,
-					RecordType = NULL,
-					ReferringProviderID = NULL,
 				ServicingProviderID = ISNULL(p.ProviderID,noprov.ProviderID),
 				SurgicalProcedure1 = mc.PrincipalProcedureCode,
 				SurgicalProcedure2  = mc.OtherProcedureCode1,
@@ -477,14 +438,11 @@ BEGIN
 				DateAdmitted = mc.AdmitDate,
 				DateDischarged = mc.DischargeDate,
 				rowid = mc.RowID,
-				MemberAge = NULL,
 				CustomerMemberID = mc.MemberID,
-				CustomerBillingProvID = NULL,
 				CustomerServicingProvID = mc.ProviderID,
 				SupplementalDataCategory = SupplementalDataSource,
 				SupplementalDataFlag = CASE WHEN ISNULL(SupplementalDataSource,'') <> '' THEN 'Y' ELSE 'N' END,
-				ICDCodeType = CASE WHEN mc.DiagnosisVersionCode = '9' THEN '9' ELSE '10' END,
-				SupplementalDataCode = NULL
+				ICDCodeType = CASE WHEN mc.DiagnosisVersionCode = '9' THEN '9' ELSE '10' END
 			--select count(*)
             FROM RDSM.Claim mc
                 INNER JOIN #ClaimFlt mx
@@ -526,20 +484,11 @@ BEGIN
 
     INSERT INTO dbo.ClaimLineItem
             (
-			AmountGrossPayment,
 			ClaimID,
 			LineItemNumber,
 			ClaimStatus,
-			AmountCOBSavings,
-			AmountCopay,
-			AmountDisallowed,
-			AmountMedicarePaid,
-			AmountNetPayment,
-			AmountTotalCharge,
-			AmountWithold,
 			Client,
 			DataSource,
-			DateAdjusted,
 			DatePaid,
 			DateServiceBegin,
 			DateServiceEnd,
@@ -549,56 +498,43 @@ BEGIN
 			CPTProcedureCodeModifier2,
 			CPTProcedureCodeModifier3,
 			CPTProcedureCodeModifier4,
-			HedisMeasureID,
 			PlaceOfServiceCode,
-			PlaceOfServiceCodeIndicator,
 			RevenueCode,
-			SubNumber,
-			TypeOfService,
 			Units,
 			CoveredDays,
 			CPT_II,
 			HCPCSProcedureCode,
-			ClaimDisallowReason,
 			LoadInstanceFileID,
 			RowFileID,
 			PayClaimID,
 			PayClaimLineID,
 			RowID,
-			PaymentStatus,
 			PayerClaimID,
 			PayerClaimLineID
 			)
         SELECT 
-				AmountGrossPayment = NULL,
 			ClaimID = c.ClaimID,
-				LineItemNumber =  CASE WHEN ISNUMERIC(mcd.ClaimLineNumber) = 0 THEN 999 ELSE CONVERT(SMALLINT, mcd.ClaimLineNumber) END, --TODO: Needs Review
+			LineItemNumber =  CASE WHEN ISNUMERIC(mcd.ClaimLineNumber) = 0 THEN 999 ELSE CONVERT(SMALLINT, mcd.ClaimLineNumber) END, --TODO: Needs Review
 			ClaimStatus = CASE WHEN ISNULL(Denied,'') = '' THEN 1 ELSE 2 END , --TODO Needs Review
-				AmountCOBSavings = NULL,
-				AmountCopay = NULL,
-				AmountDisallowed = NULL,
-				AmountMedicarePaid = NULL,
-				AmountNetPayment = NULL,
-				AmountTotalCharge = NULL,
-				AmountWithold = NULL,
 			Client = 'BCBSA',
 			DataSource = 'BCBSA_GDIT.Claim',
-				DateAdjusted = NULL,
 			DatePaid = mcd.ClaimProcessedDate,
-            DateServiceBegin = mcd.ClaimFromDate,
-            DateServiceEnd = mcd.ClaimThroughDate,
+            DateServiceBegin = ISNULL(ISNULL(mcd.AdmitDate,mcd.ClaimFromDate),mcd.FirstServiceDate),
+            DateServiceEnd = CASE WHEN mcd.DisChargeDate IS NOT NULL AND RIGHT(mcd.DisChargeDate,4) < '2079' 
+									THEN mcd.DisChargeDate
+								WHEN mcd.ClaimThroughDate IS NOT NULL AND RIGHT(mcd.ClaimThroughDate,4) < '2079' 
+									THEN mcd.ClaimThroughDate
+								WHEN mcd.LastServiceDate IS NOT NULL AND RIGHT(mcd.LastServiceDate,4) < '2079' 
+									THEN mcd.LastServiceDate
+								END,
 			DiagnosisCode = mcd.PrimaryDiagnosis,
 			CPTProcedureCode = CASE WHEN mcd.LineProcedureCode LIKE '[0-9][0-9][0-9][0-9][0-9]' THEN mcd.LineProcedureCode END, 
 			CPTProcedureCodeModifier1 = mcd.LineProcedureCodeModifier,
 			CPTProcedureCodeModifier2 = mcd.LineProcedureCodeModifier2,
 			CPTProcedureCodeModifier3 = mcd.LineProcedureCodeModifier3,
 			CPTProcedureCodeModifier4 = mcd.LineProcedureCodeModifier4,
-				HedisMeasureID = NULL,
 			PlaceOfServiceCode = mcd.PlaceOfServiceCode,
-				PlaceOfServiceCodeIndicator = NULL,
             RevenueCode = mcd.RevenueCode,
-				SubNumber = NULL,
-				TypeOfService = NULL,
 			Units = CASE WHEN RTRIM(LTRIM(mcd.Units)) <> '.' THEN CONVERT(NUMERIC(15,7),mcd.Units) ELSE 0.0 END,
             CoveredDays = CASE WHEN RevenueCode BETWEEN '0100' AND '0220'
 								AND ISNULL(Denied,'') = ''
@@ -607,13 +543,11 @@ BEGIN
 								END,
 			CPT_II = CASE WHEN mcd.LineProcedureCode LIKE '[0-9][0-9][0-9][0-9][A-Z]' THEN mcd.LineProcedureCode END, 
 			HCPCSProcedureCode = CASE WHEN mcd.LineProcedureCode LIKE '[A-Z][0-9][0-9][0-9][0-9]' THEN mcd.LineProcedureCode END, 
-				ClaimDisallowReason = NULL,
 			LoadInstanceFileID = mcd.LoadInstanceFileID,
 			RowFileID = mcd.RowFileID,
 			PayClaimID = ClaimNumber,
 			PayClaimLineID = ClaimLineNumber,
 			RowID = mcd.RowID,
-				PaymentStatus = NULL,
 			PayerClaimID = mcd.ClaimNumber,
 			PayerClaimLineID =  mcd.ClaimNumber + '~' + mcd.ClaimLineNumber
 			--	SELECT COUNT(*), count(*), count(distinct mcd.rowid)

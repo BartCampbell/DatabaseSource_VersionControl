@@ -1,7 +1,11 @@
-CREATE TABLE [dbo].[Claim]
+CREATE TABLE [dbo].[Claim_BU_20170407]
 (
 [ClaimID] [int] NOT NULL IDENTITY(1, 1),
-[BillType] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[BillingProviderID] [int] NULL,
+[BillType] [varchar] (4) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ClaimDisallowReason] [varchar] (3) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ClaimType] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ClaimTypeIndicator] [char] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ClaimStatus] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [Client] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DataSource] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -32,11 +36,25 @@ CREATE TABLE [dbo].[Claim]
 [DiagnosisRelatedGroup] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [DiagnosisRelatedGroupType] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [HealthPlanID] [int] NULL,
+[HedisMeasureID] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ihds_member_id] [int] NULL,
+[ihds_prov_id_attending] [int] NULL,
+[ihds_prov_id_billing] [int] NULL,
+[ihds_prov_id_med_group] [int] NULL,
+[ihds_prov_id_pcp] [int] NULL,
+[ihds_prov_id_referring] [int] NULL,
 [ihds_prov_id_servicing] [int] NULL,
+[ihds_prov_id_vendor] [int] NULL,
+[InstanceID] [uniqueidentifier] NULL,
+[MedicarePaidIndicator] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [MemberID] [int] NULL,
+[PatientStatus] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [PayerClaimID] [varchar] (30) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PayerClaimIDSuffix] [char] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PayerID] [varchar] (5) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [PlaceOfService] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[RecordType] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[ReferringProviderID] [int] NULL,
 [ServicingProviderID] [int] NULL,
 [SurgicalProcedure1] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SurgicalProcedure2] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -63,28 +81,13 @@ CREATE TABLE [dbo].[Claim]
 [DateAdmitted] [datetime] NULL,
 [DateDischarged] [datetime] NULL,
 [rowid] [int] NULL,
+[MemberAge] [numeric] (6, 2) NULL,
 [CustomerMemberID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CustomerBillingProvID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CustomerServicingProvID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SupplementalDataCategory] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SupplementalDataFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ICDCodeType] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[ClaimType] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[HedisMeasureID] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PatientStatus] [varchar] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PayerClaimIDSuffix] [char] (2) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MemberAge] [numeric] (6, 2) NULL,
 [SupplementalDataCode] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
-) ON [dbo_Claim]
-GO
-CREATE NONCLUSTERED INDEX [idxClaimID] ON [dbo].[Claim] ([ClaimID]) INCLUDE ([DateServiceBegin], [MemberID]) ON [dbo_Claim_IDX]
-GO
-CREATE NONCLUSTERED INDEX [idxClientClaimID] ON [dbo].[Claim] ([Client], [ClaimID]) ON [dbo_Claim_IDX]
-GO
-CREATE CLUSTERED INDEX [idxMemberID] ON [dbo].[Claim] ([MemberID], [ClaimID]) ON [dbo_Claim]
-GO
-CREATE STATISTICS [spidxClaimID] ON [dbo].[Claim] ([ClaimID])
-GO
-CREATE STATISTICS [spidxClientClaimID] ON [dbo].[Claim] ([Client], [ClaimID])
-GO
-CREATE STATISTICS [spidxMemberID] ON [dbo].[Claim] ([MemberID], [ClaimID])
+) ON [PRIMARY]
 GO

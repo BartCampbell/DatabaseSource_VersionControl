@@ -6,9 +6,7 @@ CREATE TABLE [dbo].[Eligibility]
 [DateEffective] [datetime] NULL,
 [DateRowCreated] [datetime] NULL,
 [DateTerminated] [datetime] NULL,
-[HashValue] [binary] (16) NULL,
 [HealthPlanID] [int] NOT NULL,
-[IsUpdated] [bit] NULL,
 [MemberID] [int] NOT NULL,
 [RowID] [int] NULL,
 [ProductType] [char] (3) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -20,74 +18,11 @@ CREATE TABLE [dbo].[Eligibility]
 [CoverageMHDayNightFlag] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CoverageMHInpatientFlag] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CoveragePharmacyFlag] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[HealthPlanEmployeeFlag] [char] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[HedisMeasureID] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [LoadInstanceFileID] [int] NULL,
-[Program] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [EmployerGroup] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[EmployerDivision] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[ihds_prov_id_pcp] [int] NULL,
-[MemberGroupID] [int] NULL,
-[BenefitPlanID] [int] NULL,
-[LineOfBusinessID] [int] NULL,
-[BenefitPlanCode] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[BenefitPlanDesc] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[EligRecordCreateDate] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[EligRecordCreateUser] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[EligRecordUpdateDate] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[EligRecordUpdateUser] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[TermReason] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Relationship] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[RelationshipDesc] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[LineOfBusiness] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CustomerPCPID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[IPAID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[IPADesc] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PanelID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PanelDesc] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CustomerEligibilityID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CustomerMemberGroupID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [CoverageHospiceFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[MedicareType] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CustomerSubscriberSeqID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CopayCategory] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[LICSLevel] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CustomerEligibilityStatus] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[HospitalPayorInsCode] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[SourceSystem] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[EnrollID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CustomerPlanID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[EligibleOrigID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[Carrierid] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[InsuredID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PlanDescription] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PlanType] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[EligibleOrganizationName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[EligibleOrganizationType] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CarrierName] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CarrierType] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CarrierMemID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[PlanID] [varchar] (30) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[InsuredMemberID] [int] NULL,
-[InsuredIHDS_Member_ID] [int] NULL,
-[RateCode] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[ProgramID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[ProgramDescription] [varchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[CustomerEligRatingCode] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[OrgPolicyID] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[policynum] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[ProductPriority] [int] NULL
+[ProductPriority] [int] NULL,
+[HedisMeasureID] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[HealthPlanEmployeeFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [dbo_Eligibility]
-GO
-CREATE NONCLUSTERED INDEX [idxClient] ON [dbo].[Eligibility] ([Client], [LoadInstanceFileID]) ON [dbo_Eligibility_IDX]
-GO
-CREATE NONCLUSTERED INDEX [idxEligibilityID] ON [dbo].[Eligibility] ([EligibilityID], [MemberID]) ON [dbo_Eligibility_IDX]
-GO
-CREATE CLUSTERED INDEX [idxMemberID] ON [dbo].[Eligibility] ([MemberID], [EligibilityID]) ON [dbo_Eligibility]
-GO
-CREATE STATISTICS [spidxClient] ON [dbo].[Eligibility] ([Client], [LoadInstanceFileID])
-GO
-CREATE STATISTICS [spidxEligibilityID] ON [dbo].[Eligibility] ([EligibilityID], [MemberID])
-GO
-CREATE STATISTICS [spidxMemberID] ON [dbo].[Eligibility] ([MemberID], [EligibilityID])
 GO
