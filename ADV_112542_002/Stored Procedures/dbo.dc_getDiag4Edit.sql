@@ -19,7 +19,7 @@ BEGIN
 	SELECT @Provider=Provider_ID FROM tblSuspect S INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK=P.ProviderMaster_PK WHERE S.Suspect_PK=@Suspect
 	SELECT MAX(CodedData_PK) CodedData_PK,DiagnosisCode,Code_Description,DOS_From,DOS_Thru,MAX(CPT) CPT,MAX(User_PK) User_PK,IsICD10,MAX(CodedSource_PK) CodedSource_PK
 			,MAX(Provider_PK) Provider_PK, MAX(Provider) Provider
-			,dbo.tmi_udf_GetChartNotes(MAX(CodedData_PK)) Notes
+			,dbo.tmi_udf_GetChartNotes(MAX(CodedData_PK),0) Notes
 			,MAX(NoteText) NoteText
 			,MAX(OpenedPage) OpenedPage,MAX(ScannedData_PK) ScannedData_PK,MAX(V12HCC) V12HCC,MAX(V21HCC) V21HCC,MAX(V22HCC) V22HCC,MAX(RxHCC) RxHCC
 	FROM (

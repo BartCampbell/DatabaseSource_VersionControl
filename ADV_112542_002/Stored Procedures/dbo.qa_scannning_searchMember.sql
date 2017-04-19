@@ -17,6 +17,6 @@ BEGIN
 		INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Member_PK = M.Member_PK 
 		INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 		INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON P.ProviderMaster_PK = PM.ProviderMaster_PK
-	WHERE M.Member_ID+' '+M.Lastname+IsNull(', '+M.Firstname,'') LIKE '%'+@search+'%'
+	WHERE S.LinkedSuspect_PK IS NULL AND S.IsScanned=1 AND M.Member_ID+' '+M.Lastname+IsNull(', '+M.Firstname,'') LIKE '%'+@search+'%'
 END
 GO

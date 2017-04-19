@@ -53,7 +53,7 @@ BEGIN
 			LEFT JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Scanned_User_PK
 			LEFT JOIN tblScanningQANote_Suspect SN WITH (NOLOCK) ON SN.Suspect_PK = S.Suspect_PK
 			LEFT JOIN tblUser QA WITH (NOLOCK) ON QA.User_PK = SN.QA_User_PK
-		WHERE S.IsScanned=1'
+		WHERE S.LinkedSuspect_PK IS NULL AND S.IsScanned=1'
 	
 	IF @member<>''
 	BEGIN

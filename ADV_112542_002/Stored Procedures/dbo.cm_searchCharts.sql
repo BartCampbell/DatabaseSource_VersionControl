@@ -51,7 +51,7 @@ BEGIN
 
 		,dbo.tmi_udf_GetSuspectDOSs(S.Suspect_PK) DOSs
 		,IsNull(S.IsInComp_Replied,0) IsInComp_Replied
-		,EQ.PDFname,EQAL.PageFrom,EQAL.PageTo,EQAL.dtInsert AttachDate,U.Lastname+IsNull(', '+U.Firstname,'') AttachedBy,EQAL.IsInvoice,EQAL.IsCNA
+		,EQ.PDFname,EQAL.PageFrom,EQAL.PageTo,EQAL.dtInsert AttachDate,U.Lastname+IsNull(', '+U.Firstname,'') AttachedBy,EQAL.IsInvoice,EQAL.IsCNA,S.LinkedSuspect_PK
 	FROM 
 		tblSuspect S WITH (NOLOCK)
 		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
@@ -61,7 +61,7 @@ BEGIN
 		INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
 		LEFT JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK = P.ProviderOffice_PK
 		LEFT JOIN tblZipCode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
-		LEFT JOIN tblExtractionQueueAttachLog EQAL WITH (NOLOCK) ON EQAL.Suspect_PK = S.Suspect_PK 
+		LEFT JOIN tblExtractionQueueAttachLog EQAL WITH (NOLOCK) ON EQAL.Suspect_PK = S.Suspect_PK OR EQAL.Suspect_PK = S.LinkedSuspect_PK
 		LEFT JOIN tblExtractionQueue EQ WITH (NOLOCK) ON EQ.ExtractionQueue_PK = EQAL.ExtractionQueue_PK
 		LEFT JOIN tblUser U WITH (NOLOCK) ON U.User_PK	= EQAL.User_PK
 	WHERE (@Provider=0 OR P.Provider_PK=@Provider)

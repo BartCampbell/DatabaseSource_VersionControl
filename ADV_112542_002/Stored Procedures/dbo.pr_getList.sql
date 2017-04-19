@@ -44,11 +44,11 @@ BEGIN
 	IF (@UserType=1)	--Scheduler
 	BEGIN
 		SET @SQL = '	
-			SELECT DISTINCT PO.LastUpdated_User_PK User_PK,S.Project_PK,P.ProviderOffice_PK,1 Sch, 0 Cnt,COUNT(DISTINCT S.Suspect_PK) SchCharts, 0 CntCharts INTO #tmp
+			SELECT DISTINCT PO.LastUpdated_User_PK User_PK,0 Project_PK,P.ProviderOffice_PK,1 Sch, 0 Cnt,COUNT(DISTINCT S.Suspect_PK) SchCharts, 0 CntCharts INTO #tmp
 			FROM tblSuspect S WITH (NOLOCK)
 					INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 					INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
-					INNER JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
+					INNER JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK 
 			WHERE 1=1 '
 
 		IF @User<>0
@@ -64,15 +64,15 @@ BEGIN
 		ELSE IF @DateType = 5
 			SET @SQL = @SQL + ' AND PO.LastUpdated_Date>= '''+ @startDate +''' AND PO.LastUpdated_Date < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
 
-		SET @SQL = @SQL + '	GROUP BY PO.LastUpdated_User_PK,S.Project_PK,P.ProviderOffice_PK;
+		SET @SQL = @SQL + '	GROUP BY PO.LastUpdated_User_PK,P.ProviderOffice_PK;
 
 			CREATE INDEX idxTmp ON #tmp (User_PK,Project_PK,ProviderOffice_PK);
 			INSERT INTO #tmp
-			SELECT DISTINCT PO.LastUpdated_User_PK User_PK,S.Project_PK,P.ProviderOffice_PK,0 Sch, 1 Cnt,0 SchCharts, COUNT(DISTINCT S.Suspect_PK) CntCharts
+			SELECT DISTINCT PO.LastUpdated_User_PK User_PK,0 Project_PK,P.ProviderOffice_PK,0 Sch, 1 Cnt,0 SchCharts, COUNT(DISTINCT S.Suspect_PK) CntCharts
 			FROM tblSuspect S WITH (NOLOCK)
 					INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 					INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
-					INNER JOIN tblContactNotesOffice PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.Office_PK AND S.Project_PK = PO.Project_PK
+					INNER JOIN tblContactNotesOffice PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.Office_PK
 			WHERE 1=1 '
 
 		IF @User<>0
@@ -88,11 +88,11 @@ BEGIN
 		ELSE IF @DateType = 5
 			SET @SQL = @SQL + ' AND PO.LastUpdated_Date>= '''+ @startDate +''' AND PO.LastUpdated_Date < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
 
-		SET @SQL = @SQL + '	GROUP BY PO.LastUpdated_User_PK,S.Project_PK,P.ProviderOffice_PK
+		SET @SQL = @SQL + '	GROUP BY PO.LastUpdated_User_PK,P.ProviderOffice_PK
 
 
-		SELECT User_PK,Project_PK,ProviderOffice_PK,MAX(Sch) Sch, MAX(Cnt) Cnt,MAX(SchCharts) SchCharts,MAX(CntCharts) CntCharts INTO #Sch
-		FROM #tmp GROUP BY User_PK,Project_PK,ProviderOffice_PK;
+		SELECT User_PK,0 Project_PK,ProviderOffice_PK,MAX(Sch) Sch, MAX(Cnt) Cnt,MAX(SchCharts) SchCharts,MAX(CntCharts) CntCharts INTO #Sch
+		FROM #tmp GROUP BY User_PK,ProviderOffice_PK;
 
 		CREATE INDEX idxSch ON #Sch (User_PK);
 		
@@ -180,15 +180,15 @@ BEGIN
 		SET @SQL = @SQL + ' GROUP BY U.User_PK, U.Lastname, U.Firstname ,U.Username '
 		
 	END	
-	
 	ELSE IF (@UserType=3)		--Coder	-- Reviewer
 	BEGIN
 		SET @SQL = '	
 
-			SELECT S.User_PK User_PK,COUNT(DISTINCT S.Suspect_PK) Coded, 0 Assigned INTO #tmp FROM tblSuspectLevelCoded S
-					INNER JOIN tblSuspect SC ON SC.Suspect_PK = S.Suspect_PK
+			SELECT S.User_PK User_PK,COUNT(DISTINCT S.Suspect_PK) Completed,COUNT(DISTINCT SD.ScannedData_PK) CompletedPages, 0 InComplete,NULL InCompletedPages, 0 Assigned INTO #tmp FROM tblSuspectLevelCoded S WITH (NOLOCK)
+					INNER JOIN tblSuspect SC WITH (NOLOCK) ON SC.Suspect_PK = S.Suspect_PK
 					INNER JOIN #tmpProject Pr ON SC.Project_PK = Pr.Project_PK
-			WHERE S.IsCompleted=1 ';
+					LEFT JOIN tblScannedData SD WITH (NOLOCK) ON S.Suspect_PK = SD.Suspect_PK AND (SD.Is_Deleted IS NULL OR SD.Is_Deleted=0)
+			WHERE S.IsCompleted=1 AND SC.LinkedSuspect_PK IS NULL ';
 --SELECT * FROM tblSuspectLevelCoded	
 		IF @User<>0
 			SET @SQL = @SQL + ' AND S.User_PK=' + CAST(@User AS VARChar);			
@@ -208,10 +208,33 @@ BEGIN
 
 			CREATE INDEX idxtmp ON #tmp (User_PK);
 			INSERT INTO #tmp
-			SELECT User_PK,0 Coded, COUNT(DISTINCT S.Suspect_PK) Assigned FROM tblSuspect S 
+			SELECT S.User_PK User_PK,0 Completed,NULL CompletedPages, COUNT(DISTINCT S.Suspect_PK) InComplete,COUNT(DISTINCT SD.ScannedData_PK) InCompletedPages, 0 Assigned FROM tblSuspectLevelCoded S
+					INNER JOIN tblSuspect SC ON SC.Suspect_PK = S.Suspect_PK
+					INNER JOIN #tmpProject Pr ON SC.Project_PK = Pr.Project_PK
+					LEFT JOIN tblScannedData SD WITH (NOLOCK) ON S.Suspect_PK = SD.Suspect_PK AND (SD.Is_Deleted IS NULL OR SD.Is_Deleted=0)
+			WHERE S.IsCompleted=0  AND SC.LinkedSuspect_PK IS NULL ';
+--SELECT * FROM tblSuspectLevelCoded	
+		IF @User<>0
+			SET @SQL = @SQL + ' AND S.User_PK=' + CAST(@User AS VARChar);			
+		IF @DateType = 1
+			SET @SQL = @SQL + ' AND DATEPART(wk, S.dtInserted) = DATEPART(wk, GETDATE()-7) AND DATEPART(yy, S.dtInserted) = DATEPART(yy, GETDATE()-7)'
+		ELSE IF @DateType = 2
+			SET @SQL = @SQL + ' AND DATEPART(wk, S.dtInserted) = DATEPART(wk, GETDATE()) AND DATEPART(yy, S.dtInserted) = DATEPART(yy, GETDATE())'
+		ELSE IF @DateType = 3
+			SET @SQL = @SQL + ' AND Month(S.dtInserted) = Month(GETDATE()) AND Year(S.dtInserted) = Year(GETDATE())'
+		ELSE IF @DateType = 4
+			SET @SQL = @SQL + ' AND Month(S.dtInserted) = Month(DateAdd(month,-1,getdate())) AND Year(S.dtInserted) = Year(DateAdd(month,-1,getdate()))'
+		ELSE IF @DateType = 5
+			SET @SQL = @SQL + ' AND S.dtInserted>= '''+ @startDate +''' AND S.dtInserted < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
+						
+		SET @SQL = @SQL + '
+			GROUP BY S.User_PK;
+
+			INSERT INTO #tmp
+			SELECT User_PK,0  Completed, NULL CompletedPages, 0 InComplete,NULL InCompletedPages, COUNT(DISTINCT S.Suspect_PK) Assigned FROM tblSuspect S 
 				INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
 				INNER JOIN tblCoderAssignment PA ON PA.Suspect_PK = S.Suspect_PK
-			WHERE S.IsScanned=1 '
+			WHERE 1=1' --S.IsScanned=1 
 		IF @User<>0
 			SET @SQL = @SQL + ' AND PA.LastUpdated_User_PK=' + CAST(@User AS VARChar);
 		IF @DateType = 1
@@ -228,13 +251,14 @@ BEGIN
 		SET @SQL = @SQL + '					
 			GROUP BY User_PK
 		
-		SELECT ROW_NUMBER() OVER(ORDER BY U.Lastname+ISNULL('', ''+U.Firstname,'''')) AS RowNumber, U.User_PK, U.Lastname+ISNULL('', ''+U.Firstname,'''') Fullname,U.Username
-			,MAX(Assigned) Assigned, MAX(Coded) Coded
-		FROM #tmp T INNER JOIN tblUser U ON U.User_PK = T.User_PK'
+		SELECT ROW_NUMBER() OVER(ORDER BY U.Lastname+ISNULL('', ''+U.Firstname,'''')) AS RowNumber, IsNull(U.User_PK,0) User_PK, U.Lastname+ISNULL('', ''+U.Firstname,'''') Fullname,IsNull(U.Username,''Unknown'') Username
+			,SUM(Assigned) Assigned, SUM(Completed) Completed, SUM(CompletedPages) CompletedPages, SUM(InComplete) Incomplete, SUM(InCompletedPages) IncompletePages
+		FROM #tmp T LEFT JOIN tblUser U ON U.User_PK = T.User_PK'
 		IF @location <> 0
 			SET @SQL = @SQL + ' WHERE U.Location_PK=' + CAST(@location AS VARCHAR)
 		SET @SQL = @SQL + ' GROUP BY U.User_PK, U.Lastname, U.Firstname ,U.Username
 		'		
+		--		SELECT SUM(Completed) X FROM #tmp T
 	END		
 	ELSE IF (@UserType=4)		--PDF Inventory
 	BEGIN
@@ -246,10 +270,10 @@ BEGIN
 	BEGIN
 		SET @SQL = '	
 
-			SELECT S.User_PK User_PK,COUNT(DISTINCT S.Suspect_PK) Coded, 0 Assigned INTO #tmp FROM tblSuspectLevelCoded S
+			SELECT S.User_PK User_PK,COUNT(DISTINCT S.Suspect_PK) Completed, 0 InComplete, 0 Assigned INTO #tmp FROM tblSuspectLevelCoded S
 					INNER JOIN tblSuspect SC ON SC.Suspect_PK = S.Suspect_PK
 					INNER JOIN #tmpProject Pr ON SC.Project_PK = Pr.Project_PK
-			WHERE S.IsCompleted=1 ';
+			WHERE S.IsCompleted=1  AND SC.LinkedSuspect_PK IS NULL';
 --SELECT * FROM tblSuspectLevelCoded	
 		IF @User<>0
 			SET @SQL = @SQL + ' AND S.User_PK=' + CAST(@User AS VARChar);			
@@ -268,11 +292,34 @@ BEGIN
 			GROUP BY S.User_PK;
 
 			CREATE INDEX idxtmp ON #tmp (User_PK);
+
 			INSERT INTO #tmp
-			SELECT User_PK,0 Coded, COUNT(DISTINCT S.Suspect_PK) Assigned FROM tblSuspect S 
+			SELECT S.User_PK User_PK,0 Completed, COUNT(DISTINCT S.Suspect_PK) InComplete, 0 Assigned FROM tblSuspectLevelCoded S
+					INNER JOIN tblSuspect SC ON SC.Suspect_PK = S.Suspect_PK
+					INNER JOIN #tmpProject Pr ON SC.Project_PK = Pr.Project_PK
+			WHERE S.IsCompleted=0  AND SC.LinkedSuspect_PK IS NULL';
+--SELECT * FROM tblSuspectLevelCoded	
+		IF @User<>0
+			SET @SQL = @SQL + ' AND S.User_PK=' + CAST(@User AS VARChar);			
+		IF @DateType = 1
+			SET @SQL = @SQL + ' AND DATEPART(wk, S.dtInserted) = DATEPART(wk, GETDATE()-7) AND DATEPART(yy, S.dtInserted) = DATEPART(yy, GETDATE()-7)'
+		ELSE IF @DateType = 2
+			SET @SQL = @SQL + ' AND DATEPART(wk, S.dtInserted) = DATEPART(wk, GETDATE()) AND DATEPART(yy, S.dtInserted) = DATEPART(yy, GETDATE())'
+		ELSE IF @DateType = 3
+			SET @SQL = @SQL + ' AND Month(S.dtInserted) = Month(GETDATE()) AND Year(S.dtInserted) = Year(GETDATE())'
+		ELSE IF @DateType = 4
+			SET @SQL = @SQL + ' AND Month(S.dtInserted) = Month(DateAdd(month,-1,getdate())) AND Year(S.dtInserted) = Year(DateAdd(month,-1,getdate()))'
+		ELSE IF @DateType = 5
+			SET @SQL = @SQL + ' AND S.dtInserted>= '''+ @startDate +''' AND S.dtInserted < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
+						
+		SET @SQL = @SQL + '
+			GROUP BY S.User_PK;
+
+			INSERT INTO #tmp
+			SELECT User_PK,0 Completed, 0 InComplete, COUNT(DISTINCT S.Suspect_PK) Assigned FROM tblSuspect S 
 				INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
 				INNER JOIN tblCoderAssignment PA ON PA.Suspect_PK = S.Suspect_PK
-			WHERE S.IsScanned=1 '
+			WHERE 1=1 ' -- S.IsScanned=1 
 		IF @User<>0
 			SET @SQL = @SQL + ' AND PA.LastUpdated_User_PK=' + CAST(@User AS VARChar);
 		IF @DateType = 1
@@ -289,10 +336,10 @@ BEGIN
 		SET @SQL = @SQL + '					
 			GROUP BY User_PK
 		
-		SELECT ROW_NUMBER() OVER(ORDER BY L.Location) AS RowNumber, L.Location
-			,SUM(Assigned) Assigned, SUM(Coded) Coded, 0 User_PK
-		FROM #tmp T INNER JOIN tblUser U ON U.User_PK = T.User_PK
-			INNER JOIN tblLocation L ON L.Location_PK = U.Location_PK 
+		SELECT ROW_NUMBER() OVER(ORDER BY L.Location) AS RowNumber, IsNull(L.Location,''Unknown'') Location
+			,SUM(Assigned) Assigned, SUM(Completed) Completed, SUM(InComplete) Incomplete, 0 User_PK
+		FROM #tmp T LEFT JOIN tblUser U ON U.User_PK = T.User_PK
+			LEFT JOIN tblLocation L ON L.Location_PK = U.Location_PK 
 		'
 		IF @location <> 0
 			SET @SQL = @SQL + ' WHERE U.Location_PK=' + CAST(@location AS VARCHAR)

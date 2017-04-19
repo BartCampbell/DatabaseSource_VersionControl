@@ -34,7 +34,7 @@ BEGIN
 		END
 	END CATCH
 -----------Transaction Starts-------------------
-
+/*
 	--Updating Coding Status
 	DECLARE @IsCompleted AS bit
 	IF EXISTS(SELECT 1 FROM tblScannedData SD WITH (NOLOCK) LEFT JOIN tblScannedDataPageStatus SDPS WITH (NOLOCK) ON SD.ScannedData_PK = SDPS.ScannedData_PK AND SDPS.CoderLevel=@level
@@ -61,7 +61,7 @@ BEGIN
 			GOTO RETRY2 -- Go to Label RETRY
 		END
 	END CATCH
-/*
+
 	--To Update tblSuspect with Coded info
 	DECLARE @UpdateSuspectTable AS BIT = 0
 	IF @IsCompleted=1 AND (@ConfigLevels=1 OR @IsBlindCoding=1)	--WHEN there is only one level or Blind is enabled then simply update the tblSuspect. Because any level is completed, we count the chart as coded on main grid

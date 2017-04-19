@@ -102,7 +102,7 @@ BEGIN
 	DECLARE @IsOverwriteSchedule AS TinyInt 
 	DECLARE @ChartResolutionCode AS VARCHAR(200)
 	DECLARE @IsOverwriteCNA AS TinyInt = 0
-
+	SELECT * FROM tblChaseStatus
 	SELECT @IsOverwriteSchedule = CASE WHEN ProviderOfficeBucket_PK = 5 THEN 1 ELSE 0 END, @ChartResolutionCode = ChartResolutionCode, @IsNotContacted = IsNotContacted, @IsSchedulingInProgress = IsSchedulingInProgress, @IsScheduled = IsScheduled, @IsExtracted = IsExtracted, @IsCNA = IsCNA, @IsCoded = IsCoded FROM tblChaseStatus WHERE ChaseStatus_PK = @ChaseStatus
 	IF (@ChartResolutionCode='Project Change')
 		SET @IsOverwriteCNA = 1
@@ -115,9 +115,9 @@ BEGIN
 			(@IsExtracted = 1 AND CS.IsCoded=0) OR	--Extracted flag can overwrite any other status except for Codeded
 			(@IsCNA = 1 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR --IsCNA flag can overwrite any other status except for Codeded and Extracted
 			(@IsOverwriteCNA = 1 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR --@IsOverwriteCNA flag can overwrite any other status except for Codeded and Extracted
-			((@IsScheduled = 1 OR @IsOverwriteSchedule=1) AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR
-			(@IsSchedulingInProgress = 1 AND CS.IsScheduled = 0 AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR
-			(@IsNotContacted=1 AND CS.IsSchedulingInProgress = 0 AND CS.IsScheduled = 0 AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0)
+			((@IsScheduled = 1 OR @IsOverwriteSchedule=1) AND CS.IsIssue=0 AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR --Can't overwrite Issue
+			(@IsSchedulingInProgress = 1 AND CS.IsIssue=0 AND CS.IsScheduled = 0 AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0) OR --Can't overwrite Issue/Scheduled
+			(@IsNotContacted=1 AND CS.IsIssue=0 AND CS.IsSchedulingInProgress = 0 AND CS.IsScheduled = 0 AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0) ----Can't overwrite Issue/Schedule/Scheduling InProgress
 		)
 
 	INSERT INTO tblContactNotesOffice(Project_PK, Office_PK, ContactNote_PK, ContactNoteText, LastUpdated_User_PK, LastUpdated_Date,contact_num)

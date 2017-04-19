@@ -46,77 +46,47 @@ BEGIN
 		INSERT INTO #tmpSearch(Provider_PK)
 		SELECT DISTINCT Provider_PK FROM tblSuspect S WHERE S.Provider_PK=@pid
 	END
-;
-	With tbl AS(
+
 	SELECT ROW_NUMBER() OVER(
 		ORDER BY 
 			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'P' THEN PM.Lastname+IsNull(', '+PM.Firstname,'') WHEN 'PID' THEN PM.Provider_ID ELSE NULL END END ASC,
 			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'P' THEN PM.Lastname+IsNull(', '+PM.Firstname,'') WHEN 'PID' THEN PM.Provider_ID ELSE NULL END END DESC,
-			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'CD' THEN Count(S.Coded_User_PK) WHEN 'CNA' THEN Count(S.CNA_User_PK) WHEN 'SC' THEN Count(S.Scanned_User_PK) WHEN 'CH' THEN Count(S.Member_PK) WHEN 'OS' THEN PO.ProviderOfficeBucket_PK ELSE NULL END END ASC,
-			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'CD' THEN Count(S.Coded_User_PK) WHEN 'CNA' THEN Count(S.CNA_User_PK) WHEN 'SC' THEN Count(S.Scanned_User_PK) WHEN 'CH' THEN Count(S.Member_PK) WHEN 'OS' THEN PO.ProviderOfficeBucket_PK ELSE NULL END END DESC
+			CASE WHEN @Order='ASC'  THEN CASE @SORT WHEN 'CD' THEN COUNT(DISTINCT S.Suspect_PK) WHEN 'SC' THEN COUNT(DISTINCT CASE WHEN S.IsScanned=1 THEN S.Suspect_PK ELSE NULL END) WHEN 'CH' THEN COUNT(DISTINCT CASE WHEN S.IsCoded=1 THEN S.Suspect_PK ELSE NULL END) WHEN 'OS' THEN CASE WHEN SUM(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN 1 ELSE 0 END)=0 THEN 6 ELSE MAX(CS.ProviderOfficeBucket_PK) END WHEN 'PRV' THEN COUNT(DISTINCT S.Provider_PK) ELSE NULL END END ASC,
+			CASE WHEN @Order='DESC' THEN CASE @SORT WHEN 'CD' THEN COUNT(DISTINCT S.Suspect_PK) WHEN 'SC' THEN COUNT(DISTINCT CASE WHEN S.IsScanned=1 THEN S.Suspect_PK ELSE NULL END) WHEN 'CH' THEN COUNT(DISTINCT CASE WHEN S.IsCoded=1 THEN S.Suspect_PK ELSE NULL END) WHEN 'OS' THEN CASE WHEN SUM(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN 1 ELSE 0 END)=0 THEN 6 ELSE MAX(CS.ProviderOfficeBucket_PK) END WHEN 'PRV' THEN COUNT(DISTINCT S.Provider_PK) ELSE NULL END END DESC --,
 		) AS RowNumber
-			,PO.ProviderOfficeBucket_PK OfficeStatus		
-			,S.Project_PK,P.Provider_PK,PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider
-			,Count(S.Member_PK) Charts
-			,Count(S.Scanned_User_PK) Scanned
-			,Count(S.CNA_User_PK) CNA
-			,Count(S.Coded_User_PK) Coded
-		FROM 
-			tblProvider P WITH (NOLOCK)
+			,CASE WHEN SUM(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN 1 ELSE 0 END)=0 THEN 6 ELSE MAX(CS.ProviderOfficeBucket_PK) END OfficeStatus		
+			,0 Project_PK,P.Provider_PK,PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider
+			,COUNT(DISTINCT S.Suspect_PK) Charts
+			,COUNT(DISTINCT CASE WHEN S.IsScanned=1 THEN S.Suspect_PK ELSE NULL END) Scanned
+			,COUNT(DISTINCT CASE WHEN S.IsScanned=0 AND S.IsCNA=1 THEN S.Suspect_PK ELSE NULL END) CNA
+			,COUNT(DISTINCT CASE WHEN S.IsCoded=1 THEN S.Suspect_PK ELSE NULL END) Coded
+		INTO #tbl
+		FROM tblProviderMaster PM WITH (NOLOCK)
+			INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderMaster_PK = PM.ProviderMaster_PK
 			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
-			INNER JOIN tblMember M WITH (NOLOCK) ON S.Member_PK = M.Member_PK
-			INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
-			INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
-			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK = P.ProviderOffice_PK
-			INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON S.Project_PK = cPO.Project_PK AND PO.ProviderOffice_PK = cPO.ProviderOffice_PK
-			LEFT JOIN #tmpSearch tS ON tS.Provider_PK = P.Provider_PK
+			INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
+			INNER JOIN tblChaseStatus CS WITH (NOLOCK) ON CS.ChaseStatus_PK = S.ChaseStatus_PK
+			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 		WHERE (@Office=0 OR P.ProviderOffice_PK=@Office)
 			AND IsNull(PM.Lastname+IsNull(', '+PM.Firstname,''),0) Like @Alpha+'%'
-			AND (@pid=0 OR tS.Provider_PK IS NOT NULL)
-			AND (@bucket=0 OR PO.ProviderOfficeBucket_PK=@bucket)
-			AND (@followup_bucket=0 OR follow_up<=GetDate())
+			AND (@pid=0 OR P.Provider_PK=@pid) 
 			AND (@segment=0 OR M.Segment_PK=@segment)
-		GROUP BY S.Project_PK,P.Provider_PK,PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,''),PO.ProviderOfficeBucket_PK
-	)
+		GROUP BY S.Project_PK,P.Provider_PK,PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'')--,PO.ProviderOfficeBucket_PK
+
 	
-	SELECT * FROM tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
+	SELECT * FROM #tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
 	
-	SELECT UPPER(LEFT(PM.Lastname+IsNull(', '+PM.Firstname,''),1)) alpha1, UPPER(RIGHT(LEFT(PM.Lastname+IsNull(', '+PM.Firstname,''),2),1)) alpha2,Count(DISTINCT P.Provider_PK) records
-		FROM 
-			tblProvider P WITH (NOLOCK)
-			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
-			INNER JOIN tblMember M WITH (NOLOCK) ON S.Member_PK = M.Member_PK
-			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK = P.ProviderOffice_PK
-			INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON S.Project_PK = cPO.Project_PK AND PO.ProviderOffice_PK = cPO.ProviderOffice_PK
-			INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
-			INNER JOIN #tmpProject Pr ON Pr.Project_PK = cPO.Project_PK
-			LEFT JOIN #tmpSearch tS ON tS.Provider_PK = P.Provider_PK
-		WHERE (@Office=0 OR P.ProviderOffice_PK=@Office)
-			AND (@pid=0 OR tS.Provider_PK IS NOT NULL)	
-			AND (@bucket=0 OR PO.ProviderOfficeBucket_PK=@bucket)
-			AND (@followup_bucket=0 OR follow_up<=GetDate())
-			AND (@segment=0 OR M.Segment_PK=@segment)			
-		GROUP BY LEFT(PM.Lastname+IsNull(', '+PM.Firstname,''),1), RIGHT(LEFT(PM.Lastname+IsNull(', '+PM.Firstname,''),2),1)			
+	SELECT UPPER(LEFT(Provider+IsNull(', '+Provider,''),1)) alpha1, UPPER(RIGHT(LEFT(Provider+IsNull(', '+Provider,''),2),1)) alpha2,Count(DISTINCT Provider_PK) records
+		FROM #tbl			
+		GROUP BY LEFT(Provider+IsNull(', '+Provider,''),1), RIGHT(LEFT(Provider+IsNull(', '+Provider,''),2),1)			
 		ORDER BY alpha1, alpha2
 		
 	--Totals
 	SELECT
-			Count(S.Member_PK) Charts
-			,Count(S.Scanned_User_PK) Scanned
-			,Count(S.CNA_User_PK) CNA
-			,Count(S.Coded_User_PK) Coded
-		FROM 
-			tblProvider P WITH (NOLOCK)
-			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
-			INNER JOIN tblMember M WITH (NOLOCK) ON S.Member_PK = M.Member_PK
-			INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
-			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK = P.ProviderOffice_PK
-			INNER JOIN cacheProviderOffice cPO WITH (NOLOCK) ON S.Project_PK = cPO.Project_PK AND PO.ProviderOffice_PK = cPO.ProviderOffice_PK
-			LEFT JOIN #tmpSearch tS ON tS.Provider_PK = P.Provider_PK
-		WHERE (@Office=0 OR P.ProviderOffice_PK=@Office)
-			AND (@pid=0 OR tS.Provider_PK IS NOT NULL)
-			AND (@bucket=0 OR PO.ProviderOfficeBucket_PK=@bucket)
-			AND (@followup_bucket=0 OR follow_up<=GetDate())
-			AND (@segment=0 OR M.Segment_PK=@segment)
+			SUM(Charts) Charts
+			,SUM(Scanned) Scanned
+			,SUM(CNA) CNA
+			,SUM(Coded) Coded
+		FROM #tbl
 END
 GO
