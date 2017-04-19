@@ -13,6 +13,13 @@ CREATE TABLE [dbo].[FHN_Provider_Stage]
 [Zip Code] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [County] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [City] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[State] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[State] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[CentauriProviderID] [bigint] NULL,
+[FileName] [nvarchar] (100) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Phone] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[Fax] [nvarchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[HashKey] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[LoadDate] [datetime] NULL,
+[CentauriNetworkID] [bigint] NULL
 ) ON [PRIMARY]
 GO
