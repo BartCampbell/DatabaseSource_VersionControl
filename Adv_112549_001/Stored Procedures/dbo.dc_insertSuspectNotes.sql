@@ -2,8 +2,8 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
-
---EXEC dc_insertSuspectNotes @Suspect_PK = 7558,	@Notes_IDS='0,1,2,3',	@Notes_Text='', @Coded_User_PK=1
+--EXEC dc_insertSuspectNotes @Suspect_PK = 541,@Notes_IDS='0',@Notes_Text='ABXcccdddXXX', @Coded_User_PK=1
+--EXEC dc_insertSuspectNotes @Suspect_PK = 541,	@Notes_IDS='0',	@Notes_Text='ABXX', @Coded_User_PK=1
 CREATE PROCEDURE [dbo].[dc_insertSuspectNotes] 
 	@Suspect_PK BIGINT,
 	@Notes_IDS VARCHAR(100),

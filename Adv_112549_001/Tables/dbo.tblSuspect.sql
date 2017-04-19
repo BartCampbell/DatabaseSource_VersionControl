@@ -41,7 +41,8 @@ CREATE TABLE [dbo].[tblSuspect]
 [ChaseStatus_PK] [int] NULL,
 [PlanLID] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [LastContacted] [smalldatetime] NULL,
-[FollowUp] [smalldatetime] NULL
+[FollowUp] [smalldatetime] NULL,
+[LinkedSuspect_PK] [bigint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblSuspect] ADD CONSTRAINT [PK_tblSuspect] PRIMARY KEY CLUSTERED  ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
@@ -51,6 +52,8 @@ GO
 CREATE NONCLUSTERED INDEX [IDX_IsCoded] ON [dbo].[tblSuspect] ([IsCoded]) INCLUDE ([Coded_Date], [Coded_User_PK], [Member_PK], [Project_PK], [Provider_PK], [QA_Date], [QA_User_PK], [Scanned_User_PK], [Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IDX_MemberSuspect_PK] ON [dbo].[tblSuspect] ([IsScanned], [IsCoded]) INCLUDE ([Member_PK], [Suspect_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [idxLinkedSuspect_PK] ON [dbo].[tblSuspect] ([LinkedSuspect_PK]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_tblSuspectMember] ON [dbo].[tblSuspect] ([Member_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO

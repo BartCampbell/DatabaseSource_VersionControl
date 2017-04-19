@@ -104,7 +104,7 @@ BEGIN
 	BEGIN TRANSACTION
 	BEGIN TRY
 		IF NOT EXISTS(SELECT SUSPECT_PK FROM tblSuspectLevelCoded WITH (NOLOCK) WHERE SUSPECT_PK=@Suspect_PK AND CoderLevel=@level)
-			INSERT INTO tblSuspectLevelCoded(CoderLevel,SUSPECT_PK,User_PK,dtInserted,IsCompleted) VALUES(@level, @Suspect_PK, @Coded_User_PK, GETDATE(),0)
+			INSERT INTO tblSuspectLevelCoded(CoderLevel,SUSPECT_PK,User_PK,dtInserted,IsCompleted,CompletionStatus_PK) VALUES(@level, @Suspect_PK, @Coded_User_PK, GETDATE(),0,6)
 
 		COMMIT TRANSACTION
 	END TRY

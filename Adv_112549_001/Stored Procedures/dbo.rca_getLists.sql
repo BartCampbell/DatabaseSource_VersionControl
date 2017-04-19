@@ -17,11 +17,11 @@ BEGIN
 		LEFT JOIN tblCoderAssignment CA WITH (NOLOCK) ON U.User_PK = CA.User_PK AND CA.CoderLevel=@level
 		LEFT JOIN tblSuspect S ON S.Suspect_PK = CA.Suspect_PK AND S.IsScanned=1
 		LEFT JOIN tblSuspectLevelCoded SLC WITH (NOLOCK) ON SLC.Suspect_PK=CA.Suspect_PK AND SLC.CoderLevel=@level AND SLC.IsCompleted=1
-	WHERE U.IsReviewer=1 AND U.CoderLevel=@level 
+	WHERE U.IsCoderOffsite=1 AND U.CoderLevel=@level 
 	GROUP BY U.User_PK,U.Lastname,U.Firstname, Location_PK
 	ORDER BY Fullname
 
-	SELECT DISTINCT L.Location_PK,L.Location FROM tblLocation L WITH (NOLOCK) INNER JOIN tblUser U WITH (NOLOCK) ON U.Location_PK = L.Location_PK WHERE U.IsReviewer=1 AND U.CoderLevel=@level
+	SELECT DISTINCT L.Location_PK,L.Location FROM tblLocation L WITH (NOLOCK) INNER JOIN tblUser U WITH (NOLOCK) ON U.Location_PK = L.Location_PK WHERE U.IsCoderOffsite=1 AND U.CoderLevel=@level
 
 	if (@only_coders=1)
 		return;

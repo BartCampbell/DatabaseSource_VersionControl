@@ -51,7 +51,7 @@ BEGIN
 				FROM tblSuspect S WITH (NOLOCK)
 						INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 						INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
-						INNER JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
+						INNER JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 						INNER JOIN tblProviderOffice tPO WITH (NOLOCK) ON P.ProviderOffice_PK = tPO.ProviderOffice_PK
 						INNER JOIN tblUser U WITH (NOLOCK) ON U.User_PK = PO.LastUpdated_User_PK
 						LEFT JOIN tblZipcode Z WITH (NOLOCK) ON Z.ZipCode_PK = tPO.ZipCode_PK
@@ -80,7 +80,7 @@ BEGIN
 				FROM tblSuspect S WITH (NOLOCK)
 						INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 						INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
-						INNER JOIN tblContactNotesOffice PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.Office_PK AND S.Project_PK = PO.Project_PK
+						INNER JOIN tblContactNotesOffice PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.Office_PK
 						INNER JOIN tblProviderOffice tPO WITH (NOLOCK) ON P.ProviderOffice_PK = tPO.ProviderOffice_PK
 						LEFT JOIN tblZipcode Z WITH (NOLOCK) ON Z.ZipCode_PK = tPO.ZipCode_PK
 				WHERE 1=1 '
@@ -107,7 +107,7 @@ BEGIN
 		IF @DrillType=1
 		BEGIN 
 			SET @SQL = '
-				SELECT S.Suspect_PK, M.Lastname+ISNULL('', ''+M.Firstname,'''') Member, PM.Lastname+ISNULL('', ''+PM.Firstname,'''') Provider,  S.Scanned_Date DT
+				SELECT S.Suspect_PK, M.Lastname+ISNULL('', ''+M.Firstname,'''') Member, PM.Lastname+ISNULL('', ''+PM.Firstname,'''') Provider,  S.Scanned_Date [Scanned On]
 					FROM tblSuspect S 
 						INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
 						INNER JOIN tblMember M ON M.Member_PK = S.Member_PK
@@ -131,7 +131,7 @@ BEGIN
 		ELSE
 		BEGIN
 			SET @SQL = '
-				SELECT S.Suspect_PK, M.Lastname+ISNULL('', ''+M.Firstname,'''') Member, PM.Lastname+ISNULL('', ''+PM.Firstname,'''') Provider,  S.CNA_Date DT
+				SELECT S.Suspect_PK, M.Lastname+ISNULL('', ''+M.Firstname,'''') Member, PM.Lastname+ISNULL('', ''+PM.Firstname,'''') Provider,  S.CNA_Date [CNA On]
 					FROM tblSuspect S 
 						INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
 						INNER JOIN tblMember M ON M.Member_PK = S.Member_PK
@@ -157,15 +157,20 @@ BEGIN
 	ELSE IF (@UserType=3)		--Coder	-- Reviewer
 	BEGIN
 			SET @SQL = '
-				SELECT S.Suspect_PK, M.Lastname+ISNULL('', ''+M.Firstname,'''') Member, PM.Lastname+ISNULL('', ''+PM.Firstname,'''') Provider,  SLC.dtInserted DT
+				SELECT S.Suspect_PK, M.Lastname+ISNULL('', ''+M.Firstname,'''') Member, PM.Lastname+ISNULL('', ''+PM.Firstname,'''') Provider,  SLC.dtInserted [Coded On], CS.CompletionStatus Status, X.ChartPages
 					FROM tblSuspect S 
 						INNER JOIN tblSuspectLevelCoded SLC ON SLC.Suspect_PK = S.Suspect_PK
 						INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
 						INNER JOIN tblMember M ON M.Member_PK = S.Member_PK
 						INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
 						INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
-			WHERE SLC.IsCompleted=1 ';
-		
+						LEFT JOIN tblCompletionStatus CS ON CS.CompletionStatus_PK = SLC.CompletionStatus_PK
+						OUTER APPLY (SELECT COUNT(1) ChartPages FROM tblScannedData SD WHERE SD.Suspect_PK=S.Suspect_PK AND (SD.is_deleted IS NULL OR SD.is_deleted=0)) X
+			WHERE  S.LinkedSuspect_PK IS NULL AND ';
+		IF @DrillType=1
+			SET @SQL = @SQL + ' SLC.IsCompleted=1';
+		ELSE
+			SET @SQL = @SQL + ' SLC.IsCompleted=0';
 		IF @User<>0
 			SET @SQL = @SQL + ' AND SLC.User_PK=' + CAST(@User AS VARChar);			
 		IF @DateType = 1
