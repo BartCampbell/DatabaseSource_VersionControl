@@ -18,7 +18,7 @@ GO
 --**************************************************************************************
 --sample execution:
 --exec ScoreCCS '78568140'
-
+--prRescoreMeasure 'ScoreCCS'
 CREATE PROCEDURE [dbo].[ScoreCCS] @MemberID int
 AS 
 
@@ -149,7 +149,7 @@ SELECT  MemberMeasureMetricScoringID,
                                             INNER JOIN Member d2 ON b2.MemberID = d2.MemberID
                                    WHERE    b2.MemberID = b.MemberID AND
 											a2.EvidenceType = 'Exclusion' AND  
-											(a2.HystNoResidualCervixFlg = 1 OR a2.VaginalPapWithHystFlag = 1 OR a2.HystNoTestingFlag = 1) AND
+											(a2.HystNoResidualCervixFlg = 1 OR a2.VaginalPapWithHystFlag = 1 OR a2.HystNoTestingFlag = 1 OR a2.Complete_Total_Abdominal_HysterectomyFlag = 1) AND
                                             a2.ServiceDate BETWEEN d2.DateOfBirth 
                                                            AND
                                                               @MeasureYearEnd
@@ -159,6 +159,7 @@ SELECT  MemberMeasureMetricScoringID,
         ExclusionReason = CONVERT(varchar(200),	(SELECT   MIN(CASE WHEN VaginalPapWithHystFlag = 1 THEN 'Vaginal Pap Smear in Conjunction with Documentation of Hysterectomy' 
 																	WHEN HystNoResidualCervixFlg = 1 THEN HysterectomyType + ', No Residual Cervix'
 																	WHEN HystNoTestingFlag = 1 THEN 'Hysterectomy, Pap Testing Not Needed'
+																	WHEN Complete_Total_Abdominal_HysterectomyFlag = 1 THEN '"Complete", "total", or "radical abdominal or vaginal hysterectomy"'
 																	END)
 												   FROM     dbo.MedicalRecordCCS a2
 															INNER JOIN Pursuit b2 ON a2.PursuitID = b2.PursuitID
@@ -166,7 +167,7 @@ SELECT  MemberMeasureMetricScoringID,
 															INNER JOIN Member d2 ON b2.MemberID = d2.MemberID
 												   WHERE    b2.MemberID = b.MemberID AND
 															a2.EvidenceType = 'Exclusion' AND  
-															(a2.HystNoResidualCervixFlg = 1 OR a2.VaginalPapWithHystFlag = 1 OR a2.HystNoTestingFlag = 1) AND
+															(a2.HystNoResidualCervixFlg = 1 OR a2.VaginalPapWithHystFlag = 1 OR a2.HystNoTestingFlag = 1 OR a2.Complete_Total_Abdominal_HysterectomyFlag = 1) AND
 															a2.ServiceDate BETWEEN d2.DateOfBirth 
 																		   AND
 																			  @MeasureYearEnd))
@@ -210,6 +211,5 @@ IF OBJECT_ID('tempdb..#SubMetricRuleComponents') IS NOT NULL
     DROP TABLE #SubMetricRuleComponents
 
 
-GO
-GRANT EXECUTE ON  [dbo].[ScoreCCS] TO [Support]
+
 GO
