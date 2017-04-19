@@ -1,4 +1,6 @@
 
+EXEC sp_addrolemember N'db_datareader', N'INTERNAL\brian.edwardson'
+
 EXEC sp_addrolemember N'db_datareader', N'INTERNAL\Michelle.Piccininni'
 EXEC sp_addrolemember N'db_datareader', N'ChartNet_AppUser_Custom'
 GO
