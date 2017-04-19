@@ -56,7 +56,7 @@ BEGIN
 				,CAST(S.IsScanned AS INT) Scanned
 				,CAST(S.IsCoded AS INT) Coded
 				,U.Lastname+IsNULL(', '+U.Firstname,'') Assignment
-				,SLC.IsCompleted,CS.CompletionStatus [Coded Status] 
+				,SLC.IsCompleted,CS.CompletionStatus + CASE WHEN SLC.ReceivedAdditionalPages=1 THEN '; Additional Pages Received' ELSE '' END [Coded Status] 
 			FROM tblSuspect S WITH (NOLOCK)
 				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
@@ -69,7 +69,8 @@ BEGIN
 				LEFT JOIN tblSuspectLevelCoded SLC WITH (NOLOCK) ON SLC.CoderLevel = @level AND SLC.Suspect_PK = S.Suspect_PK
 				LEFT JOIN tblUser U ON U.User_PK = CA.User_PK
 				LEFT JOIN tblCompletionStatus CS WITH (NOLOCK) ON SLC.CompletionStatus_PK = CS.CompletionStatus_PK
-			WHERE (
+			WHERE S.LinkedSuspect_PK IS NULL AND 
+				(
 					@IsOnlyAssigned=0
 					OR (@IsOnlyAssigned=1 AND CA.User_PK=@User_PK)
 				)
@@ -78,6 +79,7 @@ BEGIN
 					@search_filter=0
 					OR (@search_filter=101 AND S.IsScanned=1 AND IsNull(SLC.IsCompleted,0)=0)
 					OR (@search_filter=102 AND IsNull(SLC.IsCompleted,0)=0)
+					OR (@search_filter=103 AND SLC.ReceivedAdditionalPages=1)
 					OR (@search_filter IN (1,2,3,4,5,6) AND CS.CompletionStatus_PK=@search_filter)
 					)
 				AND 
@@ -107,9 +109,9 @@ BEGIN
 					(@search_type=4 AND CAST(CA.User_PK AS VARCHAR)=@search_value)
 				)
 	)
-	SELECT 0 SOrder,COUNT(1) RowNumber,NULL Suspect_PK,NULL Member_PK,NULL Provider_PK, NULL ProviderMaster_PK,NULL ProviderOffice_PK,COUNT(Assignment_PK) Assignment_PK,NULL ChaseID, NULL Member_ID,NULL Member,NULL DOB,NULL Provider_ID,NULL Provider,NULL Address,NULL City,NULL State,NULL ZipCode,SUM(Scanned) Scanned,SUM(Coded) Coded,NULL Assignment,NULL IsCompleted,NULL [Coded Status]  FROM tbl
+	SELECT 0 SOrder,COUNT(1) RowNumber,NULL Suspect_PK,NULL Member_PK,NULL Provider_PK, NULL ProviderMaster_PK,NULL ProviderOffice_PK,COUNT(Assignment_PK) Assignment_PK,NULL ChaseID, NULL Member_ID,NULL Member,NULL DOB,NULL Provider_ID,NULL Provider,NULL Address,NULL City,NULL State,NULL ZipCode,SUM(Scanned) Scanned,SUM(Coded) Coded,NULL Assignment,NULL IsCompleted,NULL [Coded Status],NULL ChartPages FROM tbl
 	UNION
-	SELECT 1 SOrder,RowNumber,Suspect_PK,Member_PK, Provider_PK, ProviderMaster_PK,ProviderOffice_PK,Assignment_PK,ChaseID, Member_ID,Member,DOB,Provider_ID,Provider,Address,City,State,ZipCode,Scanned,Coded,Assignment,IsCompleted,[Coded Status] FROM tbl
+	SELECT 1 SOrder,RowNumber,Suspect_PK,Member_PK, Provider_PK, ProviderMaster_PK,ProviderOffice_PK,Assignment_PK,ChaseID, Member_ID,Member,DOB,Provider_ID,Provider,Address,City,State,ZipCode,Scanned,Coded,Assignment,IsCompleted,[Coded Status],ChartPages FROM tbl T OUTER APPLY (SELECT COUNT(1) ChartPages FROM tblScannedData SD WHERE SD.Suspect_PK=T.Suspect_PK AND (is_deleted IS NULL OR is_deleted=0)) X
 	WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page
 	ORDER BY SOrder,RowNumber
 END
