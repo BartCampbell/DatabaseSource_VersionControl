@@ -14,5 +14,3 @@ ALTER TABLE [Log].[Changes] ADD CONSTRAINT [CK_Log_Changes_Antiscripting] CHECK 
 GO
 ALTER TABLE [Log].[Changes] ADD CONSTRAINT [PK_Log_Changes] PRIMARY KEY CLUSTERED  ([LogID]) ON [PRIMARY]
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [IX_Log_Changes_LogGuid] ON [Log].[Changes] ([LogGuid]) ON [PRIMARY]
-GO
