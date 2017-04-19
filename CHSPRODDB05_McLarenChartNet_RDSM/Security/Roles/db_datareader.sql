@@ -1,4 +1,10 @@
 
+EXEC sp_addrolemember N'db_datareader', N'IMIHEALTH\Michelle.Piccininni'
+
+EXEC sp_addrolemember N'db_datareader', N'INTERNAL\brian.edwardson'
+
+EXEC sp_addrolemember N'db_datareader', N'INTERNAL\Michelle.Piccininni'
+
 EXEC sp_addrolemember N'db_datareader', N'INTERNAL\brandon.rodman'
 EXEC sp_addrolemember N'db_datareader', N'IMIHEALTH\George.Graves'
 GO
