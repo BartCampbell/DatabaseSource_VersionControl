@@ -22,5 +22,13 @@ CREATE TABLE [BCBSA_GDIT2017].[GroupPlan]
 [HIOSID] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AsOfDate] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SourceID] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
-) ON [PRIMARY]
+) ON [BCBSA_GDIT2017_GroupPlan]
+GO
+CREATE NONCLUSTERED INDEX [idxGroupPlan] ON [BCBSA_GDIT2017].[GroupPlan] ([GroupID]) ON [BCBSA_GDIT2017_GroupPlan_IDX]
+GO
+CREATE CLUSTERED INDEX [clidxGroupPlan] ON [BCBSA_GDIT2017].[GroupPlan] ([RowID]) ON [BCBSA_GDIT2017_GroupPlan]
+GO
+CREATE STATISTICS [spidxGroupPlan] ON [BCBSA_GDIT2017].[GroupPlan] ([GroupID])
+GO
+CREATE STATISTICS [spclidxGroupPlan] ON [BCBSA_GDIT2017].[GroupPlan] ([RowID])
 GO

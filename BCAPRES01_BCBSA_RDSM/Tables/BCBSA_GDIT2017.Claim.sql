@@ -1,5 +1,10 @@
 CREATE TABLE [BCBSA_GDIT2017].[Claim]
 (
+[RowID] [int] NOT NULL IDENTITY(1, 1),
+[RowFileID] [int] NULL,
+[JobRunTaskFileID] [uniqueidentifier] NULL,
+[LoadInstanceID] [int] NULL,
+[LoadInstanceFileID] [int] NULL,
 [SourceID] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ClaimNumber] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ClaimLineNumber] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
@@ -150,15 +155,10 @@ CREATE TABLE [BCBSA_GDIT2017].[Claim]
 [DataSourceType] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SupplementalDataSource] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AuditorApprovedInd] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[AsOfDate] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[RowID] [int] NOT NULL IDENTITY(1, 1),
-[RowFileID] [int] NULL,
-[JobRunTaskFileID] [uniqueidentifier] NULL,
-[LoadInstanceID] [int] NULL,
-[LoadInstanceFileID] [int] NULL
-) ON [BCBSA_GDIT2017_ClaimInOutPatient_RawCol]
+[AsOfDate] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+) ON [BCBSA_GDIT2017_Claim]
 GO
-CREATE CLUSTERED INDEX [idxClaimInOutPatient_RawCol] ON [BCBSA_GDIT2017].[Claim] ([RowID]) ON [BCBSA_GDIT2017_ClaimInOutPatient_RawCol]
+CREATE CLUSTERED INDEX [idxClaim] ON [BCBSA_GDIT2017].[Claim] ([RowID]) ON [BCBSA_GDIT2017_Claim]
 GO
-CREATE STATISTICS [spidxClaimInOutPatient_RawCol] ON [BCBSA_GDIT2017].[Claim] ([RowID])
+CREATE STATISTICS [spidxClaim] ON [BCBSA_GDIT2017].[Claim] ([RowID])
 GO

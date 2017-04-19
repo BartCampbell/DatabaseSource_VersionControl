@@ -28,5 +28,13 @@ CREATE TABLE [BCBSA_GDIT2017].[RxClaim]
 [SupplementalDataSource] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AuditorApprovedInd] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AsOfDate] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
-) ON [PRIMARY]
+) ON [BCBSA_GDIT2017_RxClaim]
+GO
+CREATE NONCLUSTERED INDEX [idxRxClaim] ON [BCBSA_GDIT2017].[RxClaim] ([ClaimNumber], [ClaimLineNumber], [MemberID]) ON [BCBSA_GDIT2017_RxClaim_IDX]
+GO
+CREATE CLUSTERED INDEX [clidxRxClaim] ON [BCBSA_GDIT2017].[RxClaim] ([RowID]) ON [BCBSA_GDIT2017_RxClaim]
+GO
+CREATE STATISTICS [spidxRxClaim] ON [BCBSA_GDIT2017].[RxClaim] ([ClaimNumber], [ClaimLineNumber], [MemberID])
+GO
+CREATE STATISTICS [spclidxRxClaim] ON [BCBSA_GDIT2017].[RxClaim] ([RowID])
 GO

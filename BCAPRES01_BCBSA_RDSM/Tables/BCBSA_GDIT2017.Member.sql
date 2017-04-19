@@ -51,5 +51,13 @@ CREATE TABLE [BCBSA_GDIT2017].[Member]
 [ECDSCoverage] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AsOfDate] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SourceID] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
-) ON [PRIMARY]
+) ON [BCBSA_GDIT2017_Member]
+GO
+CREATE NONCLUSTERED INDEX [idxMember] ON [BCBSA_GDIT2017].[Member] ([MemberID]) ON [BCBSA_GDIT2017_Member_IDX]
+GO
+CREATE CLUSTERED INDEX [clidxMember] ON [BCBSA_GDIT2017].[Member] ([RowID]) ON [BCBSA_GDIT2017_Member]
+GO
+CREATE STATISTICS [spidxMember] ON [BCBSA_GDIT2017].[Member] ([MemberID])
+GO
+CREATE STATISTICS [spclidxMember] ON [BCBSA_GDIT2017].[Member] ([RowID])
 GO

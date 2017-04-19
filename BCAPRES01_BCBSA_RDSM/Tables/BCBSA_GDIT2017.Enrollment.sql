@@ -56,5 +56,13 @@ CREATE TABLE [BCBSA_GDIT2017].[Enrollment]
 [CoverageIndicator] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AsOfDate] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SourceID] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
-) ON [PRIMARY]
+) ON [BCBSA_GDIT2017_Enrollment]
+GO
+CREATE NONCLUSTERED INDEX [idxEnrollment] ON [BCBSA_GDIT2017].[Enrollment] ([MemberID], [GroupID]) ON [BCBSA_GDIT2017_Enrollment_IDX]
+GO
+CREATE CLUSTERED INDEX [clidxEnrollment] ON [BCBSA_GDIT2017].[Enrollment] ([RowID]) ON [BCBSA_GDIT2017_Enrollment]
+GO
+CREATE STATISTICS [spidxEnrollment] ON [BCBSA_GDIT2017].[Enrollment] ([MemberID], [GroupID])
+GO
+CREATE STATISTICS [spclidxEnrollment] ON [BCBSA_GDIT2017].[Enrollment] ([RowID])
 GO

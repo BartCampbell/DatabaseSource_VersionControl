@@ -3,6 +3,8 @@ GO
 SET ANSI_NULLS ON
 GO
 
+
+
 /*************************************************************************************
 Procedure:	util.prManageIndexANDFilegroup
 Author:		Leon Dowling
@@ -18,14 +20,15 @@ Notes:
 Update Log:
 11/4/2016 - fix code
 1/9/2017 - fix logic to not move file group if not needed
+2017-04-07	Michael Vlk		- Pop util.DBStandardIndexes entries, leon update dir
 Test Script: 
 
 EXEC util.prManageIndexANDFilegroup
 	@iLoadInstanceID		= 1,
 	@bDebug					= 1,
 	@bExec					= 1,
-	@vcSpecificTable		= 'ClaimInOutPatient_RawCol',
-	@bDropIndexes			= 0,
+	@vcSpecificTable		= 'Claim',
+	@bDropIndexes			= 1,
 	@bIncludeClusteredIndexes  = 1,
 	@bCreateIndexes			= 1,
 	@vcSpecificSchema		= 'BCBSA_GDIT2017'
@@ -91,27 +94,145 @@ IF OBJECT_ID('util.DBStandardIndexes') IS NULL
 
 TRUNCATE TABLE util.DBStandardIndexes
 
-INSERT INTO util.DBStandardIndexes
-        ( TabSchema ,
-          TabName ,
-          IndexName ,
-          ClusteredIndexFlag ,
-          IndexFields ,
-          IncludeFields,
-		  DataFGPath ,
-		  IndexFGPath
-        )
-	-- BCBSA GDIT2017
+INSERT INTO util.DBStandardIndexes (
+	TabSchema,
+	TabName,
+	IndexName,
+	ClusteredIndexFlag,
+	IndexFields,
+	IncludeFields,
+	DataFGPath,
+	IndexFGPath
+	)
+-- BCBSA_GDIT2017 // clix for Clustered Index (non PK) // covix for Covering Index
+SELECT TabSchema = 'BCBSA_GDIT2017',
+			TabName = 'Claim',
+			IndexName = 'clidxClaim',
+			ClusteredIndexFlag = 1,
+			IndexFields = 'RowID',
+			IncludeFields = NULL,
+			DataFGPath = 'i:\sql.data\',
+			IndexFGPath = 'j:\sql.data\'
+		UNION
 		SELECT TabSchema = 'BCBSA_GDIT2017',
-					TabName = 'ClaimInOutPatient_RawCol',
-					IndexName = 'idxClaimInOutPatient_RawCol',
-					ClusteredIndexFlag = 1,
-					IndexFields = 'RowID',
+					TabName = 'Claim',
+					IndexName = 'idxClaim',
+					ClusteredIndexFlag = 0,
+					IndexFields = 'ClaimNumber,ClaimLineNumber,ProviderID,MemberID',
 					IncludeFields = NULL,
-					DataFGPath = 'd:\imi.sql.data\',
-					IndexFGPath = 'm:\imi.sql.data\'
-	
+					DataFGPath = 'i:\sql.data\',
+					IndexFGPath = 'j:\sql.data\'
+-- TODO: ClaimLab
+UNION
+SELECT TabSchema = 'BCBSA_GDIT2017',
+			TabName = 'Enrollment',
+			IndexName = 'clidxEnrollment',
+			ClusteredIndexFlag = 1,
+			IndexFields = 'RowID',
+			IncludeFields = NULL,
+			DataFGPath = 'j:\sql.data\',
+			IndexFGPath = 'i:\sql.data\'
+		UNION
+		SELECT TabSchema = 'BCBSA_GDIT2017',
+					TabName = 'Enrollment',
+					IndexName = 'idxEnrollment',
+					ClusteredIndexFlag = 0,
+					IndexFields = 'MemberID,GroupID',
+					IncludeFields = NULL,
+					DataFGPath = 'j:\sql.data\',
+					IndexFGPath = 'f:\sql.data\'
+UNION
+SELECT TabSchema = 'BCBSA_GDIT2017',
+			TabName = 'GroupPlan',
+			IndexName = 'clidxGroupPlan',
+			ClusteredIndexFlag = 1,
+			IndexFields = 'RowID',
+			IncludeFields = NULL,
+			DataFGPath = 'f:\sql.data\',
+			IndexFGPath = 'i:\sql.data\'
+		UNION
+		SELECT TabSchema = 'BCBSA_GDIT2017',
+					TabName = 'GroupPlan',
+					IndexName = 'idxGroupPlan',
+					ClusteredIndexFlag = 0,
+					IndexFields = 'GroupID',
+					IncludeFields = NULL,
+					DataFGPath = 'i:\sql.data\',
+					IndexFGPath = 'j:\sql.data\'
+UNION
+SELECT TabSchema = 'BCBSA_GDIT2017',
+			TabName = 'Member',
+			IndexName = 'clidxMember',
+			ClusteredIndexFlag = 1,
+			IndexFields = 'RowID',
+			IncludeFields = NULL,
+			DataFGPath = 'g:\sql.data\',
+			IndexFGPath = 'j:\sql.data\'
+		UNION
+		SELECT TabSchema = 'BCBSA_GDIT2017',
+					TabName = 'Member',
+					IndexName = 'idxMember',
+					ClusteredIndexFlag = 0,
+					IndexFields = 'MemberID',
+					IncludeFields = NULL,
+					DataFGPath = 'j:\sql.data\',
+					IndexFGPath = 'i:\sql.data\'
+UNION
+SELECT TabSchema = 'BCBSA_GDIT2017',
+			TabName = 'Provider',
+			IndexName = 'clidxProviderr',
+			ClusteredIndexFlag = 1,
+			IndexFields = 'RowID',
+			IncludeFields = NULL,
+			DataFGPath = 'g:\sql.data\',
+			IndexFGPath = 'j:\sql.data\'
+		UNION
+		SELECT TabSchema = 'BCBSA_GDIT2017',
+					TabName = 'Provider',
+					IndexName = 'idxProvider',
+					ClusteredIndexFlag = 0,
+					IndexFields = 'ProviderID',
+					IncludeFields = NULL,
+					DataFGPath = 'i:\sql.data\',
+					IndexFGPath = 'j:\sql.data\'
+UNION
+SELECT TabSchema = 'BCBSA_GDIT2017',
+			TabName = 'ProviderSpecialty',
+			IndexName = 'clidxProviderSpecialty',
+			ClusteredIndexFlag = 1,
+			IndexFields = 'RowID',
+			IncludeFields = NULL,
+			DataFGPath = 'h:\sql.data\',
+			IndexFGPath = 'j:\sql.data\'
+		UNION
+		SELECT TabSchema = 'BCBSA_GDIT2017',
+					TabName = 'ProviderSpecialty',
+					IndexName = 'idxProviderSpecialty',
+					ClusteredIndexFlag = 0,
+					IndexFields = 'ProviderID',
+					IncludeFields = NULL,
+					DataFGPath = 'i:\sql.data\',
+					IndexFGPath = 'j:\sql.data\'
+UNION
+SELECT TabSchema = 'BCBSA_GDIT2017',
+			TabName = 'RxClaim',
+			IndexName = 'clidxRxClaim',
+			ClusteredIndexFlag = 1,
+			IndexFields = 'RowID',
+			IncludeFields = NULL,
+			DataFGPath = 'i:\sql.data\',
+			IndexFGPath = 'j:\sql.data\'
+		UNION
+		SELECT TabSchema = 'BCBSA_GDIT2017',
+					TabName = 'RxClaim',
+					IndexName = 'idxRxClaim',
+					ClusteredIndexFlag = 0,
+					IndexFields = 'ClaimNumber,ClaimLineNumber,MemberID',
+					IncludeFields = NULL,
+					DataFGPath = 'i:\sql.data\',
+					IndexFGPath = 'j:\sql.data\'
 
+-- SELECT * FROM util.DBStandardIndexes
 
 
 IF OBJECT_ID('tempdb..#ProcLIst') IS NOT NULL 

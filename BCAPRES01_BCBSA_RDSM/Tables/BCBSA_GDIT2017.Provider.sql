@@ -40,5 +40,13 @@ CREATE TABLE [BCBSA_GDIT2017].[Provider]
 [OMEmail] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AsOfDate] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SourceID] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
-) ON [PRIMARY]
+) ON [BCBSA_GDIT2017_Provider]
+GO
+CREATE NONCLUSTERED INDEX [idxProvider] ON [BCBSA_GDIT2017].[Provider] ([ProviderID]) ON [BCBSA_GDIT2017_Provider_IDX]
+GO
+CREATE CLUSTERED INDEX [clidxProviderr] ON [BCBSA_GDIT2017].[Provider] ([RowID]) ON [BCBSA_GDIT2017_Provider]
+GO
+CREATE STATISTICS [spidxProvider] ON [BCBSA_GDIT2017].[Provider] ([ProviderID])
+GO
+CREATE STATISTICS [spclidxProviderr] ON [BCBSA_GDIT2017].[Provider] ([RowID])
 GO
