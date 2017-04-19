@@ -11,13 +11,14 @@ GO
 -- Version History	
 -- Date			Name			Comments
 -- 03/01/2017	Melody Jones	Initial create
+-- 03/16/2017	Melody Jones	Changed from MemberID to CustomerMemberID				
 -- ==================================================================================================================================
 
 CREATE PROCEDURE [dbo].[Report_ABA_AbstractionForm]
     @MemberID varchar(5000)
 AS 
 SELECT DISTINCT
-       p.[MemberID]
+       m.[CustomerMemberID] AS MemberID
 	  ,[NameFirst]
       ,[NameLast]
       ,[NameMiddleInitial]
@@ -31,8 +32,9 @@ ON p.PursuitID = pe.PursuitID
 INNER JOIN [ChartNet_BCBSAZ_Application].[dbo].[Measure] me
 ON pe.MeasureID = me.MeasureID
 AND [HEDISMeasure] = 'ABA'
-WHERE  p.[MemberID] IN (SELECT stringValue FROM [dbo].[dba_parseString_udf](@MemberID,','))
-ORDER BY MemberID
+WHERE    m.[CustomerMemberID] IN (SELECT stringValue FROM [dbo].[dba_parseString_udf](@MemberID,','))
+ORDER BY   m.[CustomerMemberID]
 
-
+GO
+GRANT EXECUTE ON  [dbo].[Report_ABA_AbstractionForm] TO [INTERNAL\Melody.Jones]
 GO

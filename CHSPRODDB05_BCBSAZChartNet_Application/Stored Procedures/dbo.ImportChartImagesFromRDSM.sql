@@ -45,10 +45,47 @@ BEGIN
 			LEFT OUTER JOIN dbo.PursuitEventChartImage AS NC --NameCheck
 					ON RV.PursuitEventID = RVCI.PursuitEventID AND
 						CIFI.Name = RVCI.ImageName
+			LEFT JOIN dbo.PursuitEventChartImageArchive ARC --Check Archive for previous load. Only loads if it has never been loaded previously 
+					ON CIFI.Name = ARC.ImageName 
+					AND CIFI.FileData = ARC.ImageData
 	WHERE	(CIFI.Xref IS NOT NULL) AND
 			(RVCI.PursuitEventChartImageID IS NULL) AND
-			(CIFI.Ignore = 0);
+			(CIFI.Ignore = 0) AND
+			(ARC.ImageName IS NULL);
     
-END
+	/*Insert new records into Archive*/
+	SET IDENTITY_INSERT [dbo].[PursuitEventChartImageArchive] ON
 
+	INSERT INTO [dbo].[PursuitEventChartImageArchive] ([PursuitEventChartImageID]
+      ,[PursuitEventID]
+      ,[ImageOrdinal]
+      ,[ImageName]
+      ,[MimeType]
+      ,[ImageData]
+      ,[AnnotationContent]
+      ,[AnnotationData]
+      ,[CreatedDate]
+      ,[CreatedUser]
+      ,[LastChangedDate]
+      ,[LastChangedUser])
+	SELECT a.[PursuitEventChartImageID]
+		  ,a.[PursuitEventID]
+		  ,a.[ImageOrdinal]
+		  ,a.[ImageName]
+		  ,a.[MimeType]
+		  ,a.[ImageData]
+		  ,a.[AnnotationContent]
+		  ,a.[AnnotationData]
+		  ,a.[CreatedDate]
+		  ,a.[CreatedUser]
+		  ,a.[LastChangedDate]
+		  ,a.[LastChangedUser]
+	FROM [dbo].[PursuitEventChartImage] a
+	LEFT JOIN [dbo].[PursuitEventChartImageArchive]  b
+		ON a.PursuitEventChartImageID = b.PursuitEventChartImageID
+	WHERE b.PursuitEventChartImageID IS NULL
+
+	SET IDENTITY_INSERT [dbo].[PursuitEventChartImageArchive] OFF
+
+END
 GO
