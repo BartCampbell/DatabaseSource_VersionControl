@@ -9,6 +9,7 @@ GO
 -- Create date: 08/30/2016
 --Updated 09/21/2016 Linked tables changed to CHSDV PJ
 --Updated 02/07/2017 Adding RecordSource to joins PJ
+--Update to fix dupe error in --RECORD END DATE CLEANUP 20170323 PDJ
 -- Description:	Load all Link Tables from the tblIssueResponseStage table
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_IssueResponse_LoadLinks]
@@ -189,7 +190,7 @@ AS
         UPDATE  dbo.LS_IssueResponseOfficeDetail
         SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
                                   FROM      dbo.LS_IssueResponseOfficeDetail z
-                                  WHERE     z.[LS_IssueResponseOfficeDetail_RK] = a.[LS_IssueResponseOfficeDetail_RK]
+                                  WHERE     z.[L_IssueResponseUserContactNotesOffice_RK] = a.[L_IssueResponseUserContactNotesOffice_RK]
                                             AND z.LoadDate > a.LoadDate
                                 )
         FROM    dbo.LS_IssueResponseOfficeDetail a
