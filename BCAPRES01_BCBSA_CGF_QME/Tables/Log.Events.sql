@@ -34,11 +34,11 @@ CREATE TABLE [Log].[Events]
 [OwnerID] [int] NOT NULL,
 [Value] [decimal] (18, 6) NULL,
 [XferID] [bigint] NULL
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+) ON [EVT] TEXTIMAGE_ON [PRIMARY]
 GO
-ALTER TABLE [Log].[Events] ADD CONSTRAINT [PK_Log_Events] PRIMARY KEY CLUSTERED  ([LogID]) ON [PRIMARY]
+ALTER TABLE [Log].[Events] ADD CONSTRAINT [PK_Log_Events] PRIMARY KEY CLUSTERED  ([LogID]) ON [EVT]
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [IX_Log_Events_BatchID] ON [Log].[Events] ([BatchID], [DataRunID], [DataSetID], [DSMemberID], [LogID]) ON [PRIMARY]
+CREATE UNIQUE NONCLUSTERED INDEX [IX_Log_Events_BatchID] ON [Log].[Events] ([BatchID], [DataRunID], [DataSetID], [DSMemberID], [LogID]) ON [IDX5]
 GO
-CREATE NONCLUSTERED INDEX [IX_Log_Events_DSMemberID] ON [Log].[Events] ([DSMemberID], [DataRunID], [BatchID], [DataSetID], [OwnerID]) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_Log_Events_DSMemberID] ON [Log].[Events] ([DSMemberID], [DataRunID], [BatchID], [DataSetID], [OwnerID]) ON [IDX5]
 GO

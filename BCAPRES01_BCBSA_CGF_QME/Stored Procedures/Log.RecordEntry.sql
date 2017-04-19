@@ -21,12 +21,12 @@ CREATE PROCEDURE [Log].[RecordEntry]
 	@ExecObjectName nvarchar(128) = NULL,
 	@ExecObjectSchema nvarchar(128) = NULL,
 	@IsSuccess bit = 0,
-	@Iteration tinyint = NULL,
+	@Iteration int = NULL,
 	@ProgLogID int = NULL OUTPUT,
 	@SrcObjectName nvarchar(128),
 	@SrcObjectSchema nvarchar(128),
-	@StepNbr smallint = NULL,
-	@StepTot smallint = NULL
+	@StepNbr int = NULL,
+	@StepTot int = NULL
 )
 AS
 BEGIN
@@ -57,11 +57,11 @@ BEGIN
 		BEGIN;
 			BEGIN TRY;
 				DECLARE @EntryXrefDescr varchar(256);
-				DECLARE @EntryXrefID smallint;
+				DECLARE @EntryXrefID int;
 				DECLARE @ExecObjectGuid uniqueidentifier;
-				DECLARE @ExecObjectID smallint;
+				DECLARE @ExecObjectID int;
 				DECLARE @SrcObjectGuid uniqueidentifier;
-				DECLARE @SrcObjectID smallint;
+				DECLARE @SrcObjectID int;
 			
 				BEGIN TRANSACTION TLog1;
 				

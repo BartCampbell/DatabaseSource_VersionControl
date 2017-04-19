@@ -15,14 +15,14 @@ CREATE PROCEDURE [Batch].[CreateDataSetBatches]
 	@CalculateXml bit = 1,
 	@DataRunID int = NULL OUTPUT,
 	@DataSetID int,
-	@DefaultBenefitID smallint = 1,
+	@DefaultBenefitID int = 1,
 	@EndInitSeedDate datetime = NULL,
 	@FileFormatID int = NULL,
 	@IsLogged bit = 1,
 	@IsReady bit = 1,
 	@MeasureID int = NULL,
 	@MeasureSetID int,
-	@MbrMonthID smallint = 1,
+	@MbrMonthID int = 1,
 	@ReturnFileFormatID int = NULL,
 	@SeedDate datetime
 )
@@ -236,8 +236,8 @@ BEGIN
 					DECLARE @BatchBeginTime datetime;
 					DECLARE @BatchEndTime datetime;
 
-					DECLARE @BatchStatusA smallint; --Creating
-					DECLARE @BatchStatusB smallint; --Created
+					DECLARE @BatchStatusA int; --Creating
+					DECLARE @BatchStatusB int; --Created
 					SET @BatchStatusA = Batch.ConvertBatchStatusIDFromAbbrev('A');
 					SET @BatchStatusB = Batch.ConvertBatchStatusIDFromAbbrev('B');
 

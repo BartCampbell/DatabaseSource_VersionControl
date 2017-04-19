@@ -12,7 +12,7 @@ CREATE TABLE [Log].[ProcessEntries]
 [EntryXrefID] [int] NULL,
 [ErrLogID] [int] NULL,
 [ExecObjectGuid] [uniqueidentifier] NULL,
-[ExecObjectID] [smallint] NULL,
+[ExecObjectID] [int] NULL,
 [IsSuccess] [bit] NOT NULL CONSTRAINT [DF_Progress_IsSuccess] DEFAULT ((0)),
 [IsSynced] [bit] NOT NULL CONSTRAINT [DF_ProcessEntries_IsSubmitted] DEFAULT ((0)),
 [Iteration] [tinyint] NULL,
@@ -22,9 +22,9 @@ CREATE TABLE [Log].[ProcessEntries]
 [MeasureSetID] [int] NULL,
 [OwnerID] [int] NOT NULL,
 [SrcObjectGuid] [uniqueidentifier] NOT NULL,
-[SrcObjectID] [smallint] NULL,
-[StepNbr] [smallint] NULL,
-[StepTot] [smallint] NULL
+[SrcObjectID] [int] NULL,
+[StepNbr] [int] NULL,
+[StepTot] [int] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [Log].[ProcessEntries] ADD CONSTRAINT [PK_Log_ProcessEntries] PRIMARY KEY CLUSTERED  ([LogID]) ON [PRIMARY]

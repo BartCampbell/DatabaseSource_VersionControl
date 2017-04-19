@@ -38,11 +38,11 @@ CREATE TABLE [Result].[MeasureEventDetail]
 [ReviewDate] [datetime] NULL,
 [ReviewerID] [int] NULL,
 [ServDate] [datetime] NOT NULL
-) ON [PRIMARY]
+) ON [RES]
 GO
-ALTER TABLE [Result].[MeasureEventDetail] ADD CONSTRAINT [PK_MeasureEventDetail] PRIMARY KEY CLUSTERED  ([ResultRowID]) ON [PRIMARY]
+ALTER TABLE [Result].[MeasureEventDetail] ADD CONSTRAINT [PK_MeasureEventDetail] PRIMARY KEY CLUSTERED  ([ResultRowID]) ON [RES]
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [IX_MeasureEventDetail_BatchID] ON [Result].[MeasureEventDetail] ([BatchID], [DataRunID], [DataSetID], [DSMemberID], [ResultRowGuid]) ON [PRIMARY]
+CREATE UNIQUE NONCLUSTERED INDEX [IX_MeasureEventDetail_BatchID] ON [Result].[MeasureEventDetail] ([BatchID], [DataRunID], [DataSetID], [DSMemberID], [ResultRowGuid]) ON [IDX7]
 GO
-CREATE NONCLUSTERED INDEX [IX_MeasureEventDetail_DSMemberID] ON [Result].[MeasureEventDetail] ([DSMemberID], [MetricID], [KeyDate], [DataRunID]) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_MeasureEventDetail_DSMemberID] ON [Result].[MeasureEventDetail] ([DSMemberID], [MetricID], [KeyDate], [DataRunID]) ON [IDX7]
 GO

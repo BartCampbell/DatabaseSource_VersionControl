@@ -1,8 +1,8 @@
 CREATE TABLE [Batch].[DataSets]
 (
-[CountClaimCodes] [int] NULL,
-[CountClaimLines] [int] NULL,
-[CountClaims] [int] NULL,
+[CountClaimCodes] [bigint] NULL,
+[CountClaimLines] [bigint] NULL,
+[CountClaims] [bigint] NULL,
 [CountEnrollment] [int] NULL,
 [CountMemberAttribs] [int] NULL,
 [CountMembers] [int] NULL,

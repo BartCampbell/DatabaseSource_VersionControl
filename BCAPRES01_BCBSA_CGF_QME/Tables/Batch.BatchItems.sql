@@ -5,11 +5,11 @@ CREATE TABLE [Batch].[BatchItems]
 [DSMemberID] [bigint] NOT NULL,
 [IsResult] [bit] NOT NULL CONSTRAINT [DF_BatchItems_IsResult] DEFAULT ((0)),
 [MeasureID] [int] NOT NULL
-) ON [PRIMARY]
+) ON [BTCH2]
 GO
-ALTER TABLE [Batch].[BatchItems] ADD CONSTRAINT [PK_BatchItems] PRIMARY KEY CLUSTERED  ([BatchItemID]) ON [PRIMARY]
+ALTER TABLE [Batch].[BatchItems] ADD CONSTRAINT [PK_BatchItems] PRIMARY KEY CLUSTERED  ([BatchItemID]) ON [BTCH2]
 GO
-CREATE NONCLUSTERED INDEX [IX_BatchItems_BatchID] ON [Batch].[BatchItems] ([BatchID]) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_BatchItems_BatchID] ON [Batch].[BatchItems] ([BatchID]) ON [IDX2]
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [IX_BatchItems_Item] ON [Batch].[BatchItems] ([DSMemberID], [MeasureID], [BatchID]) ON [PRIMARY]
+CREATE UNIQUE NONCLUSTERED INDEX [IX_BatchItems_Item] ON [Batch].[BatchItems] ([DSMemberID], [MeasureID], [BatchID]) ON [IDX2]
 GO

@@ -8,7 +8,9 @@ GO
 -- Create date: 6/8/2012
 -- Description:	Transforms claim data from dbo.Claim/dbo.ClaimItem into the Claim.ClaimItems table and Claim.ClaimCodes. (v2)
 --				(UPDATED: 10/13/2015 to incorporate some of Leon Dowling's concepts in production.)
+--            Leon Update - 1/15/2017
 -- =============================================
+--/*
 CREATE PROCEDURE [Import].[TransformEncounterClaims]
 (
 	@DataSetID int,
@@ -17,13 +19,84 @@ CREATE PROCEDURE [Import].[TransformEncounterClaims]
 AS
 BEGIN
 	SET NOCOUNT ON;
-		
+--*/	
+--select * from batch.datasets
+
+	--declare @DataSetID int = 1;
+	--declare @HedisMeasureID varchar(10) = NULL;
+
+
+	DECLARE @tRes TABLE (RowCnt INT);
+	DECLARE @iMaxDiagCode INT;
+	DECLARE @iMaxSurgProc INT;
+	DECLARE @i INT ;
+
 	DECLARE @DebugOutput bit = 0;
 
 	DECLARE @CmdParam nvarchar(max);
 	DECLARE @CmdSql nvarchar(max);
 
 	BEGIN TRY;
+		
+		-- SET @iMaxDiagCode and @iMaxSurgProc
+		BEGIN
+			SET @i = 50
+
+			WHILE @i > 0
+				AND @iMaxDiagCode IS NULL
+			BEGIN
+				IF EXISTS (SELECT * 
+							FROM INFORMATION_SCHEMA.COlumns 
+							WHERE TABLE_NAME = 'Claim'
+								AND TABLE_SCHEMA = 'dbo'
+								AND COLUMN_NAME = 'DiagnosisCode' + CONVERT(VARCHAR(2),@i))
+				BEGIN
+					DELETE FROM @tRes
+					SET @CmdSQl = 'SELECT COUNT(*) FROM Claim WHERE ISNULL(DiagnosisCode' + CONVERT(VARCHAR(2),@i) + ','''') <> '''''
+
+					INSERT INTO @tRes
+							(RowCnt)
+					EXEC (@CmdSQL)
+
+					IF EXISTS (SELECT 1 FROM @tRes WHERE RowCnt > 0)
+						SET @iMaxDiagCode = @i
+				END
+		
+				SET @i = @i -1
+
+			END
+
+			SET @i = 50
+
+			WHILE @i > 0
+				AND @iMaxSurgProc IS NULL
+			BEGIN
+				IF EXISTS (SELECT * 
+							FROM INFORMATION_SCHEMA.COlumns 
+							WHERE TABLE_NAME = 'Claim'
+								AND TABLE_SCHEMA = 'dbo'
+								AND COLUMN_NAME = 'SurgicalProcedure' + CONVERT(VARCHAR(2),@i))
+				BEGIN
+					DELETE FROM @tRes
+					SET @CmdSQl = 'SELECT COUNT(*) FROM Claim WHERE ISNULL(SurgicalProcedure' + CONVERT(VARCHAR(2),@i) + ','''') <> '''''
+
+					INSERT INTO @tRes
+							(RowCnt)
+					EXEC (@CmdSQL)
+
+					IF EXISTS (SELECT 1 FROM @tRes WHERE RowCnt > 0)
+						SET @iMaxSurgProc = @i
+				END
+		
+				SET @i = @i -1
+
+			END
+
+			-- Add count of 1 to each
+			SELECT @iMaxDiagCode = @iMaxDiagCode  + 1
+			SELECT @iMaxSurgProc = @iMaxSurgProc + 1
+    
+		END
 
 		--i) Load preliminary variables
 		DECLARE @ClaimTypeE tinyint;
@@ -104,10 +177,11 @@ BEGIN
 			IsPrimary bit NOT NULL DEFAULT (0),
 			SourceColumn nvarchar(128) NOT NULL,
 			SourceSchema nvarchar(128) NOT NULL,
-			SourceTable nvarchar(128) NOT NULL
+			SourceTable nvarchar(128) NOT NULL,
+			ColumnSpecificSQL VARCHAR(500)
 		);
 		
-		WITH SourceColumns(CodeTypeID, Condition, IsPrimary, SortOrder, SourceColumn, SourceSchema, SourceTable) AS
+		WITH SourceColumns(CodeTypeID, Condition, IsPrimary, SortOrder, SourceColumn, SourceSchema, SourceTable,ColumnSpecificSQL) AS
 		(
 			--CPT
 			SELECT	@CodeType1 AS CodeTypeID, 
@@ -116,7 +190,8 @@ BEGIN
 					1 AS SortOrder,
 					'CPTProcedureCode' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'ClaimLineItem' AS SourceTable
+					'ClaimLineItem' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			UNION
 			--CPT2
 			SELECT	@CodeType2 AS CodeTypeID, 
@@ -125,7 +200,8 @@ BEGIN
 					1 AS SortOrder,
 					'CPT_II' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'ClaimLineItem' AS SourceTable
+					'ClaimLineItem' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			UNION
 			--CPT2, Part 2 (Potential CPT2 in the CPT field)
 			SELECT	@CodeType2 AS CodeTypeID, 
@@ -134,7 +210,8 @@ BEGIN
 					1 AS SortOrder,
 					'CPTProcedureCode' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'ClaimLineItem' AS SourceTable
+					'ClaimLineItem' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			UNION
 			--CPT Modifiers
 			SELECT	@CodeType0 AS CodeTypeID, 
@@ -143,7 +220,8 @@ BEGIN
 					N AS SortOrder,
 					'CPTProcedureCodeModifier' + CONVERT(nvarchar(16), N) AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'ClaimLineItem' AS SourceTable
+					'ClaimLineItem' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			FROM	dbo.Tally
 			WHERE	N BETWEEN 1 AND 10
 			UNION
@@ -154,7 +232,12 @@ BEGIN
 					1 AS SortOrder,
 					'RevenueCode' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'ClaimLineItem' AS SourceTable
+					'ClaimLineItem' AS SourceTable,
+					'CASE WHEN cli.RevenueCode IS NULL THEN SPACE(0) '
+						+ ' ELSE UPPER(CASE WHEN LEN(LTRIM(RTRIM(RevenueCode))) = 3 THEN CONVERT(VARCHAR(1),0) + LTRIM(RTRIM(RevenueCode)) '
+						+ ' WHEN LEN(LTRIM(RTRIM(RevenueCode))) = 4 THEN NULLIF(LTRIM(RTRIM(RevenueCode)), SPACE(0)) END)'
+						+ ' END ' AS ColumnSpecificSQL  
+					--ELSE import.CleanUB(cli.RevenueCode) END' AS ColumnSpecificSQL 
 			UNION
 			--UB Type of Bill
 			SELECT	@CodeTypeB AS CodeTypeID, 
@@ -163,7 +246,12 @@ BEGIN
 					1 AS SortOrder,
 					'BillType' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'Claim' AS SourceTable
+					'Claim' AS SourceTable,
+					'CASE WHEN BillType IS NULL THEN SPACE(0) '
+						+ ' ELSE UPPER(CASE WHEN LEN(LTRIM(RTRIM(BillType))) = 3 THEN CONVERT(VARCHAR(1),0) + LTRIM(RTRIM(BillType)) '
+						+ ' WHEN LEN(LTRIM(RTRIM(BillType))) = 4 THEN NULLIF(LTRIM(RTRIM(BillType)), SPACE(0)) END)'
+						+ ' END ' AS ColumnSpecificSQL  
+					--'CASE WHEN c.BillType IS NULL THEN '''' ELSE import.CleanUB(c.BillType) END' AS ColumnSpecificSQL 
 			UNION
 			--ICD-9 Diagnosis Codes
 			SELECT	@CodeTypeD AS CodeTypeID, 
@@ -172,9 +260,10 @@ BEGIN
 					N AS SortOrder,
 					'DiagnosisCode' + CONVERT(nvarchar(16), N) AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'Claim' AS SourceTable
+					'Claim' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			FROM	dbo.Tally
-			WHERE	N BETWEEN 1 AND 50
+			WHERE	N BETWEEN 1 AND @iMaxDiagCode
 			UNION
 			--ICD-9 Procedure Codes
 			SELECT	@CodeTypeP AS CodeTypeID, 
@@ -183,9 +272,10 @@ BEGIN
 					N AS SortOrder,
 					'SurgicalProcedure' + CONVERT(nvarchar(16), N) AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'Claim' AS SourceTable
+					'Claim' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			FROM	dbo.Tally
-			WHERE	N BETWEEN 1 AND 50
+			WHERE	N BETWEEN 1 AND @iMaxSurgProc
 			UNION
 			--ICD-10 Diagnosis Codes
 			SELECT	@CodeTypeI AS CodeTypeID, 
@@ -194,9 +284,10 @@ BEGIN
 					N AS SortOrder,
 					'DiagnosisCode' + CONVERT(nvarchar(16), N) AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'Claim' AS SourceTable
+					'Claim' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			FROM	dbo.Tally
-			WHERE	N BETWEEN 1 AND 50
+			WHERE	N BETWEEN 1 AND @iMaxDiagCode
 			UNION
 			--ICD-10 Procedure Codes
 			SELECT	@CodeTypeQ AS CodeTypeID, 
@@ -205,9 +296,10 @@ BEGIN
 					N AS SortOrder,
 					'SurgicalProcedure' + CONVERT(nvarchar(16), N) AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'Claim' AS SourceTable
+					'Claim' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			FROM	dbo.Tally
-			WHERE	N BETWEEN 1 AND 50
+			WHERE	N BETWEEN 1 AND @iMaxSurgProc
 			UNION
 			--CMS DRG
 			SELECT	@CodeTypeC AS CodeTypeID, 
@@ -216,7 +308,8 @@ BEGIN
 					1 AS SortOrder,
 					'DiagnosisRelatedGroup' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'Claim' AS SourceTable
+					'Claim' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			UNION
 			--MS DRG
 			SELECT	@CodeTypeM AS CodeTypeID, 
@@ -225,7 +318,8 @@ BEGIN
 					1 AS SortOrder,
 					'DiagnosisRelatedGroup' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'Claim' AS SourceTable
+					'Claim' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			UNION
 			--HCPCS
 			SELECT	@CodeTypeH AS CodeTypeID, 
@@ -234,7 +328,8 @@ BEGIN
 					1 AS SortOrder,
 					'HCPCSProcedureCode' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'ClaimLineItem' AS SourceTable
+					'ClaimLineItem' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			UNION
 			--HCPCS, Part 2 (Potential HCPCS in the CPT field)
 			SELECT	@CodeTypeH AS CodeTypeID, 
@@ -243,7 +338,8 @@ BEGIN
 					1 AS SortOrder,
 					'CPTProcedureCode' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'ClaimLineItem' AS SourceTable
+					'ClaimLineItem' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			UNION
 			--Place of Service Code
 			SELECT	@CodeTypeS AS CodeTypeID, 
@@ -252,7 +348,8 @@ BEGIN
 					1 AS SortOrder,
 					'PlaceOfService' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'Claim' AS SourceTable
+					'Claim' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			UNION
 			--Discharge Status Code
 			SELECT	@CodeTypeX AS CodeTypeID, 
@@ -261,7 +358,8 @@ BEGIN
 					1 AS SortOrder,
 					'DischargeStatus' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'Claim' AS SourceTable
+					'Claim' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			UNION
 			--APR DRG
 			SELECT	@CodeTypeA AS CodeTypeID, 
@@ -270,7 +368,8 @@ BEGIN
 					1 AS SortOrder,
 					'DiagnosisRelatedGroup' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'Claim' AS SourceTable
+					'Claim' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 			UNION
 			--Supplemental Data Code
 			SELECT	@CodeTypeSuppCode AS CodeTypeID, 
@@ -279,10 +378,11 @@ BEGIN
 					1 AS SortOrder,
 					'SupplementalDataCode' AS SourceColumn, 
 					'dbo' AS SourceSchema, 
-					'Claim' AS SourceTable
+					'Claim' AS SourceTable,
+					NULL AS ColumnSpecificSQL 
 		)
 		INSERT INTO @CodeSource
-				(CodeTypeID, Condition, DataType, IsPrimary, SourceColumn, SourceSchema, SourceTable)
+				(CodeTypeID, Condition, DataType, IsPrimary, SourceColumn, SourceSchema, SourceTable,ColumnSpecificSQL)
 		SELECT	SC.CodeTypeID, 
 				SC.Condition, 
 				--Borrowed from [Cloud].[GetSqlForBatchInXml]
@@ -294,7 +394,19 @@ BEGIN
 				SC.IsPrimary, 
 				SC.SourceColumn, 
 				SC.SourceSchema, 
-				SC.SourceTable
+				SC.SourceTable,
+				ColumnSpecificSQL = CASE WHEN sc.ColumnSpecificSQL IS NULL 
+										THEN 'NULLIF(LTRIM(RTRIM('
+											+ CASE
+												WHEN SourceSchema = 'dbo' AND SourceTable = 'Claim' THEN '[C].'
+												WHEN SourceSchema = 'dbo' AND SourceTable = 'ClaimLineItem' THEN '[CLI].'
+												ELSE '' 
+												END
+											+ sc.SourceColumn
+											+ ')),'''')'
+										ELSE
+											sc.ColumnSpecificSQL
+										END
 		FROM	SourceColumns AS SC
 				INNER JOIN INFORMATION_SCHEMA.COLUMNS AS C
 						ON SC.SourceColumn = C.COLUMN_NAME AND
@@ -304,23 +416,25 @@ BEGIN
 		
 		DECLARE @AddColumnList nvarchar(MAX);
 		DECLARE @ColumnList nvarchar(MAX);
-
+		DECLARE @ColumnSQL NVARCHAR(MAX);
 		--iii) Build a temp table for claims from Staging...
 		SET @AddColumnList = NULL;
 		SET @ColumnList = NULL;
 
 		SELECT	@AddColumnList = ISNULL(@AddColumnList + ', ', '') + QUOTENAME(SourceColumn) + ' ' + DataType + ' NULL',
-				@ColumnList = ISNULL(@ColumnList + ', ', '') + QUOTENAME(SourceColumn)
+				@ColumnList = ISNULL(@ColumnList + ', ', '') + QUOTENAME(SourceColumn),
+				@ColumnSQL = ISNULL(@ColumnSQL + ', ','') + QUOTENAME(SourceColumn)
+							+ ' = ' + ColumnSpecificSQL
 		FROM	@CodeSource
 		WHERE	SourceSchema = 'dbo' AND
 				SourceTable = 'Claim'
-		GROUP BY SourceColumn, DataType
+		GROUP BY SourceColumn, DataType, ColumnSpecificSQL
 		ORDER BY SourceColumn;
 
-		IF OBJECT_ID('tempdb..#dbo_Claim') IS NOT NULL
-			DROP TABLE #dbo_Claim;
+		IF OBJECT_ID('tmp_dbo_claim') IS NOT NULL
+			DROP TABLE tmp_dbo_claim;
 
-		CREATE TABLE #dbo_Claim
+		CREATE TABLE tmp_dbo_claim
 		(
 			ID bigint NOT NULL IDENTITY(1, 1),
 			ClaimID int NOT NULL,
@@ -335,12 +449,12 @@ BEGIN
 			DiagnosisRelatedGroupType varchar(1) NULL,
 			ICDCodeType tinyint NULL,
 			ClaimStatus varchar(2) NULL
-		);
+		) ON tmpClaim;
 
-		SET @CmdSql = 'ALTER TABLE #dbo_Claim ADD ' + @AddColumnList + ';';
+		SET @CmdSql = 'ALTER TABLE tmp_dbo_claim ADD ' + @AddColumnList + ';';
 		EXEC sys.sp_executesql @CmdSql;
 
-		SET @CmdSql = 'INSERT INTO #dbo_Claim' +
+		SET @CmdSql = 'INSERT INTO tmp_dbo_claim' +
 								'([ClaimID], ' +
 								'[PayerClaimID], ' +
 								'[ClaimType], ' +
@@ -366,8 +480,8 @@ BEGIN
 								'[DiagnosisRelatedGroupType], ' +
 								'[ICDCodeType], ' +
 								'[ClaimStatus], ' +
-								@ColumnList + CHAR(13) + CHAR(10) + 
-						'FROM	[dbo].[Claim] ' + CHAR(13) + CHAR(10);
+								REPLACE(@ColumnSQL,'''','''''') + CHAR(13) + CHAR(10) + 
+						'FROM	[dbo].[Claim] C' + CHAR(13) + CHAR(10);
 
 		IF (@HedisMeasureID IS NOT NULL)
 			SET @CmdSql = @CmdSql + 'WHERE	([HedisMeasureID] = ''' + @HedisMeasureID + ''')';
@@ -380,25 +494,28 @@ BEGIN
 
 		EXEC sys.sp_executesql @CmdSql;
 
-		CREATE UNIQUE CLUSTERED INDEX PK_#dbo_Claim on #dbo_Claim (ID);
-		CREATE NONCLUSTERED INDEX IX_#dbo_Claim on #dbo_Claim (ClaimID) INCLUDE (PayerClaimID, ClaimType, DischargeStatus, PlaceOfService, BillType);
+		CREATE UNIQUE CLUSTERED INDEX PK_tmp_dbo_claim on tmp_dbo_claim (ID) ON tmpClaimNDX;
+		CREATE NONCLUSTERED INDEX IX_tmp_dbo_claim on tmp_dbo_claim (ClaimID) INCLUDE (PayerClaimID, ClaimType, DischargeStatus, PlaceOfService, BillType) ON tmpClaimNDX;
 
 		--iv) Build a temp table for claim lines from Staging...
 		SET @AddColumnList = NULL;
 		SET @ColumnList = NULL;
+		SET @ColumnSQL = NULL;
 
 		SELECT	@AddColumnList = ISNULL(@AddColumnList + ', ', '') + QUOTENAME(SourceColumn) + ' ' + DataType + ' NULL',
-				@ColumnList = ISNULL(@ColumnList + ', ', '') + QUOTENAME(SourceColumn)
+				@ColumnList = ISNULL(@ColumnList + ', ', '') + QUOTENAME(SourceColumn),
+				@ColumnSQL = ISNULL(@ColumnSQL + ', ','') + QUOTENAME(SourceColumn)
+							+ ' = ' + ColumnSpecificSQL
 		FROM	@CodeSource
 		WHERE	SourceSchema = 'dbo' AND
 				SourceTable = 'ClaimLineItem'
-		GROUP BY SourceColumn, DataType
+		GROUP BY SourceColumn, DataType, ColumnSpecificSQL
 		ORDER BY SourceColumn;
 
-		IF OBJECT_ID('tempdb..#dbo_ClaimLineItem') IS NOT NULL
-			DROP TABLE #dbo_ClaimLineItem;
+		IF OBJECT_ID('tmp_dbo_claimLineItem') IS NOT NULL
+			DROP TABLE tmp_dbo_claimLineItem;
 
-		CREATE TABLE #dbo_ClaimLineItem
+		CREATE TABLE tmp_dbo_claimLineItem
 		(
 			ID bigint NOT NULL IDENTITY(1, 1),
 			ClaimID int NOT NULL,
@@ -410,12 +527,12 @@ BEGIN
 			CoveredDays numeric (10, 2) NULL,
 			DataSource varchar(50) NULL,
 			PlaceOfServiceCode char(2) NULL
-		);
+		) ON tmpClaimLineItem;
 
-		SET @CmdSql = 'ALTER TABLE #dbo_ClaimLineItem ADD ' + @AddColumnList + ';';
+		SET @CmdSql = 'ALTER TABLE tmp_dbo_claimLineItem ADD ' + @AddColumnList + ';';
 		EXEC sys.sp_executesql @CmdSql;
 
-		SET @CmdSql =	'INSERT INTO #dbo_ClaimLineItem' + CHAR(13) + CHAR(10) +
+		SET @CmdSql =	'INSERT INTO tmp_dbo_claimLineItem' + CHAR(13) + CHAR(10) +
 								'([ClaimID], ' +
 								'[ClaimLineItemID], ' +
 								'[DateServiceBegin], ' +
@@ -435,8 +552,8 @@ BEGIN
 								'[CoveredDays], ' +
 								'[DataSource], ' +
 								'[PlaceOfServiceCode],' + 
-								@ColumnList + CHAR(13) + CHAR(10) +  
-						'FROM	[dbo].[ClaimLineItem] ' + CHAR(13) + CHAR(10);
+								REPLACE(@ColumnSQL,'''','''''') + CHAR(13) + CHAR(10) +  
+						'FROM	[dbo].[ClaimLineItem] CLI' + CHAR(13) + CHAR(10);
 
 		IF (@HedisMeasureID IS NOT NULL)
 			SET @CmdSql = @CmdSql + 'WHERE	([HedisMeasureID] = ''' + @HedisMeasureID + ''')';
@@ -449,8 +566,8 @@ BEGIN
 	
 		EXEC sys.sp_executesql @CmdSql;
 
-		CREATE UNIQUE CLUSTERED INDEX PK_#dbo_ClaimLineItem on #dbo_ClaimLineItem (ID);
-		CREATE NONCLUSTERED INDEX IX_#dbo_ClaimLineItem on #dbo_ClaimLineItem (ClaimID, DateServiceBegin, DateServiceEnd) INCLUDE (ClaimLineItemID, CPTProcedureCode, CPT_II, CPTProcedureCodeModifier1, CPTProcedureCodeModifier2, CPTProcedureCodeModifier3, HCPCSProcedureCode, ClaimStatus, PlaceOfServiceCode, Units);
+		CREATE UNIQUE CLUSTERED INDEX PK_tmp_dbo_claimLineItem on tmp_dbo_claimLineItem (ID) ON tmpClaimLineItemNDX;
+		CREATE NONCLUSTERED INDEX IX_tmp_dbo_claimLineItem on tmp_dbo_claimLineItem (ClaimID, DateServiceBegin, DateServiceEnd) INCLUDE (ClaimLineItemID, CPTProcedureCode, CPT_II, CPTProcedureCodeModifier1, CPTProcedureCodeModifier2, CPTProcedureCodeModifier3, HCPCSProcedureCode, ClaimStatus, PlaceOfServiceCode, Units) ON tmpClaimLineItemNDX;
 		
 		SET @CmdSql = NULL;
 
@@ -548,25 +665,11 @@ BEGIN
 				CLI.ClaimLineItemID,
 				C.PayerClaimID AS ClaimNum,
 				--Changed for HEDIS 2017 per NCQA's Guideline 46 and clarified by certification via PCS
-				--***************************************************************************************************
-				--CASE --I BLAME GEORGE!
-				--	 WHEN /*Rev --> */ (NULLIF(LTRIM(RTRIM(Import.CleanUB(CLI.RevenueCode))),'') IS NOT NULL) OR
-				--		  /*TOB --> */ (NULLIF(LTRIM(RTRIM(Import.CleanUB(C.BillType))), '') IS NOT NULL) OR
-				--		  /*DRG --> */ (NULLIF(LTRIM(RTRIM(C.DiagnosisRelatedGroup)), '') IS NOT NULL)
-				--	 THEN @ClaimSrcTypeInst
-				--***************************************************************************************************
-				-- Modified 01/22/2017 - Removed CleanUB function - GG
-				--***************************************************************************************************
-				--I BLAME GEORGE!
-                --     WHEN /*Rev --> */  ISNULL(CLI.RevenueCode,'') <> ''
-                --                        OR /*TOB --> */  ISNULL(C.BillType,'') <> ''
-                --                        OR /*DRG --> */  ISNULL(C.DiagnosisRelatedGroup,'') <> ''
-                --THEN @ClaimSrcTypeInst
-				CASE 
-					 WHEN /*Rev --> */ (NULLIF(LTRIM(RTRIM(CLI.RevenueCode)),'') IS NOT NULL) OR
-						  /*TOB --> */ (NULLIF(LTRIM(RTRIM(C.BillType)), '') IS NOT NULL) OR
-						  /*DRG --> */ (NULLIF(LTRIM(RTRIM(C.DiagnosisRelatedGroup)), '') IS NOT NULL)
-					 THEN @ClaimSrcTypeInst
+				CASE --I BLAME GEORGE!
+					 WHEN /*Rev --> */ ISNULL(CLI.RevenueCode,'') <> '' OR
+						  /*TOB --> */ ISNULL(C.BillType, '') <> '' OR
+						  /*DRG --> */ ISNULL(C.DiagnosisRelatedGroup, '') <> ''
+					 THEN @ClaimSrcTypeInst 
 					 WHEN /*CPT --> */ (NULLIF(LTRIM(RTRIM(CASE WHEN LEN(CLI.CPTProcedureCode) <= 5 AND ISNUMERIC(CLI.CPTProcedureCode) = 1 THEN CLI.CPTProcedureCode END)), '') IS NOT NULL) OR 
 						  /*HCPCS --> */ (NULLIF(LTRIM(RTRIM(CLI.HCPCSProcedureCode)), '') IS NOT NULL) OR
 						  /*POS --> */(NULLIF(LTRIM(RTRIM(ISNULL(C.PlaceOfService, CASE WHEN ISNUMERIC(CLI.PlaceOfServiceCode) = 1 AND LEN(CLI.PlaceOfServiceCode) = 2 THEN CLI.PlaceOfServiceCode END))), '') IS NOT NULL)
@@ -604,11 +707,13 @@ BEGIN
 				NULL AS NDC,
 				NULLIF(LTRIM(RTRIM(ISNULL(C.PlaceOfService, CASE WHEN ISNUMERIC(CLI.PlaceOfServiceCode) = 1 AND LEN(CLI.PlaceOfServiceCode) = 2 THEN CLI.PlaceOfServiceCode END))), '') AS POS,
 				CASE WHEN ISNULL(CLI.Units, 1) > 2147483647 THEN 2147483647 WHEN ISNULL(CLI.Units, 1) < -2147483648 THEN -2147483648 ELSE ISNULL(CLI.Units, 1) END AS Qty,
-				Import.CleanUB(CLI.RevenueCode) AS Rev,
+				UPPER(CASE WHEN LEN(LTRIM(RTRIM(CLI.RevenueCode))) = 3 THEN '0' + LTRIM(RTRIM(CLI.RevenueCode)) WHEN LEN(LTRIM(RTRIM(CLI.RevenueCode))) = 4 THEN NULLIF(LTRIM(RTRIM(CLI.RevenueCode)), '') END) AS Rev,
+				--Import.CleanUB(CLI.RevenueCode) AS Rev,
 				CLI.DateServiceBegin AS ServDate,
-				Import.CleanUB(C.BillType) AS TOB
-		FROM	#dbo_Claim AS C
-				INNER JOIN #dbo_ClaimLineItem AS CLI
+				UPPER(CASE WHEN LEN(LTRIM(RTRIM(C.BillType))) = 3 THEN '0' + LTRIM(RTRIM(C.BillType)) WHEN LEN(LTRIM(RTRIM(C.BillType))) = 4 THEN NULLIF(LTRIM(RTRIM(C.BillType)), '') END) AS TOB
+				--Import.CleanUB(C.BillType) AS TOB
+		FROM	tmp_dbo_claim AS C
+				INNER JOIN tmp_dbo_claimLineItem AS CLI
 						ON C.ClaimID = CLI.ClaimID AND
 							CLI.DateServiceBegin IS NOT NULL AND
 							(CLI.DateServiceEnd IS NULL OR (CLI.DateServiceEnd IS NOT NULL AND CLI.DateServiceBegin <= CLI.DateServiceEnd))
@@ -696,8 +801,8 @@ BEGIN
 						'			CL.DSClaimLineID, ' + @lf +
 						'			CL.DSMemberID, ' + @lf +
 						@CaseIsPrimarySql + ' AS IsPrimary ' + @lf +
-						'	FROM	#dbo_Claim AS C ' + @lf +
-						'			INNER JOIN #dbo_ClaimLineItem AS CLI ' + @lf +
+						'	FROM	tmp_dbo_claim AS C ' + @lf +
+						'			INNER JOIN tmp_dbo_claimLineItem AS CLI ' + @lf +
 						'					ON C.ClaimID = CLI.ClaimID ' + @lf +
 						'			INNER JOIN #DSClaimLines AS CL ' + @lf +
 						'					ON CLI.ClaimLineItemID = CL.ClaimLineItemID ' + @lf +
@@ -745,7 +850,21 @@ BEGIN
 									@TableName = N'ClaimCodes',
 									@TableSchema = N'Claim';
 
+		IF @DebugOutput = 0
+		BEGIN
+			IF OBJECT_id('tmp_dbo_claim') IS NOT NULL 
+				DROP TABLE tmp_dbo_claim
+			IF OBJECT_ID('tmp_dbo_claimlineitem') is not null 
+				drop table tmp_dbo_claimlineitem
+			IF OBJECT_ID('tempdb..#Member_Members') IS NOT NULL
+				DROP TABLE #Member_Members;
+			IF OBJECT_ID('tempdb..#Provider_Providers') IS NOT NULL
+				DROP TABLE #Provider_Providers;
+		END
 
+
+
+--/*
 		RETURN 0;
 	END TRY
 	BEGIN CATCH;
@@ -788,7 +907,7 @@ BEGIN
 	END CATCH;
 END
 
-
+--*/
 
 GO
 GRANT EXECUTE ON  [Import].[TransformEncounterClaims] TO [Processor]

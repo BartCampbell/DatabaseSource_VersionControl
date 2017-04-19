@@ -57,15 +57,15 @@ CREATE TABLE [Result].[MeasureDetail]
 [SourceNumeratorSrc] [int] NULL,
 [SysSampleRefID] [bigint] NULL,
 [Weight] [decimal] (18, 10) NULL
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+) ON [RES2] TEXTIMAGE_ON [PRIMARY]
 GO
-ALTER TABLE [Result].[MeasureDetail] ADD CONSTRAINT [PK_MeasureDetail] PRIMARY KEY CLUSTERED  ([ResultRowID]) ON [PRIMARY]
+ALTER TABLE [Result].[MeasureDetail] ADD CONSTRAINT [PK_MeasureDetail] PRIMARY KEY CLUSTERED  ([ResultRowID]) ON [RES2]
 GO
-CREATE NONCLUSTERED INDEX [IX_MeasureDetail_BatchID] ON [Result].[MeasureDetail] ([BatchID], [DataRunID], [DataSetID]) WITH (ALLOW_PAGE_LOCKS=OFF) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_MeasureDetail_BatchID] ON [Result].[MeasureDetail] ([BatchID], [DataRunID], [DataSetID]) WITH (ALLOW_PAGE_LOCKS=OFF) ON [IDX8]
 GO
-CREATE NONCLUSTERED INDEX [IX_MeasureDetail_AgeBands] ON [Result].[MeasureDetail] ([DataRunID], [Age], [Gender]) INCLUDE ([DataSetID], [DSMemberID], [MeasureID], [MetricID], [PopulationID], [ProductLineID]) WITH (ALLOW_PAGE_LOCKS=OFF) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_MeasureDetail_AgeBands] ON [Result].[MeasureDetail] ([DataRunID], [Age], [Gender]) INCLUDE ([DataSetID], [DSMemberID], [MeasureID], [MetricID], [PopulationID], [ProductLineID]) WITH (ALLOW_PAGE_LOCKS=OFF) ON [IDX8]
 GO
-CREATE NONCLUSTERED INDEX [IX_MeasureDetail] ON [Result].[MeasureDetail] ([DataRunID], [DSMemberID], [PopulationID], [BitProductLines], [ResultTypeID], [MetricID], [MeasureID]) INCLUDE ([DataSetID], [Days], [IsDenominator], [Qty]) WITH (ALLOW_PAGE_LOCKS=OFF) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_MeasureDetail] ON [Result].[MeasureDetail] ([DataRunID], [DSMemberID], [PopulationID], [BitProductLines], [ResultTypeID], [MetricID], [MeasureID]) INCLUDE ([DataSetID], [Days], [IsDenominator], [Qty]) WITH (ALLOW_PAGE_LOCKS=OFF) ON [IDX8]
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [IX_MeasureDetail_ResultRowGuid] ON [Result].[MeasureDetail] ([ResultRowGuid]) WITH (ALLOW_PAGE_LOCKS=OFF) ON [PRIMARY]
+CREATE UNIQUE NONCLUSTERED INDEX [IX_MeasureDetail_ResultRowGuid] ON [Result].[MeasureDetail] ([ResultRowGuid]) WITH (ALLOW_PAGE_LOCKS=OFF) ON [IDX8]
 GO

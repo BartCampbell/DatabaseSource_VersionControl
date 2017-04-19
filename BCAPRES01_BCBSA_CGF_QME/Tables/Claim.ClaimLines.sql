@@ -37,11 +37,11 @@ CREATE TABLE [Claim].[ClaimLines]
 [ServDate] [datetime] NOT NULL,
 [SNOMED] [varchar] (16) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [TOB] [varchar] (4) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
-) ON [PRIMARY]
+) ON [CLM2]
 GO
-ALTER TABLE [Claim].[ClaimLines] ADD CONSTRAINT [PK_ClaimLines] PRIMARY KEY CLUSTERED  ([DSClaimLineID]) ON [PRIMARY]
+ALTER TABLE [Claim].[ClaimLines] ADD CONSTRAINT [PK_ClaimLines] PRIMARY KEY CLUSTERED  ([DSClaimLineID]) ON [CLM2]
 GO
-CREATE NONCLUSTERED INDEX [IX_ClaimLines_DSClaimID] ON [Claim].[ClaimLines] ([DSClaimID]) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_ClaimLines_DSClaimID] ON [Claim].[ClaimLines] ([DSClaimID]) ON [IDX4]
 GO
-CREATE NONCLUSTERED INDEX [IX_ClaimLines_DSMemberID] ON [Claim].[ClaimLines] ([DSMemberID], [DataSetID]) INCLUDE ([BeginDate], [EndDate], [ServDate]) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_ClaimLines_DSMemberID] ON [Claim].[ClaimLines] ([DSMemberID], [DataSetID]) ON [IDX4]
 GO

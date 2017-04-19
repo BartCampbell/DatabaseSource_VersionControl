@@ -19,7 +19,7 @@ CREATE TABLE [Batch].[Batches]
 [RetrievedDate] [datetime] NULL,
 [SourceGuid] [uniqueidentifier] NULL,
 [SubmittedDate] [datetime] NULL
-) ON [PRIMARY]
+) ON [BTCH]
 GO
 SET QUOTED_IDENTIFIER ON
 GO
@@ -57,15 +57,17 @@ BEGIN
 	
 END
 GO
-ALTER TABLE [Batch].[Batches] ADD CONSTRAINT [PK_Batches] PRIMARY KEY CLUSTERED  ([BatchID]) ON [PRIMARY]
+ALTER TABLE [Batch].[Batches] ADD CONSTRAINT [PK_Batches] PRIMARY KEY CLUSTERED  ([BatchID]) ON [BTCH]
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [IX_Batches_BatchGuid] ON [Batch].[Batches] ([BatchGuid]) ON [PRIMARY]
+CREATE UNIQUE NONCLUSTERED INDEX [IX_Batches_BatchGuid] ON [Batch].[Batches] ([BatchGuid]) ON [IDX1]
 GO
-CREATE NONCLUSTERED INDEX [IX_Batches_DataRunID] ON [Batch].[Batches] ([DataRunID]) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_Batches_DataRunID] ON [Batch].[Batches] ([DataRunID]) ON [IDX1]
 GO
-CREATE NONCLUSTERED INDEX [IX_Batches_DataSetID] ON [Batch].[Batches] ([DataSetID]) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_Batches_DataSetID] ON [Batch].[Batches] ([DataSetID]) ON [IDX1]
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [IX_Batches_SourceGuid] ON [Batch].[Batches] ([SourceGuid]) WHERE ([SourceGuid] IS NOT NULL) ON [PRIMARY]
+CREATE UNIQUE NONCLUSTERED INDEX [IX_Batches_SourceGuid] ON [Batch].[Batches] ([SourceGuid]) WHERE ([SourceGuid] IS NOT NULL) ON [IDX1]
+GO
+ALTER TABLE [Batch].[Batches] SET ( LOCK_ESCALATION = DISABLE )
 GO
 ALTER TABLE [Batch].[Batches] SET ( LOCK_ESCALATION = DISABLE )
 GO

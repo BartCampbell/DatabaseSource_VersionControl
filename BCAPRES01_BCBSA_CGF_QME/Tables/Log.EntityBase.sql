@@ -36,11 +36,11 @@ CREATE TABLE [Log].[EntityBase]
 [RowID] [bigint] NULL,
 [SourceID] [bigint] NULL,
 [SourceLinkID] [bigint] NULL
-) ON [PRIMARY]
+) ON [PART1]
 GO
-ALTER TABLE [Log].[EntityBase] ADD CONSTRAINT [PK_Log_EntityBase] PRIMARY KEY CLUSTERED  ([LogID]) ON [PRIMARY]
+ALTER TABLE [Log].[EntityBase] ADD CONSTRAINT [PK_Log_EntityBase] PRIMARY KEY CLUSTERED  ([LogID]) ON [PART1]
 GO
-CREATE UNIQUE NONCLUSTERED INDEX [IX_Log_EntityBase_BatchID] ON [Log].[EntityBase] ([BatchID], [DataRunID], [DataSetID], [DSMemberID], [LogID]) ON [PRIMARY]
+CREATE UNIQUE NONCLUSTERED INDEX [IX_Log_EntityBase_BatchID] ON [Log].[EntityBase] ([BatchID], [DataRunID], [DataSetID], [DSMemberID], [LogID]) ON [IDX6]
 GO
-CREATE NONCLUSTERED INDEX [IX_Log_EntityBase_DSMemberID] ON [Log].[EntityBase] ([DSMemberID], [DataRunID], [BatchID], [DataSetID], [OwnerID]) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_Log_EntityBase_DSMemberID] ON [Log].[EntityBase] ([DSMemberID], [DataRunID], [BatchID], [DataSetID], [OwnerID]) ON [IDX6]
 GO

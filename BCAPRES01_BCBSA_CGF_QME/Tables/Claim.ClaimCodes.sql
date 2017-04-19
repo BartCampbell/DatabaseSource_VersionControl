@@ -10,13 +10,13 @@ CREATE TABLE [Claim].[ClaimCodes]
 [DSClaimLineID] [bigint] NOT NULL,
 [DSMemberID] [bigint] NOT NULL,
 [IsPrimary] [bit] NOT NULL CONSTRAINT [DF_ClaimCodes_IsPrimary] DEFAULT ((0))
-) ON [PRIMARY]
+) ON [CLM]
 GO
-ALTER TABLE [Claim].[ClaimCodes] ADD CONSTRAINT [PK_Claim_ClaimCodes] PRIMARY KEY CLUSTERED  ([DSClaimCodeID]) ON [PRIMARY]
+ALTER TABLE [Claim].[ClaimCodes] ADD CONSTRAINT [PK_Claim_ClaimCodes] PRIMARY KEY CLUSTERED  ([DSClaimCodeID]) ON [CLM]
 GO
-CREATE NONCLUSTERED INDEX [IX_Claim_ClaimCodes_Codes] ON [Claim].[ClaimCodes] ([Code], [CodeTypeID]) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_Claim_ClaimCodes] ON [Claim].[ClaimCodes] ([DataSetID], [DSClaimLineID]) ON [IDX3]
 GO
-CREATE NONCLUSTERED INDEX [IX_Claim_ClaimCodes] ON [Claim].[ClaimCodes] ([DataSetID], [DSClaimLineID]) INCLUDE ([ClaimTypeID], [Code], [CodeTypeID], [DSClaimCodeID], [DSClaimID], [IsPrimary]) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_Claim_ClaimCodes_Codes] ON [Claim].[ClaimCodes] ([DataSetID], [DSClaimLineID]) ON [IDX3]
 GO
-CREATE NONCLUSTERED INDEX [IX_Claim_ClaimCodes_DSClaimLineID] ON [Claim].[ClaimCodes] ([DSClaimLineID]) ON [PRIMARY]
+CREATE NONCLUSTERED INDEX [IX_Claim_ClaimCodes_DSClaimLineID] ON [Claim].[ClaimCodes] ([DataSetID], [DSClaimLineID]) ON [IDX3]
 GO
