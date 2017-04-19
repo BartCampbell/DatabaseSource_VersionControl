@@ -52,7 +52,7 @@ BEGIN
 			INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PP.ProviderMaster_PK = PM.ProviderMaster_PK
 			LEFT JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Coded_User_PK
 			LEFT JOIN tblUser QA WITH (NOLOCK) ON QA.User_PK = S.QA_User_PK
-		WHERE S.IsCoded=1 '
+		WHERE S.LinkedSuspect_PK IS NULL AND S.IsCoded=1 '
 	
 	IF @member<>''
 	BEGIN

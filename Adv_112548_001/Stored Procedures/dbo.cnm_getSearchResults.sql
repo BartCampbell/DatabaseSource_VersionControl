@@ -13,7 +13,14 @@ Create PROCEDURE [dbo].[cnm_getSearchResults]
 	@search_value varchar(1000),
 	@User int,
 	@Sort Varchar(150),
-	@Order Varchar(4)
+	@Order Varchar(4),
+	@dos int,
+	@diag int,
+	@hcc int,
+	@s_dos varchar(1000),
+	@s_diag varchar(1000),
+	@s_hcc varchar(1000),
+	@commercial bit
 AS
 BEGIN
 	-- PROJECT/Channel SELECTION
@@ -54,7 +61,7 @@ BEGIN
 		EXEC ('DELETE T FROM #tmpChaseStatus T WHERE ChaseStatus_PK NOT IN ('+@Status2+')')						 
 	-- PROJECT/Channel SELECTION
 
-	IF (@search_type<200) --@search_type>100 AND 
+	IF (@search_type<200 AND @dos=1 AND @diag=1 AND @hcc=1) --@search_type>100 AND 
 	BEGIN
 		-- 101 Provider Office Address</option>
 		-- 102 Office Location ID</option>
@@ -92,7 +99,7 @@ BEGIN
 			(@search_type=105 AND S.PlanLID Like '%'+@search_value+'%')
 		GROUP BY PO.ProviderOffice_PK,PO.LocationID,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,PO.ContactNumber,PO.FaxNumber,PO.ContactPerson
 	END
-	ELSE IF (@search_type>200 AND @search_type<300)
+	ELSE IF (@search_type>200 AND @search_type<300 AND @dos=1 AND @diag=1 AND @hcc=1)
 	BEGIN
         --201	Provider Group
         --202	Provider ID
@@ -129,8 +136,30 @@ BEGIN
 		GROUP BY PM.Provider_ID,PM.Lastname,PM.Firstname,PM.NPI,PM.PIN
 				,S.Provider_PK,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode,PM.ProviderGroup,P.ProviderMaster_PK
 	END
-	ELSE IF (@search_type>300 AND @search_type<400)
+	ELSE IF (@search_type>300 AND @search_type<400) OR @dos=0 OR @diag=0 OR @hcc=0
 	BEGIN
+		Create Table #Suspect (Suspect_PK BIGINT)
+		CREATE INDEX idxTSuspect ON #Suspect (Suspect_PK)
+		DECLARE @SQL AS VARCHAR(MAX) = ''
+		if @dos=0 OR @diag=0 OR @hcc=0
+			SET @SQL = 'INSERT INTO #Suspect SELECT DISTINCT CD.Suspect_PK FROM tblCodedData CD'
+		if @hcc=0
+			SET @SQL = @SQL + ' INNER JOIN tblModelCode MC ON MC.DiagnosisCode = CD.DiagnosisCode'
+		if @dos=0 OR @diag=0 OR @hcc=0
+			SET @SQL = @SQL + ' WHERE 1=1 '
+
+		if (@dos=0)
+			SET @SQL = @SQL + ' AND CD.DOS_From Between ''' + REPLACE(@s_dos,',',''' AND ''') + '''';
+		if (@diag=0)
+			SET @SQL = @SQL + ' AND CD.DiagnosisCode IN (''' + REPLACE(@s_diag,',',''',''') + ''')';
+		if (@hcc=0)
+			IF (@commercial=1)
+				SET @SQL = @SQL + ' AND MC.V12HCC IN (' + @s_hcc + ')';
+			ELSE
+				SET @SQL = @SQL + ' AND (MC.V12HCC IN (' + @s_hcc + ') OR MC.V21HCC IN (' + @s_hcc + ') OR MC.V22HCC IN (' + @s_hcc + '))';
+
+		EXEC (@SQL)
+
 		--301	Member ID
 		--302	Member Name
 		--303	HIC NUmber
@@ -157,15 +186,30 @@ BEGIN
 				INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
 				INNER JOIN tblMember M WITH (NOLOCK) ON M.Member_PK = S.Member_PK
 				INNER JOIN tblProject Pr ON Pr.Project_PK = S.Project_PK
+				LEFT JOIN #Suspect tS WITH (NOLOCK) ON tS.Suspect_PK = S.Suspect_PK
 				LEFT JOIN tblChaseStatus CS WITH (NOLOCK) ON CS.ChaseStatus_PK = S.ChaseStatus_PK
 				LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK		
 				LEFT JOIN tblChannel C WITH (NOLOCK) ON C.Channel_PK = S.Channel_PK
-		WHERE 
+		WHERE ((@dos=1 AND @diag=1 AND @hcc=1) OR tS.Suspect_PK IS NOT NULL) AND
+		(
+			--Office
+			(@search_type=101 AND PO.Address Like '%'+@search_value+'%') OR
+			(@search_type=102 AND PO.LocationID Like '%'+@search_value+'%') OR
+			(@search_type=103 AND PO.ContactNumber Like '%'+@search_value+'%') OR
+			(@search_type=104 AND PO.FaxNumber Like '%'+@search_value+'%') OR
+			(@search_type=105 AND S.PlanLID Like '%'+@search_value+'%') OR
+			--Provider
+			(@search_type=201 AND PM.ProviderGroup Like '%'+@search_value+'%') OR
+			(@search_type=202 AND PM.Provider_ID Like '%'+@search_value+'%') OR
+			(@search_type=203 AND PM.NPI Like '%'+@search_value+'%') OR
+			(@search_type=204 AND PM.Lastname+IsNull(', '+PM.Firstname,'') Like '%'+@search_value+'%') OR
+			(@search_type=205 AND PM.PIN Like '%'+@search_value+'%') OR
+			--Member
 			(@search_type=301 AND M.Member_ID Like '%'+@search_value+'%') OR
 			(@search_type=302 AND M.Lastname+IsNull(', '+M.Firstname,'') Like '%'+@search_value+'%') OR
 			(@search_type=303 AND M.HICNumber Like '%'+@search_value+'%') OR
 			(@search_type=304 AND S.ChaseID Like '%'+@search_value+'%')
-
+		)
 	END
 END
 GO
