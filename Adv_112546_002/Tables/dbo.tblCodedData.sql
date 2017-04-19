@@ -15,7 +15,9 @@ CREATE TABLE [dbo].[tblCodedData]
 [OpenedPage] [smallint] NULL,
 [Is_Deleted] [bit] NULL,
 [ScannedData_PK] [bigint] NULL,
-[CoderLevel] [tinyint] NULL
+[CoderLevel] [tinyint] NULL,
+[BeforeQA_OpenedPage] [smallint] NULL,
+[BeforeQA_ScannedData_PK] [bigint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblCodedData] ADD CONSTRAINT [PK_tblCodedData] PRIMARY KEY CLUSTERED  ([CodedData_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]

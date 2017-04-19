@@ -10,7 +10,7 @@ GO
 -- =============================================
 --	qa_getMembers 0,0,100,1,'','','0,1,7,10','6',''
 --	qa_searchMembers 0,'45719444','','1,2,3,4,5,6,7,8,9,10'
-CREATE PROCEDURE [dbo].[qa_scanning_searchMembers] 
+Create PROCEDURE [dbo].[qa_scanning_searchMembers] 
 	@Projects varchar(100),
 	@ProjectGroup varchar(10),
 	@member varchar(200), 
@@ -53,7 +53,7 @@ BEGIN
 			LEFT JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Scanned_User_PK
 			LEFT JOIN tblScanningQANote_Suspect SN WITH (NOLOCK) ON SN.Suspect_PK = S.Suspect_PK
 			LEFT JOIN tblUser QA WITH (NOLOCK) ON QA.User_PK = SN.QA_User_PK
-		WHERE S.IsScanned=1'
+		WHERE S.LinkedSuspect_PK IS NULL AND S.IsScanned=1'
 	
 	IF @member<>''
 	BEGIN

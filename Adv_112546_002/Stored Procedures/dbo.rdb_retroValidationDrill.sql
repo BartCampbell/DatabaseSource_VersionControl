@@ -83,7 +83,7 @@ BEGIN
 			LEFT JOIN tblNoteText NTx ON NTx.NoteText_PK = CDN.NoteText_PK
 			LEFT JOIN tblModelCode MC ON MC.DiagnosisCode = CD.DiagnosisCode
 			LEFT JOIN tblHCC H ON H.HCC = MC.V12HCC AND H.PaymentModel=12
-			WHERE (
+			WHERE S.IsCoded=1 AND (
 			(@DrillType=0 AND CD.CodedSource_PK=@ID)
 				OR (@DrillType=1 AND CDN.NoteText_PK=@ID)
 				)

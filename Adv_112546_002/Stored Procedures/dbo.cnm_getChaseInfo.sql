@@ -7,20 +7,24 @@ Create PROCEDURE [dbo].[cnm_getChaseInfo]
 	@suspect bigint
 AS
 BEGIN
+	DECLARE @LinkedSuspect_PK AS BIGINT = @suspect
 	--Chase Status
-	SELECT IsCNA,CNA_Date,IsScanned,Scanned_Date,IsCoded,Coded_Date FROM tblSuspect WHERE Suspect_PK=@suspect
+	SELECT IsCNA,CNA_Date,IsScanned,Scanned_Date,IsCoded,Coded_Date,LinkedSuspect_PK INTO #Chase FROM tblSuspect WHERE Suspect_PK=@suspect
+	SELECT IsCNA,CNA_Date,IsScanned,Scanned_Date,IsCoded,Coded_Date,LinkedSuspect_PK FROM #Chase
+	IF EXISTS(SELECT 1 FROM #Chase WHERE LinkedSuspect_PK IS NOT NULL)
+		SELECT @LinkedSuspect_PK=LinkedSuspect_PK FROM #Chase
 
 	--Historical Claims and Coding
-	SELECT T.DiagnosisCode,MC.Code_Description,T.DOS,MC.V12HCC,MC.V21HCC,MC.V22HCC,MAX([Validation]) [Validation],MAX(Claim) Claim,MAX(Coded) Coded
+	SELECT T.DiagnosisCode,MC.Code_Description,T.DOS,MC.V12HCC,MC.V21HCC,MC.V22HCC,MC.RxHCC,MAX([Validation]) [Validation],MAX(Claim) Claim,MAX(Coded) Coded
 	FROM (
 		SELECT DiagnosisCode,DOS_Thru DOS,NULL [Validation],1 Claim,0 Coded
 		FROM tblClaimData WHERE Suspect_PK=@suspect
 		UNION
 		SELECT DiagnosisCode,DOS_Thru DOS,NT.NoteType [Validation],0 Claim,1 Coded
 		FROM tblCodedData C LEFT JOIN tblNoteType NT ON NT.NoteType_PK = CodedSource_PK
-		WHERE Suspect_PK=@suspect AND (C.Is_Deleted IS NULL OR C.Is_Deleted=0)
+		WHERE Suspect_PK=@LinkedSuspect_PK AND (C.Is_Deleted IS NULL OR C.Is_Deleted=0)
 	) T LEFT JOIN tblModelCode MC ON MC.DiagnosisCode = T.DiagnosisCode
-	GROUP BY T.DiagnosisCode,MC.Code_Description,T.DOS,MC.V12HCC,MC.V21HCC,MC.V22HCC
+	GROUP BY T.DiagnosisCode,MC.Code_Description,T.DOS,MC.V12HCC,MC.V21HCC,MC.V22HCC,MC.RxHCC
 	ORDER BY T.DOS
 
 	--Channel Log
