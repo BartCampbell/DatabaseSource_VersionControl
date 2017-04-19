@@ -56,20 +56,13 @@ BEGIN
 	
 	SELECT NoteType_PK CodedSource_PK, NoteType CodedSource FROM tblNoteType WITH (NOLOCK)
 
-	SELECT distinct HM.measure_description FROM tblHEDIS_Suspect HS 
-		INNER JOIN tblHEDIS_Measure HM ON HM.Measure_PK = HS.Measure_PK
-		INNER JOIN tblSuspect S ON S.Suspect_PK = HS.Suspect_PK
-	WHERE S.Member_PK=@Member
-/*
-	if (@Provider=0)
-	BEGIN 
-		SELECT P.Provider_PK,PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider_Name
-			FROM tblProvider P WITH (NOLOCK) 
-				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK 
-				INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
-			WHERE S.Suspect_PK = @Suspect
-	END
-*/
+	SELECT S.ChaseID,PM.Provider_ID,PM.Lastname+IsNull(', '+PM.Firstname,'') Provider
+		FROM 
+			tblSuspect TS WITH (NOLOCK) 
+			INNER JOIN tblSuspect S WITH (NOLOCK) ON TS.Suspect_PK = S.LinkedSuspect_PK 
+			INNER JOIN tblProvider P WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK 
+			INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PM.ProviderMaster_PK = P.ProviderMaster_PK
+		WHERE TS.Suspect_PK = @Suspect
 
 	SELECT IsQA FROM tblSuspect WHERE Suspect_PK=@Suspect
 

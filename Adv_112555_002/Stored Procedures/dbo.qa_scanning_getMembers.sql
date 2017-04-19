@@ -8,7 +8,7 @@ GO
 -- Create date: Mar-12-2014
 -- Description:	RA Coder will use this sp to pull list of members in a project
 -- =============================================
---	qa_scanning_getMembers 0,0,1,100,1,'','',0,1
+--	qa_scanning_getMembers 0,0,1,100,1,'','',1,1,1
 CREATE PROCEDURE [dbo].[qa_scanning_getMembers] 
 	@Projects varchar(100),
 	@ProjectGroup varchar(10),
@@ -18,6 +18,7 @@ CREATE PROCEDURE [dbo].[qa_scanning_getMembers]
 	@date_from varchar(15),
 	@date_to varchar(15),
 	@only_does_not_belong int,
+	@only_image_issue int,
 	@user int
 AS
 BEGIN
@@ -53,13 +54,20 @@ BEGIN
 			INNER JOIN tblProject P WITH (NOLOCK) ON S.Project_PK = P.Project_PK
 			INNER JOIN tblProvider PP WITH (NOLOCK) ON PP.Provider_PK = S.Provider_PK
 			INNER JOIN tblProviderMaster PM WITH (NOLOCK) ON PP.ProviderMaster_PK = PM.ProviderMaster_PK'
-	IF (@only_does_not_belong=1)
-		SET @SQL = @SQL + ' CROSS APPLY (SELECT TOP 1 ScannedData_PK FROM tblScannedData WHERE Suspect_PK=S.Suspect_PK AND IsNull(is_deleted,0)=0 AND CodedStatus=2) X'
+	IF (@only_does_not_belong=1 OR @only_image_issue=1)
+	BEGIN
+		SET @SQL = @SQL + ' CROSS APPLY (SELECT TOP 1 SD.ScannedData_PK FROM tblScannedData SD WITH (NOLOCK) INNER JOIN tblScannedDataPageStatus SDPS WITH (NOLOCK) ON SD.ScannedData_PK = SDPS.ScannedData_PK WHERE SD.Suspect_PK=S.Suspect_PK AND PageStatus_PK IN (10'
+		IF (@only_does_not_belong=1)
+			SET @SQL = @SQL + ',2'
+		IF (@only_image_issue=1)
+			SET @SQL = @SQL + ',3'
+		SET @SQL = @SQL + ' )) X'
+	END
 	SET @SQL = @SQL + ' 		
 			LEFT JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Scanned_User_PK
 			LEFT JOIN tblScanningQANote_Suspect SN WITH (NOLOCK) ON SN.Suspect_PK = S.Suspect_PK
 			LEFT JOIN tblUser QA WITH (NOLOCK) ON QA.User_PK = SN.QA_User_PK
-		WHERE S.IsScanned=1'
+		WHERE S.LinkedSuspect_PK IS NULL AND S.IsScanned=1'
 	SET @SQL = Replace(@SQL,'TOP 100 PERCENT','TOP 1000') 
 
 	IF (@scantech<>0)

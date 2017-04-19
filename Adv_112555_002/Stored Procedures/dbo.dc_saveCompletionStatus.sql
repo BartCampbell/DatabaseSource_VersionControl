@@ -2,12 +2,12 @@ SET QUOTED_IDENTIFIER ON
 GO
 SET ANSI_NULLS ON
 GO
---	dc_saveCompletionStatus @suspect=1, @usr =1, @chase_status =1, @checkImageCompletion =1, @ConfigLevels=1, @IsBlindCoding=1
+--	dc_saveCompletionStatus @suspect=541, @usr =1, @chase_status =4, @checkImageCompletion =4, @ConfigLevels=1, @IsBlindCoding=1
 CREATE PROCEDURE [dbo].[dc_saveCompletionStatus] 
 	@suspect bigint,
 	@usr int,
 	@chase_status TinyInt,
-	@checkImageCompletion bit,
+	@checkImageCompletion tinyint,
 	@ConfigLevels TinyInt,
 	@IsBlindCoding bit
 AS
@@ -16,9 +16,11 @@ BEGIN
 	SELECT @level=CoderLevel FROM tblUser WHERE User_PK=@usr
 	DECLARE @IsCompleted AS BIT = CASE WHEN @chase_status=1 THEN 1 ELSE 0 END
 
-	IF (@checkImageCompletion=1)
+	IF (@checkImageCompletion=1 AND @IsCompleted=1)
 	BEGIN
-		IF EXISTS(SELECT * FROM tblScannedData SD WITH (NOLOCK) LEFT JOIN tblScannedDataPageStatus SDPS WITH (NOLOCK) ON SD.ScannedData_PK = SDPS.ScannedData_PK AND SDPS.CoderLevel=@level WHERE SD.Suspect_PK=@suspect AND SDPS.ScannedData_PK IS NULL)
+		IF EXISTS(SELECT * FROM tblScannedData SD WITH (NOLOCK) LEFT JOIN tblScannedDataPageStatus SDPS WITH (NOLOCK) ON SD.ScannedData_PK = SDPS.ScannedData_PK AND SDPS.CoderLevel=@level WHERE SD.Suspect_PK=@suspect AND SDPS.ScannedData_PK IS NULL AND (SD.is_deleted IS NULL OR SD.is_deleted=0))
+			AND NOT EXISTS(SELECT * FROM tblSuspectNote WHERE Suspect_PK=@suspect)
+			AND NOT EXISTS(SELECT * FROM tblSuspectNoteText WHERE Suspect_PK=@suspect)
 		BEGIN
 			SELECT 1
 			return;
@@ -26,6 +28,18 @@ BEGIN
 		ELSE
 		BEGIN
 			SELECT 0
+		END
+	END
+	ELSE IF (@checkImageCompletion=4) --Image Issue
+	BEGIN
+		IF EXISTS(SELECT 1 FROM tblScannedData SD WITH (NOLOCK) INNER JOIN tblScannedDataPageStatus SDPS WITH (NOLOCK) ON SD.ScannedData_PK = SDPS.ScannedData_PK AND SDPS.CoderLevel=@level WHERE SD.Suspect_PK=@suspect AND IsNull(is_deleted,0)=0 AND PageStatus_PK=3)
+		BEGIN
+			SELECT 4
+		END
+		ELSE
+		BEGIN
+			SELECT 0
+			return;
 		END
 	END
 	ELSE
@@ -41,9 +55,15 @@ BEGIN
 
 	--Chase Coded Status
 	IF EXISTS(SELECT * FROM tblSuspectLevelCoded WHERE CoderLevel=@level AND Suspect_PK=@suspect)
-		Update tblSuspectLevelCoded SET IsCompleted=@IsCompleted, CompletionStatus_PK = @chase_status WHERE CoderLevel=@level AND Suspect_PK=@suspect
+		Update SLC SET IsCompleted=@IsCompleted, CompletionStatus_PK = @chase_status,User_PK=@usr,dtInserted=GETDATE(),ReceivedAdditionalPages=CASE WHEN @IsCompleted=1 THEN 0 ELSE ReceivedAdditionalPages END FROM tblSuspectLevelCoded SLC INNER JOIN tblSuspect S ON S.Suspect_PK=SLC.Suspect_PK WHERE CoderLevel=@level AND (S.Suspect_PK=@suspect OR S.LinkedSuspect_PK=@suspect)
 	ELSE
-		INSERT INTO tblSuspectLevelCoded(CoderLevel,Suspect_PK,User_PK,dtInserted,IsCompleted,CompletionStatus_PK) VALUES(@level,@suspect,@usr,GETDATE(),@IsCompleted,@chase_status)
+		INSERT INTO tblSuspectLevelCoded(CoderLevel,Suspect_PK,User_PK,dtInserted,IsCompleted,CompletionStatus_PK,ReceivedAdditionalPages) 
+			SELECT @level,Suspect_PK,@usr,GETDATE(),@IsCompleted,@chase_status,0 FROM tblSuspect WHERE Suspect_PK=@suspect OR LinkedSuspect_PK=@suspect
+
+	--To Update remaining pages as ignored
+	IF (@IsCompleted=1)
+		INSERT INTO tblScannedDataPageStatus(ScannedData_PK,User_PK,CoderLevel,PageStatus_PK)
+		SELECT SD.ScannedData_PK,@usr,@level,4 Ignored FROM tblScannedData SD WITH (NOLOCK) LEFT JOIN tblScannedDataPageStatus SDPS WITH (NOLOCK) ON SD.ScannedData_PK = SDPS.ScannedData_PK AND SDPS.CoderLevel=@level WHERE SD.Suspect_PK=@suspect AND SDPS.ScannedData_PK IS NULL
 
 	--To Update tblSuspect with Coded info
 	DECLARE @UpdateSuspectTable AS BIT = 0
@@ -64,16 +84,23 @@ BEGIN
 				UPDATE tblSuspect WITH (ROWLOCK) SET 
 				MemberStatus=1,
 				IsCoded=1,
-				Coded_Date= CASE WHEN Coded_User_PK IS NULL THEN GetDate() ELSE Coded_Date END,
-				Coded_User_PK=CASE WHEN Coded_User_PK IS NULL THEN @usr ELSE Coded_User_PK END,
+				Coded_Date= GetDate(),
+				Coded_User_PK= @usr,
 				LastAccessed_Date = GetDate(),
 				LastUpdated = GetDate(),
 				ChaseStatus_PK = @ChaseStatusPK,
 				FollowUp = NULL
-				WHERE SUSPECT_PK=@suspect
+				WHERE SUSPECT_PK=@suspect OR LinkedSuspect_PK=@suspect
 			END
 			ELSE
 			BEGIN
+				DECLARE @ChaseStatusExtracted AS INT = 1
+				DECLARE @ChaseStatusCNA AS INT = 1
+				DECLARE @ChaseStatusScheduled AS INT = 1
+				SELECT TOP 1 @ChaseStatusExtracted = ChaseStatus_PK FROM tblChaseStatus WHERE IsExtracted=1
+				SELECT TOP 1 @ChaseStatusCNA = ChaseStatus_PK FROM tblChaseStatus WHERE IsCNA=1 AND VendorCodeType='CHS'
+				SELECT TOP 1 @ChaseStatusScheduled = ChaseStatus_PK FROM tblChaseStatus WHERE IsScheduled=1
+
 				UPDATE tblSuspect WITH (ROWLOCK) SET 
 				MemberStatus=0,
 				IsCoded=0,
@@ -81,8 +108,9 @@ BEGIN
 				Coded_User_PK = NULL,
 				LastAccessed_Date = GetDate(),
 				LastUpdated = GetDate(),
-				FollowUp = NULL
-				WHERE SUSPECT_PK=@suspect
+				FollowUp = NULL,
+				ChaseStatus_PK = CASE WHEN IsScanned=1 THEN @ChaseStatusExtracted WHEN IsCNA=1 THEN @ChaseStatusCNA ELSE @ChaseStatusScheduled END
+				WHERE SUSPECT_PK=@suspect OR LinkedSuspect_PK=@suspect
 			END
 			COMMIT TRANSACTION
 		END TRY

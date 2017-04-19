@@ -39,7 +39,7 @@ BEGIN
 	FROM tblSuspect S WITH (NOLOCK)
 			INNER JOIN #tmpProject AP ON AP.Project_PK = S.Project_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
-			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
+			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK --AND S.Project_PK = PO.Project_PK
 	WHERE PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL
 	GROUP BY S.Project_PK,S.Provider_PK
 	CREATE CLUSTERED INDEX  idxTProjectPK ON #tmpSch (Project_PK,Provider_PK)
@@ -92,7 +92,7 @@ BEGIN
     	INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
 		INNER JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
     	INNER JOIN tblProviderOffice PO ON P.ProviderOffice_PK = PO.ProviderOffice_PK
-		INNER JOIN cacheProviderOffice cPO ON cPO.Project_PK = S.Project_PK AND cPO.ProviderOffice_PK = PO.ProviderOffice_PK
+		--INNER JOIN cacheProviderOffice cPO ON cPO.Project_PK = S.Project_PK AND cPO.ProviderOffice_PK = PO.ProviderOffice_PK
     	LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK=PO.ZipCode_PK
 		/*
     	OUTER APPLY (
@@ -212,12 +212,13 @@ BEGIN
 	SELECT T.Project_PK,T.Office_PK ProviderOffice_PK,contact_num,MIN(CAST(LastUpdated_Date AS DATE)) ContactDate 
 		INTO #tmpContact FROM tblContactNotesOffice T INNER JOIN #tmpProject Pr ON Pr.Project_PK = T.Project_PK
 			GROUP BY T.Project_PK,T.Office_PK,contact_num 
-	SELECT T.Project_PK,ProviderOffice_PK,MIN(CAST(Sch_Start AS DATE)) SchedulerDate 
+	SELECT T.Project_PK,ProviderOffice_PK,MIN(CAST(Sch_Start AS DATE)) SchedulerDate, MAX(ST.ScheduleType) ScheduleType 
 		INTO #tmpSchedule FROM tblProviderOfficeSchedule T INNER JOIN #tmpProject Pr ON Pr.Project_PK = T.Project_PK
+			LEFT JOIN tblScheduleType ST ON ST.ScheduleType_PK = T.sch_type
 			GROUP BY T.Project_PK,ProviderOffice_PK
 
 	SELECT Project_PK, ProviderOffice_PK
-			,MIN([1st Contact]) [1st Contact] ,MIN([2nd Contact]) [2nd Contact] ,MIN([3rd Contact]) [3rd Contact] ,MIN([4th Contact]) [4th Contact] ,MIN([Schedule]) [Schedule]
+			,MIN([1st Contact]) [1st Contact] ,MIN([2nd Contact]) [2nd Contact] ,MIN([3rd Contact]) [3rd Contact] ,MIN([4th Contact]) [4th Contact] ,MIN([Schedule]) [Schedule], MAX(ScheduleType) ScheduleType 
 			,MIN([Invoice Rec Start]) [Invoice Rec Start] ,MAX([Invoice Rec End]) [Invoice Rec End] ,MIN([Chart Rec Start]) [Chart Rec Start] ,MAX([Chart Rec End]) [Chart Rec End] ,MIN([Chart Extraction Start]) [Chart Extraction Start] ,MAX([Chart Extraction End]) [Chart Extraction End] ,MAX(TotalCharts) TotalCharts ,MAX(Extracted) Extracted ,MAX(CNA) CNA
 	INTO #tmpTurnaround FROM (
 		SELECT S.Project_PK,PO.ProviderOffice_PK
@@ -232,6 +233,7 @@ BEGIN
 				,COUNT(*) TotalCharts
 				,COUNT(CASE WHEN IsScanned=1 THEN S.Suspect_PK ELSE NULL END) Extracted
 				,COUNT(CASE WHEN IsScanned=0 AND IsCNA=1 THEN S.Suspect_PK ELSE NULL END) CNA
+				,NULL ScheduleType
 			FROM tblSuspect S
 			INNER JOIN tblProvider P ON P.Provider_PK = S.Provider_PK
 			INNER JOIN tblProviderOffice PO ON PO.ProviderOffice_PK = P.ProviderOffice_PK
@@ -240,33 +242,33 @@ BEGIN
 		UNION
 		SELECT Project_PK, ProviderOffice_PK
 				,ContactDate [1st Contact] ,NULL [2nd Contact] ,NULL [3rd Contact] ,NULL [4th Contact] ,NULL [Schedule]
-				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA
+				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA,NULL ScheduleType
 			FROM #tmpContact WHERE contact_num=1
 		UNION
 		SELECT Project_PK, ProviderOffice_PK
 				,NULL [1st Contact] ,ContactDate [2nd Contact] ,NULL [3rd Contact] ,NULL [4th Contact] ,NULL [Schedule]
-				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA
+				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA,NULL ScheduleType
 			FROM #tmpContact WHERE contact_num=2
 		UNION
 		SELECT Project_PK, ProviderOffice_PK
 				,NULL [1st Contact] ,NULL [2nd Contact] ,ContactDate [3rd Contact] ,NULL [4th Contact] ,NULL [Schedule]
-				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA
+				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA,NULL ScheduleType
 			FROM #tmpContact WHERE contact_num=3
 		UNION
 		SELECT Project_PK, ProviderOffice_PK
 				,NULL [1st Contact] ,NULL [2nd Contact] ,NULL [3rd Contact] ,ContactDate [4th Contact] ,NULL [Schedule]
-				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA
+				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA,NULL ScheduleType
 			FROM #tmpContact WHERE contact_num=4
 		UNION
 		SELECT Project_PK, ProviderOffice_PK
 				,NULL [1st Contact] ,NULL [2nd Contact] ,NULL [3rd Contact] ,NULL [4th Contact] ,SchedulerDate [Schedule]
-				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA
+				,NULL [Invoice Rec Start] ,NULL [Invoice Rec End] ,NULL [Chart Rec Start] ,NULL [Chart Rec End] ,NULL [Chart Extraction Start] ,NULL [Chart Extraction End] ,NULL TotalCharts ,NULL Extracted ,NULL CNA, ScheduleType
 			FROM #tmpSchedule
 	) T GROUP BY Project_PK, ProviderOffice_PK
 
 	SELECT PO.Address [Address Line 1],ZC.City,ZC.ZipCode,ZC.State
 		,PO.GroupName [Group Name],PO.ContactPerson [Contact Name],PO.ContactNumber [Phone Number]
-		,[1st Contact],[2nd Contact],[3rd Contact],[4th Contact],IsNull(IsNull([Schedule],[Invoice Rec Start]),[Chart Rec Start]) Schedule
+		,[1st Contact],[2nd Contact],[3rd Contact],[4th Contact],IsNull(IsNull([Schedule],[Invoice Rec Start]),[Chart Rec Start]) Schedule,ScheduleType
 		,[Invoice Rec Start] ,CASE WHEN [Invoice Rec End] = [Invoice Rec Start] THEN NULL ELSE [Invoice Rec End] END [Invoice Rec End]
 		,[Chart Rec Start] , CASE WHEN [Chart Rec End]=[Chart Rec Start] THEN NULL ELSE [Chart Rec End] END [Chart Rec End]
 		,[Chart Extraction Start] , CASE WHEN [Chart Extraction End]=[Chart Extraction Start] THEN NULL ELSE [Chart Extraction END] END [Chart Extraction End]
