@@ -1,4 +1,8 @@
 
+EXEC sp_addrolemember N'db_datareader', N'IMIHEALTH\Michelle.Piccininni'
+
+EXEC sp_addrolemember N'db_datareader', N'INTERNAL\Michelle.Piccininni'
+
 EXEC sp_addrolemember N'db_datareader', N'IMIHEALTH\IMI.SQL.Developers'
 
 EXEC sp_addrolemember N'db_datareader', N'INTERNAL\CHSSQLDevOps'
