@@ -23,12 +23,23 @@ AS
         BEGIN TRY
 
 
-            SELECT TOP 1
+            --SELECT TOP 1
+            --        @IsFileProcessed = t.FileProcessed
+            --FROM    ( SELECT    1 AS FileProcessed
+            --          FROM      CHSStaging.raps.RAPS_RESPONSE_AAA
+            --          WHERE     RecordSource IN ( SELECT    RecordSource
+            --                                      FROM      dbo.H_RAPS_Response )
+            --          UNION
+            --          SELECT    0 AS FileProcessed
+            --        ) t
+            --ORDER BY t.FileProcessed DESC;
+
+		  SELECT TOP 1
                     @IsFileProcessed = t.FileProcessed
             FROM    ( SELECT    1 AS FileProcessed
                       FROM      CHSStaging.raps.RAPS_RESPONSE_AAA
                       WHERE     RecordSource IN ( SELECT    RecordSource
-                                                  FROM      dbo.H_RAPS_Response )
+                                                  FROM      dbo.S_RAPS_Response_CCC )
                       UNION
                       SELECT    0 AS FileProcessed
                     ) t
@@ -43,4 +54,5 @@ AS
     END;
 
 
+    --SELECT * FROM CHSStaging.raps.RAPS_RESPONSE_AAA
 GO

@@ -53,18 +53,29 @@ AS
                                                                    AND a.RecordEndDate IS NULL
                                                                    AND a.HashDiff = r.HashDiff
                     WHERE   a.S_RAPS_Response_AAA_RK IS NULL
-            OPTION  ( MAXDOP 2 ); 
+            --OPTION  ( MAXDOP 2 ); 
 		  
 		  --RECORD END DATE CLEANUP
-            UPDATE  dbo.S_RAPS_Response_AAA
-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
-                                      FROM      dbo.S_RAPS_Response_AAA AS z
-                                      WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
-                                                AND z.LoadDate > a.LoadDate
-                                    )
+            UPDATE  a
+            SET     RecordEndDate = z.LoadDate
             FROM    dbo.S_RAPS_Response_AAA a
-            WHERE   a.RecordEndDate IS NULL
-            OPTION  ( MAXDOP 2 );
+                    INNER JOIN ( SELECT H_RAPS_Response_RK ,
+                                        DATEADD(ss, -1, MIN(LoadDate)) AS LoadDate
+                                 FROM   dbo.S_RAPS_Response_AAA
+                                 WHERE  RecordEndDate IS NULL
+                                 GROUP BY H_RAPS_Response_RK 
+                               ) z ON z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+                                      AND z.LoadDate > a.LoadDate
+            WHERE   a.RecordEndDate IS NULL;
+
+		  --UPDATE  dbo.S_RAPS_Response_AAA
+    --        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+    --                                  FROM      dbo.S_RAPS_Response_AAA AS z
+    --                                  WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+    --                                            AND z.LoadDate > a.LoadDate
+    --                                )
+    --        FROM    dbo.S_RAPS_Response_AAA a
+    --        WHERE   a.RecordEndDate IS NULL
 		  
 
 		  --LOAD RAPS BBB
@@ -99,19 +110,31 @@ AS
                                                                    AND b.RecordEndDate IS NULL
                                                                    AND b.HashDiff = r.HashDiff
                     WHERE   b.S_RAPS_Response_BBB_RK IS NULL
-            OPTION  ( MAXDOP 2 ); 
+            --OPTION  ( MAXDOP 2 ); 
 
 
 		  --RECORD END DATE CLEANUP
-            UPDATE  dbo.S_RAPS_Response_BBB
-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
-                                      FROM      dbo.S_RAPS_Response_BBB AS z
-                                      WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
-                                                AND z.LoadDate > a.LoadDate
-                                    )
+		  UPDATE  a
+            SET     RecordEndDate = z.LoadDate
             FROM    dbo.S_RAPS_Response_BBB a
-            WHERE   a.RecordEndDate IS NULL
-            OPTION  ( MAXDOP 2 );
+                    INNER JOIN ( SELECT H_RAPS_Response_RK ,
+                                        DATEADD(ss, -1, MIN(LoadDate)) AS LoadDate
+                                 FROM   dbo.S_RAPS_Response_BBB
+                                 WHERE  RecordEndDate IS NULL
+                                 GROUP BY H_RAPS_Response_RK 
+                               ) z ON z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+                                      AND z.LoadDate > a.LoadDate
+            WHERE   a.RecordEndDate IS NULL;
+
+            --UPDATE  dbo.S_RAPS_Response_BBB
+            --SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+            --                          FROM      dbo.S_RAPS_Response_BBB AS z
+            --                          WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+            --                                    AND z.LoadDate > a.LoadDate
+            --                        )
+            --FROM    dbo.S_RAPS_Response_BBB a
+            --WHERE   a.RecordEndDate IS NULL
+            ----OPTION  ( MAXDOP 2 );
 
 
 		  --LOAD RAPS CCC
@@ -330,19 +353,31 @@ AS
                                                                    AND c.RecordEndDate IS NULL
                                                                    AND c.HashDiff = r.HashDiff
                     WHERE   c.S_RAPS_Response_CCC_RK IS NULL
-            OPTION  ( MAXDOP 2 ); 
+            --OPTION  ( MAXDOP 2 ); 
 		  
 		  
 		  --RECORD END DATE CLEANUP
-            UPDATE  dbo.S_RAPS_Response_CCC
-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
-                                      FROM      dbo.S_RAPS_Response_CCC AS z
-                                      WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
-                                                AND z.LoadDate > a.LoadDate
-                                    )
+		  UPDATE  a
+            SET     RecordEndDate = z.LoadDate
             FROM    dbo.S_RAPS_Response_CCC a
-            WHERE   a.RecordEndDate IS NULL
-            OPTION  ( MAXDOP 2 );
+                    INNER JOIN ( SELECT H_RAPS_Response_RK ,
+                                        DATEADD(ss, -1, MIN(LoadDate)) AS LoadDate
+                                 FROM   dbo.S_RAPS_Response_CCC
+                                 WHERE  RecordEndDate IS NULL
+                                 GROUP BY H_RAPS_Response_RK 
+                               ) z ON z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+                                      AND z.LoadDate > a.LoadDate
+            WHERE   a.RecordEndDate IS NULL;
+
+            --UPDATE  dbo.S_RAPS_Response_CCC
+            --SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+            --                          FROM      dbo.S_RAPS_Response_CCC AS z
+            --                          WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+            --                                    AND z.LoadDate > a.LoadDate
+            --                        )
+            --FROM    dbo.S_RAPS_Response_CCC a
+            --WHERE   a.RecordEndDate IS NULL
+            ----OPTION  ( MAXDOP 2 );
 		  
 		  
 		  --LOAD RAPS YYY
@@ -371,18 +406,31 @@ AS
                                                                    AND y.HashDiff = r.HashDiff
                                                                    AND y.RecordEndDate IS NULL
                     WHERE   y.S_RAPS_Response_YYY_RK IS NULL
-            OPTION  ( MAXDOP 2 ); 
+            --OPTION  ( MAXDOP 2 ); 
 		  
 		  --RECORD END DATE CLEANUP
-            UPDATE  dbo.S_RAPS_Response_YYY
-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
-                                      FROM      dbo.S_RAPS_Response_YYY AS z
-                                      WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
-                                                AND z.LoadDate > a.LoadDate
-                                    )
+		  UPDATE  a
+            SET     RecordEndDate = z.LoadDate
             FROM    dbo.S_RAPS_Response_YYY a
-            WHERE   a.RecordEndDate IS NULL
-            OPTION  ( MAXDOP 2 );
+                    INNER JOIN ( SELECT H_RAPS_Response_RK ,
+                                        DATEADD(ss, -1, MIN(LoadDate)) AS LoadDate
+                                 FROM   dbo.S_RAPS_Response_YYY
+                                 WHERE  RecordEndDate IS NULL
+                                 GROUP BY H_RAPS_Response_RK 
+                               ) z ON z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+                                      AND z.LoadDate > a.LoadDate
+            WHERE   a.RecordEndDate IS NULL;
+
+
+            --UPDATE  dbo.S_RAPS_Response_YYY
+            --SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+            --                          FROM      dbo.S_RAPS_Response_YYY AS z
+            --                          WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+            --                                    AND z.LoadDate > a.LoadDate
+            --                        )
+            --FROM    dbo.S_RAPS_Response_YYY a
+            --WHERE   a.RecordEndDate IS NULL
+            --OPTION  ( MAXDOP 2 );
 		  
 		  
 		  --LOAD RAPS ZZZ
@@ -411,19 +459,32 @@ AS
                                                                    AND z.HashDiff = r.HashDiff
                                                                    AND z.RecordEndDate IS NULL
                     WHERE   z.S_RAPS_Response_ZZZ_RK IS NULL
-            OPTION  ( MAXDOP 2 ); 
+            --OPTION  ( MAXDOP 2 ); 
 
 
 		  --RECORD END DATE CLEANUP
-            UPDATE  dbo.S_RAPS_Response_ZZZ
-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
-                                      FROM      dbo.S_RAPS_Response_ZZZ AS z
-                                      WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
-                                                AND z.LoadDate > a.LoadDate
-                                    )
+		  UPDATE  a
+            SET     RecordEndDate = z.LoadDate
             FROM    dbo.S_RAPS_Response_ZZZ a
-            WHERE   a.RecordEndDate IS NULL
-            OPTION  ( MAXDOP 2 );
+                    INNER JOIN ( SELECT H_RAPS_Response_RK ,
+                                        DATEADD(ss, -1, MIN(LoadDate)) AS LoadDate
+                                 FROM   dbo.S_RAPS_Response_ZZZ
+                                 WHERE  RecordEndDate IS NULL
+                                 GROUP BY H_RAPS_Response_RK 
+                               ) z ON z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+                                      AND z.LoadDate > a.LoadDate
+            WHERE   a.RecordEndDate IS NULL;
+
+
+            --UPDATE  dbo.S_RAPS_Response_ZZZ
+            --SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+            --                          FROM      dbo.S_RAPS_Response_ZZZ AS z
+            --                          WHERE     z.H_RAPS_Response_RK = a.H_RAPS_Response_RK
+            --                                    AND z.LoadDate > a.LoadDate
+            --                        )
+            --FROM    dbo.S_RAPS_Response_ZZZ a
+            --WHERE   a.RecordEndDate IS NULL
+            ----OPTION  ( MAXDOP 2 );
 
 		  
 		  --LOAD MemberHICN satellite
@@ -447,19 +508,32 @@ AS
                                                             AND s.RecordEndDate IS NULL
                                                             AND r.S_MemberHICN_HashDiff = s.HashDiff
                     WHERE   s.S_MemberHICN_RK IS NULL
-            OPTION  ( MAXDOP 2 ); 
+            --OPTION  ( MAXDOP 2 ); 
 
 
 		  --RECORD END DATE CLEANUP
-            UPDATE  dbo.S_MemberHICN
-            SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
-                                      FROM      dbo.S_MemberHICN AS z
-                                      WHERE     z.H_Member_RK = a.H_Member_RK
-                                                AND z.LoadDate > a.LoadDate
-                                    )
+		  UPDATE  a
+            SET     RecordEndDate = z.LoadDate
             FROM    dbo.S_MemberHICN a
-            WHERE   a.RecordEndDate IS NULL
-            OPTION  ( MAXDOP 2 );
+                    INNER JOIN ( SELECT H_Member_RK ,
+                                        DATEADD(ss, -1, MIN(LoadDate)) AS LoadDate
+                                 FROM   dbo.S_MemberHICN
+                                 WHERE  RecordEndDate IS NULL
+                                 GROUP BY H_Member_RK 
+                               ) z ON z.H_Member_RK = a.H_Member_RK
+                                      AND z.LoadDate > a.LoadDate
+            WHERE   a.RecordEndDate IS NULL;
+
+
+            --UPDATE  dbo.S_MemberHICN
+            --SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+            --                          FROM      dbo.S_MemberHICN AS z
+            --                          WHERE     z.H_Member_RK = a.H_Member_RK
+            --                                    AND z.LoadDate > a.LoadDate
+            --                        )
+            --FROM    dbo.S_MemberHICN a
+            --WHERE   a.RecordEndDate IS NULL
+            --OPTION  ( MAXDOP 2 );
 
 
 
@@ -470,6 +544,5 @@ AS
             THROW;
         END CATCH;
     END;
-
 
 GO

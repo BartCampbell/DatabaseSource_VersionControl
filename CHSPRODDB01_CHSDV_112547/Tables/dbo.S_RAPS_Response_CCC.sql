@@ -1,5 +1,6 @@
 CREATE TABLE [dbo].[S_RAPS_Response_CCC]
 (
+[S_RAPS_Response_CCCID] [bigint] NOT NULL IDENTITY(1, 1),
 [S_RAPS_Response_CCC_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [H_RAPS_Response_RK] [varchar] (50) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
 [RecordID] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NOT NULL,
@@ -107,7 +108,13 @@ CREATE TABLE [dbo].[S_RAPS_Response_CCC]
 [RecordEndDate] [datetime] NULL
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[S_RAPS_Response_CCC] ADD CONSTRAINT [PK_S_RAPS_Response_CCC] PRIMARY KEY CLUSTERED  ([S_RAPS_Response_CCC_RK]) ON [PRIMARY]
+ALTER TABLE [dbo].[S_RAPS_Response_CCC] ADD CONSTRAINT [PK_S_RAPS_Response_CCC] PRIMARY KEY CLUSTERED  ([S_RAPS_Response_CCCID]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_LoadDate] ON [dbo].[S_RAPS_Response_CCC] ([LoadDate]) INCLUDE ([DiagClstrErrorA1], [DiagClstrErrorA10], [DiagClstrErrorA2], [DiagClstrErrorA3], [DiagClstrErrorA4], [DiagClstrErrorA5], [DiagClstrErrorA6], [DiagClstrErrorA7], [DiagClstrErrorA8], [DiagClstrErrorA9], [DiagClstrErrorB1], [DiagClstrErrorB10], [DiagClstrErrorB2], [DiagClstrErrorB3], [DiagClstrErrorB4], [DiagClstrErrorB5], [DiagClstrErrorB6], [DiagClstrErrorB7], [DiagClstrErrorB8], [DiagClstrErrorB9], [DiagnosisCode1], [DiagnosisCode10], [DiagnosisCode2], [DiagnosisCode3], [DiagnosisCode4], [DiagnosisCode5], [DiagnosisCode6], [DiagnosisCode7], [DiagnosisCode8], [DiagnosisCode9], [DOBErrorCode], [FromDate1], [FromDate10], [FromDate2], [FromDate3], [FromDate4], [FromDate5], [FromDate6], [FromDate7], [FromDate8], [FromDate9], [H_RAPS_Response_RK], [HicErrorCode], [HicNo], [PatientControlNo], [PatientDOB], [ProviderType1], [ProviderType10], [ProviderType2], [ProviderType3], [ProviderType4], [ProviderType5], [ProviderType6], [ProviderType7], [ProviderType8], [ProviderType9], [RecordSource], [RiskAssessmentCode1], [RiskAssessmentCode10], [RiskAssessmentCode2], [RiskAssessmentCode3], [RiskAssessmentCode4], [RiskAssessmentCode5], [RiskAssessmentCode6], [RiskAssessmentCode7], [RiskAssessmentCode8], [RiskAssessmentCode9], [RiskAssessmentCodeError1], [RiskAssessmentCodeError10], [RiskAssessmentCodeError2], [RiskAssessmentCodeError3], [RiskAssessmentCodeError4], [RiskAssessmentCodeError5], [RiskAssessmentCodeError6], [RiskAssessmentCodeError7], [RiskAssessmentCodeError8], [RiskAssessmentCodeError9], [SeqNo], [ThruDate1], [ThruDate10], [ThruDate2], [ThruDate3], [ThruDate4], [ThruDate5], [ThruDate6], [ThruDate7], [ThruDate8], [ThruDate9]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_EndDate] ON [dbo].[S_RAPS_Response_CCC] ([RecordEndDate]) INCLUDE ([H_RAPS_Response_RK], [HashDiff], [S_RAPS_Response_CCC_RK]) ON [PRIMARY]
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_S_RAPS_Response_CCC] ON [dbo].[S_RAPS_Response_CCC] ([S_RAPS_Response_CCC_RK]) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[S_RAPS_Response_CCC] ADD CONSTRAINT [FK_S_RAPS_Response_CCC_H_RAPS_Response] FOREIGN KEY ([H_RAPS_Response_RK]) REFERENCES [dbo].[H_RAPS_Response] ([H_RAPS_Response_RK])
 GO
