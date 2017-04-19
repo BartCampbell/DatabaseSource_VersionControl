@@ -9,7 +9,7 @@ GO
 -- Description:	To get Finance Report Summary for Dashboad
 -- =============================================
 /* Sample Executions
-pr_getList '0','0',1,0,5,5,'11/1/2016','11/30/2016',0
+pr_getList '0','0',1,0,3,5,'11/1/2016','11/30/2016',0
 */
 CREATE PROCEDURE [dbo].[pr_getList]
 	@Projects varchar(100),
@@ -48,7 +48,7 @@ BEGIN
 			FROM tblSuspect S WITH (NOLOCK)
 					INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 					INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
-					INNER JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
+					INNER JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK 
 			WHERE 1=1 '
 
 		IF @User<>0
@@ -64,7 +64,7 @@ BEGIN
 		ELSE IF @DateType = 5
 			SET @SQL = @SQL + ' AND PO.LastUpdated_Date>= '''+ @startDate +''' AND PO.LastUpdated_Date < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
 
-		SET @SQL = @SQL + '	GROUP BY PO.LastUpdated_User_PK,S.Project_PK,P.ProviderOffice_PK;
+		SET @SQL = @SQL + '	GROUP BY PO.LastUpdated_User_PK,P.ProviderOffice_PK;
 
 			CREATE INDEX idxTmp ON #tmp (User_PK,Project_PK,ProviderOffice_PK);
 			INSERT INTO #tmp
@@ -72,7 +72,7 @@ BEGIN
 			FROM tblSuspect S WITH (NOLOCK)
 					INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
 					INNER JOIN #tmpProject Pr ON Pr.Project_PK = S.Project_PK
-					INNER JOIN tblContactNotesOffice PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.Office_PK AND S.Project_PK = PO.Project_PK
+					INNER JOIN tblContactNotesOffice PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.Office_PK
 			WHERE 1=1 '
 
 		IF @User<>0
@@ -88,7 +88,7 @@ BEGIN
 		ELSE IF @DateType = 5
 			SET @SQL = @SQL + ' AND PO.LastUpdated_Date>= '''+ @startDate +''' AND PO.LastUpdated_Date < DATEADD(Day,1,CAST('''+ @endDate +''' as Date))'
 
-		SET @SQL = @SQL + '	GROUP BY PO.LastUpdated_User_PK,S.Project_PK,P.ProviderOffice_PK
+		SET @SQL = @SQL + '	GROUP BY PO.LastUpdated_User_PK,P.ProviderOffice_PK
 
 
 		SELECT User_PK,Project_PK,ProviderOffice_PK,MAX(Sch) Sch, MAX(Cnt) Cnt,MAX(SchCharts) SchCharts,MAX(CntCharts) CntCharts INTO #Sch
@@ -299,7 +299,7 @@ BEGIN
 		SET @SQL = @SQL + ' GROUP BY L.Location_PK,L.Location
 		'		
 	END		
-	
+	PRINT (@SQL);
 	EXEC (@SQL);
 END 
 GO

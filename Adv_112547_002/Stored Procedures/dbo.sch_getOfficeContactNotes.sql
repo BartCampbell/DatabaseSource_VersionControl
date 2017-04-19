@@ -62,7 +62,7 @@ BEGIN
 		SELECT DISTINCT CNO.MergedProviderOffice_PK,PO.Address+IsNull(', '+City+', '+State+' '+ZipCode,'') OfficeAddress
         FROM tblContactNotesOffice CNO WITH (NOLOCK)
         INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK=CNO.MergedProviderOffice_PK
-		INNER JOIN tblZipCode ZC ON ZC.ZipCode_PK = PO.ZipCode_PK
+		LEFT JOIN tblZipCode ZC ON ZC.ZipCode_PK = PO.ZipCode_PK
 		WHERE CNO.Office_PK=@Office
 END
 GO
