@@ -63,12 +63,13 @@ BEGIN
 	INSERT INTO #tmp
 	SELECT DISTINCT S.Suspect_PK,MIN(IsNull(PO.LastUpdated_Date,S.Scanned_Date)) Sch_Date--, MIN(PO.sch_type)
 	FROM tblSuspect S WITH (NOLOCK)
+			INNER JOIN tblChaseStatus CS ON CS.ChaseStatus_PK = S.ChaseStatus_PK
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
 			INNER JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = S.Provider_PK
-			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK AND S.Project_PK = PO.Project_PK
-	WHERE (PO.ProviderOffice_PK IS NOT NULL OR S.Scanned_Date IS NOT NULL)
+			LEFT JOIN tblProviderOfficeSchedule PO WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK --AND S.Project_PK = PO.Project_PK
+	WHERE (CS.IsScheduled=1 OR S.Scanned_Date IS NOT NULL)
 	GROUP BY S.Suspect_PK;
 
 	--Overall Progress for All Projects
@@ -120,7 +121,7 @@ BEGIN
 				LEFT JOIN tblZipCode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK
 				LEFT JOIN #tmp T ON T.Suspect_PK = S.Suspect_PK
 				WHERE (
-					(@DrillType=1 AND IsNull(T.Sch_Date,S.Scanned_Date)<@Dt)
+					(@DrillType=1 AND T.Sch_Date<@Dt)
 					OR (@DrillType=2 AND S.Scanned_Date<@Dt)
 					OR (@DrillType=3 AND S.Coded_Date<@Dt)
 					OR (@DrillType=4 AND S.CNA_Date<@Dt)

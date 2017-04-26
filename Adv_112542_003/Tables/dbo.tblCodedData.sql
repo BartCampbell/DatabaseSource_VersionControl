@@ -15,7 +15,9 @@ CREATE TABLE [dbo].[tblCodedData]
 [OpenedPage] [smallint] NULL,
 [Is_Deleted] [bit] NULL,
 [ScannedData_PK] [bigint] NULL,
-[CoderLevel] [tinyint] NULL
+[CoderLevel] [tinyint] NULL,
+[BeforeQA_OpenedPage] [smallint] NULL,
+[BeforeQA_ScannedData_PK] [bigint] NULL
 ) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_tblCodedDataSource] ON [dbo].[tblCodedData] ([CodedSource_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]

@@ -101,7 +101,7 @@ BEGIN
 			SELECT P.ProviderOffice_PK
 				,COUNT(DISTINCT S.Provider_PK) Providers, COUNT(DISTINCT CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN S.Suspect_PK ELSE NULL END) Charts
 				,CASE WHEN SUM(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN 1 ELSE 0 END)=0 THEN 6 ELSE MAX(CS.ProviderOfficeBucket_PK) END ProviderOfficeBucket_PK
-				,MAX(S.LastContacted) LastContact, MIN(S.FollowUp) FollowUpDate,Count(DISTINCT S.Project_PK) Offices
+				,MAX(S.LastContacted) LastContact, MIN(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN S.FollowUp ELSE NULL END) FollowUpDate,Count(DISTINCT S.Project_PK) Offices
 				FROM tblProviderOffice PO WITH (NOLOCK)
 					INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 					INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK

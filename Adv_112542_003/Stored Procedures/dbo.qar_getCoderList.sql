@@ -34,6 +34,7 @@ BEGIN
 		S.Coded_User_PK User_PK,
 		U.Lastname+', '+U.Firstname+' ('+ U.username+')' Coder,
 		COUNT(DISTINCT S.Suspect_PK) [Coded Charts],
+		COUNT(DISTINCT SD.ScannedData_PK) [Total Page Count],
 		COUNT(DISTINCT CASE WHEN S.IsQA=1 THEN S.Suspect_PK ELSE NULL END) [QA Charts],
 		CAST(Round(CAST(COUNT(DISTINCT CASE WHEN S.IsQA=1 THEN S.Suspect_PK ELSE NULL END) AS Float)/CAST(COUNT(DISTINCT S.Suspect_PK) AS Float)*100,2) AS varchar) + ' %' [% QA Charts],
 		COUNT(DISTINCT CD.CodedData_PK) [Total Dx Coded],
@@ -41,17 +42,28 @@ BEGIN
 		COUNT(DISTINCT CASE WHEN CDQ.IsChanged=1 THEN CDQ.CodedData_PK ELSE NULL END) [Total Dx Changed],
 		COUNT(DISTINCT CASE WHEN CDQ.IsAdded=1 THEN CDQ.CodedData_PK ELSE NULL END) [Total Dx Added],
 		COUNT(DISTINCT CASE WHEN CDQ.IsRemoved=1 THEN CDQ.CodedData_PK ELSE NULL END) [Total Dx Removed],
-
+		--Total DX Confirmed/(Total DX Confirmed + Total DX Added + DX Changed + DX Removed)*100
 		CASE WHEN COUNT(DISTINCT CASE WHEN CDQ.IsConfirmed=1 THEN CDQ.CodedData_PK ELSE NULL END)=0 THEN '' ELSE
-		--	CAST(ROUND(CAST(COUNT(DISTINCT CASE WHEN CDQ.IsConfirmed=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)/CAST(COUNT(DISTINCT CD.CodedData_PK)+COUNT(DISTINCT CASE WHEN CDQ.IsRemoved=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)*100,2) AS varchar) 
-		CAST(ROUND(CAST(COUNT(DISTINCT CASE WHEN CDQ.IsConfirmed=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)/CAST(COUNT(DISTINCT CASE WHEN CDQ.IsConfirmed=1 THEN CDQ.CodedData_PK ELSE NULL END) + COUNT(DISTINCT CASE WHEN CDQ.IsAdded=1 THEN CDQ.CodedData_PK ELSE NULL END) AS float)*100,2) AS VARCHAR)
-		+ ' %' END [QA Accuracy Rate]
+			CAST(ROUND(
+				CAST(COUNT(DISTINCT CASE WHEN CDQ.IsConfirmed=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)
+				/
+				(
+					CAST(COUNT(DISTINCT CASE WHEN CDQ.IsConfirmed=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)
+					+
+					CAST(COUNT(DISTINCT CASE WHEN CDQ.IsAdded=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)
+					+
+					CAST(COUNT(DISTINCT CASE WHEN CDQ.IsChanged=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)
+					+
+					CAST(COUNT(DISTINCT CASE WHEN CDQ.IsRemoved=1 THEN CDQ.CodedData_PK ELSE NULL END) AS Float)
+				) * 100
+			,0) AS varchar) + ' %' END [QA Accuracy Rate]
 	FROM tblSuspect S WITH (NOLOCK) 
 		INNER JOIN #tmpProject P ON P.Project_PK = S.Project_PK
 		INNER JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.Coded_User_PK
 		LEFT JOIN tblCodedData CD WITH (NOLOCK) ON CD.Suspect_PK = S.Suspect_PK
 		LEFT JOIN tblCodedDataQA CDQ WITH (NOLOCK) ON CD.CodedData_PK = CDQ.CodedData_PK
-	WHERE S.IsCoded=1 AND IsNull(CD.Is_Deleted,0)=0
+		LEFT JOIN tblScannedData SD WITH (NOLOCK) ON S.Suspect_PK = SD.Suspect_PK AND (SD.Is_Deleted IS NULL OR SD.Is_Deleted=0)
+	WHERE S.IsCoded=1 AND (SD.Is_Deleted IS NULL OR SD.Is_Deleted=0 OR CDQ.IsRemoved=1)
 		AND (@date_range<>1 OR (CAST(S.QA_Date AS DATE)>=@txt_FROM AND CAST(S.QA_Date AS DATE)<=@txt_to))
 		AND (@date_range<>2 OR (CAST(S.Coded_Date AS DATE)>=@txt_FROM AND CAST(S.Coded_Date AS DATE)<=@txt_to))
 		AND (@location=0 OR U.Location_PK=@location)

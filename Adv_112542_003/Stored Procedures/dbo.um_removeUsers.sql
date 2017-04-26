@@ -45,8 +45,8 @@ BEGIN
 			   ,[IsAdmin]
 			   ,[IsScanTech]
 			   ,[IsScheduler]
-			   ,[IsReviewer]
-			   ,[IsQA]
+			   ,[IsCoderOffsite]
+			   ,[IsQAManager]
 			   ,[IsActive]
 			   ,[only_work_selected_hours]
 			   ,[only_work_selected_zipcodes]
@@ -55,6 +55,5 @@ BEGIN
 
 	DELETE FROM tblUser WHERE User_PK=@User
 END
-
 
 GO
