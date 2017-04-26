@@ -7,10 +7,10 @@ GO
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
---	SELECT dbo.tmi_udf_GetChartNotes(12)
-Create FUNCTION [dbo].[tmi_udf_GetChartNotes]
+CREATE FUNCTION [dbo].[tmi_udf_GetChartNotes]
 (	
-	@CodedDate_PK BIGINT
+	@CodedDate_PK BIGINT,
+	@QA bit 
 )
 RETURNS VARCHAR(MAX) 
 AS
@@ -21,7 +21,7 @@ BEGIN
 	SET @RETURN = '';
 
 	DECLARE db_cursor CURSOR FOR  
-		SELECT NoteText_PK FROM tblCodedDataNote WHERE CodedData_PK = @CodedDate_PK
+		SELECT NoteText_PK FROM tblCodedDataNote WHERE CodedData_PK = @CodedDate_PK AND ((@QA=0 AND IsNull(IsAdded,0)=0) OR (@QA=1 AND IsNull(IsRemoved,0)=0)) 
 
 	OPEN db_cursor   
 	FETCH NEXT FROM db_cursor INTO @Note
@@ -41,6 +41,4 @@ BEGIN
 	
 	RETURN @RETURN;
 END
-
-
 GO

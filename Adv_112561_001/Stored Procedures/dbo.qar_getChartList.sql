@@ -32,7 +32,7 @@ BEGIN
 	-- PROJECT SELECTION
 	
 	SELECT ROW_NUMBER() OVER(ORDER BY M.Lastname) RowNumber,
-		S.Suspect_PK, S.ChaseID, M.Member_ID, M.Lastname+IsNull(', '+M.Firstname,'') Member, M.DOB, PM.Provider_ID, PM.Lastname+IsNull(', '+PM.Firstname,'') Provider,
+		S.Suspect_PK, S.ChaseID,COUNT(DISTINCT SD.ScannedData_PK) [Pages], M.Member_ID, M.Lastname+IsNull(', '+M.Firstname,'') Member, M.DOB, PM.Provider_ID, PM.Lastname+IsNull(', '+PM.Firstname,'') Provider,
 		S.Coded_Date [Coded Date],S.QA_Date [QA Date],U.Lastname+IsNull(', '+U.Firstname,'') [QA By],
 		COUNT(DISTINCT CD.CodedData_PK) [Total Dx Coded],
 		COUNT(DISTINCT CASE WHEN CDQ.IsConfirmed=1 THEN CDQ.CodedData_PK ELSE NULL END) [Total Dx Confirmed],
@@ -47,6 +47,7 @@ BEGIN
 		LEFT JOIN tblUser U WITH (NOLOCK) ON U.User_PK = S.QA_User_PK
 		LEFT JOIN tblCodedData CD WITH (NOLOCK) ON CD.Suspect_PK = S.Suspect_PK
 		LEFT JOIN tblCodedDataQA CDQ WITH (NOLOCK) ON CD.CodedData_PK = CDQ.CodedData_PK
+		LEFT JOIN tblScannedData SD WITH (NOLOCK) ON S.Suspect_PK = SD.Suspect_PK AND (SD.Is_Deleted IS NULL OR SD.Is_Deleted=0)
 	WHERE S.IsCoded=1 AND S.Coded_User_PK=@coder
 		AND (@type <> 1 OR S.IsQA=1)
 		AND (@date_range<>1 OR (CAST(S.QA_Date AS DATE)>=@txt_FROM AND CAST(S.QA_Date AS DATE)<=@txt_to))
