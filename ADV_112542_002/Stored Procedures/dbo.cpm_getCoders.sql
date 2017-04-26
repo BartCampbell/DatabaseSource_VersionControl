@@ -19,13 +19,13 @@ BEGIN
 		) AS RowNumber
 			,U.User_PK,U.Username,U.Lastname+', '+U.Firstname Fullname,U.CoderLevel 
 		FROM tblUser U
-		WHERE U.IsReviewer = 1 And (@Alpha='' OR U.Username LIKE @Alpha+'%')
+		WHERE (U.IsCoderOffsite = 1 OR U.IsCoderOnsite = 1) And (@Alpha='' OR U.Username LIKE @Alpha+'%')
 	)
 	
 	SELECT * FROM tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber
 	
 	SELECT UPPER(LEFT(Username,1)) alpha1, UPPER(RIGHT(LEFT(Username,2),1)) alpha2,Count(DISTINCT User_PK) records
-		FROM tblUser WHERE IsReviewer = 1 
+		FROM tblUser WHERE (IsCoderOffsite = 1 OR IsCoderOnsite = 1)
 		GROUP BY LEFT(Username,1), RIGHT(LEFT(Username,2),1)	
 		ORDER BY alpha1, alpha2
 END
