@@ -142,11 +142,11 @@ BEGIN
 		CREATE INDEX idxTSuspect ON #Suspect (Suspect_PK)
 		DECLARE @SQL AS VARCHAR(MAX) = ''
 		if @dos=0 OR @diag=0 OR @hcc=0
-			SET @SQL = 'INSERT INTO #Suspect SELECT DISTINCT CD.Suspect_PK FROM tblCodedData CD'
+			SET @SQL = 'INSERT INTO #Suspect SELECT DISTINCT CD.Suspect_PK FROM tblSuspect S WITH (NOLOCK) INNER JOIN tblCodedData CD WITH (NOLOCK) ON S.Suspect_PK = CD.Suspect_PK'
 		if @hcc=0
-			SET @SQL = @SQL + ' INNER JOIN tblModelCode MC ON MC.DiagnosisCode = CD.DiagnosisCode'
+			SET @SQL = @SQL + ' INNER JOIN tblModelCode MC WITH (NOLOCK) ON MC.DiagnosisCode = CD.DiagnosisCode'
 		if @dos=0 OR @diag=0 OR @hcc=0
-			SET @SQL = @SQL + ' WHERE 1=1 '
+			SET @SQL = @SQL + ' WHERE S.IsCoded=1 '
 
 		if (@dos=0)
 			SET @SQL = @SQL + ' AND CD.DOS_From Between ''' + REPLACE(@s_dos,',',''' AND ''') + '''';
