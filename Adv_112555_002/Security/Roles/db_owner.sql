@@ -1,4 +1,6 @@
 
+EXEC sp_addrolemember N'db_owner', N'INTERNAL\joe.vesneski'
+
 EXEC sp_addrolemember N'db_owner', N'INTERNAL\travis.parker'
 EXEC sp_addrolemember N'db_owner', N'INTERNAL\sajid.ali'
 GO
