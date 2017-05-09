@@ -1,4 +1,8 @@
 
+EXEC sp_addrolemember N'db_datareader', N'INTERNAL\lavar.mccullough'
+
+EXEC sp_addrolemember N'db_datareader', N'INTERNAL\Matthew.Ellinger'
+
 EXEC sp_addrolemember N'db_datareader', N'INTERNAL\CHSSQLDevOps'
 
 EXEC sp_addrolemember N'db_datareader', N'INTERNAL\dawn.carter'

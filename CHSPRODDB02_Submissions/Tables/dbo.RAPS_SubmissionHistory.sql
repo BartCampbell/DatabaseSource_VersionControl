@@ -31,6 +31,10 @@ CREATE TABLE [dbo].[RAPS_SubmissionHistory]
 GO
 ALTER TABLE [dbo].[RAPS_SubmissionHistory] ADD CONSTRAINT [PK_RAPS_SubmissionHistory] PRIMARY KEY CLUSTERED  ([RAPSResponseID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [idx_RAPS_SubmissionHistory_1] ON [dbo].[RAPS_SubmissionHistory] ([Accepted], [FromDate]) INCLUDE ([CentauriClientID]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [idx_RAPS_SubmissionHistory_2] ON [dbo].[RAPS_SubmissionHistory] ([CentauriClientID], [Accepted], [FromDate]) ON [PRIMARY]
+GO
 CREATE NONCLUSTERED INDEX [IDX1] ON [dbo].[RAPS_SubmissionHistory] ([CentauriClientID], [DOBErrorCode], [HICErrorCode], [ThruDate], [ErrorA], [ErrorB]) INCLUDE ([DXCode], [HicNo]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IDX2] ON [dbo].[RAPS_SubmissionHistory] ([CentauriClientID], [DXCode], [DOBErrorCode], [HICErrorCode], [ThruDate], [ErrorA], [ErrorB]) ON [PRIMARY]
