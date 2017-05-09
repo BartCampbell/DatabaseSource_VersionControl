@@ -103,6 +103,18 @@ CREATE TABLE [fact].[MMR]
 GO
 ALTER TABLE [fact].[MMR] ADD CONSTRAINT [PK_MMR] PRIMARY KEY CLUSTERED  ([MMRID]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_Sequence_ContractNbr_RunDate_PaymentDate_HICN_FileName] ON [fact].[MMR] ([Sequence], [ContractNbr], [FileRunDate], [PaymentDate], [HICN], [FileName]) ON [PRIMARY]
+GO
+CREATE STATISTICS [_dta_stat_361768346_2_1_4_5_6_7_8_97_3] ON [fact].[MMR] ([ClientID], [MMRID], [Sequence], [ContractNbr], [FileRunDate], [PaymentDate], [HICN], [FileName], [MemberID])
+GO
+CREATE STATISTICS [_dta_stat_361768346_1_2_3] ON [fact].[MMR] ([MMRID], [ClientID], [MemberID])
+GO
+CREATE STATISTICS [_dta_stat_361768346_1_3_4_5_6_7_8_97] ON [fact].[MMR] ([MMRID], [MemberID], [Sequence], [ContractNbr], [FileRunDate], [PaymentDate], [HICN], [FileName])
+GO
+CREATE STATISTICS [_dta_stat_361768346_1_4_5_6_7_8] ON [fact].[MMR] ([MMRID], [Sequence], [ContractNbr], [FileRunDate], [PaymentDate], [HICN])
+GO
+CREATE STATISTICS [_dta_stat_361768346_4_5_6_7_8_97_1] ON [fact].[MMR] ([Sequence], [ContractNbr], [FileRunDate], [PaymentDate], [HICN], [FileName], [MMRID])
+GO
 ALTER TABLE [fact].[MMR] ADD CONSTRAINT [FK_MMR_Client] FOREIGN KEY ([ClientID]) REFERENCES [dim].[Client] ([ClientID])
 GO
 ALTER TABLE [fact].[MMR] ADD CONSTRAINT [FK_MMR_Member] FOREIGN KEY ([MemberID]) REFERENCES [dim].[Member] ([MemberID])

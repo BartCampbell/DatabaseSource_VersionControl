@@ -23,12 +23,13 @@ AS
         MERGE INTO dim.Member AS t
         USING
             ( SELECT    CentauriMemberID ,
-                        LastName ,
-                        FirstName ,
-                        MiddleName ,
-                        Gender ,
-                        DOB
+                        MAX(LastName) LastName ,
+                        MAX(FirstName) FirstName ,
+                        MAX(MiddleName) MiddleName ,
+                        MAX(Gender) Gender ,
+                        MAX(DOB) DOB
               FROM      stage.Member_MOR
+		    GROUP BY CentauriMemberID
             ) AS s
         ON t.CentauriMemberID = s.CentauriMemberID
         WHEN MATCHED AND ( t.LastName <> s.LastName
@@ -43,7 +44,7 @@ AS
                     t.MiddleName = s.MiddleName ,
                     t.Gender = s.Gender ,
                     t.DOB = s.DOB ,
-                    t.LastUpdate = @CurrentDate
+                    t.LastUpdate = GETDATE()--@CurrentDate
         WHEN NOT MATCHED BY TARGET THEN
             INSERT ( CentauriMemberID ,
                      LastName ,
@@ -61,6 +62,4 @@ AS
                    );
 
     END;     
-
-
 GO

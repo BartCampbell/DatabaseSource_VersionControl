@@ -100,3 +100,13 @@ CREATE TABLE [stage].[MMR]
 [LoadDate] [datetime] NULL
 ) ON [PRIMARY]
 GO
+CREATE CLUSTERED INDEX [_dta_index_MMR_c_5_1421248118__K1_K2_K3_K4_K5_K6_K7_K96] ON [stage].[MMR] ([ClientID], [CentauriMemberID], [Sequence], [MCO_Contract_Nbr], [File_Run_Date], [Payment_YYYYMM], [HICN_Nbr], [RecordSource]) ON [PRIMARY]
+GO
+CREATE STATISTICS [_dta_stat_1421248118_1_2_3_4_5_6_7] ON [stage].[MMR] ([ClientID], [CentauriMemberID], [Sequence], [MCO_Contract_Nbr], [File_Run_Date], [Payment_YYYYMM], [HICN_Nbr])
+GO
+CREATE STATISTICS [_dta_stat_1421248118_4_6_7_1_2_3] ON [stage].[MMR] ([MCO_Contract_Nbr], [Payment_YYYYMM], [HICN_Nbr], [ClientID], [CentauriMemberID], [Sequence])
+GO
+CREATE STATISTICS [_dta_stat_1421248118_4_6_7_8_9_10_12_13_14_15_16_17_18_19_20_21] ON [stage].[MMR] ([MCO_Contract_Nbr], [Payment_YYYYMM], [HICN_Nbr], [Last_Name], [First_Initial], [Gender], [Age_Group], [State_County_Code], [Out_Of_Area_Ind], [Part_A_Entitle_Ind], [Part_B_Entitle_Ind], [Hospice_Ind], [ESRD_Ind], [Aged_Disabled_MSP_Ind], [Institutional_Ind], [NHC_Ind])
+GO
+CREATE STATISTICS [_dta_stat_1421248118_3_4_5_6_7_96_1_2_8_9_10_12_13_14_15_16] ON [stage].[MMR] ([Sequence], [MCO_Contract_Nbr], [File_Run_Date], [Payment_YYYYMM], [HICN_Nbr], [RecordSource], [ClientID], [CentauriMemberID], [Last_Name], [First_Initial], [Gender], [Age_Group], [State_County_Code], [Out_Of_Area_Ind], [Part_A_Entitle_Ind], [Part_B_Entitle_Ind])
+GO

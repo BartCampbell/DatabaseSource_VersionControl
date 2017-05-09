@@ -1,4 +1,6 @@
 
+EXEC sp_addrolemember N'db_datareader', N'INTERNAL\lavar.mccullough'
+
 EXEC sp_addrolemember N'db_datareader', N'INTERNAL\corey.collins'
 
 EXEC sp_addrolemember N'db_datareader', N'INTERNAL\Matthew.Ellinger'
