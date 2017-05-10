@@ -23,6 +23,7 @@ CREATE TABLE [dbo].[Eligibility]
 [CoverageHospiceFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [ProductPriority] [int] NULL,
 [HedisMeasureID] [varchar] (10) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[HealthPlanEmployeeFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+[HealthPlanEmployeeFlag] [varchar] (1) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PlanProduct] [varchar] (20) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
 ) ON [dbo_Eligibility]
 GO

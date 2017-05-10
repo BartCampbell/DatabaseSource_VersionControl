@@ -31,6 +31,7 @@ Change Log:
 2017-03-30	Corey Collins		--Add TargetDB per VLK/Leon
 2017-03-30  Leon				--Change for staging
 2017-03-31	CC					--Change ClaimInOutPatient to Claim
+2017-05-10	CC					--Add user and UserPlanCode
 ****************************************************************************************************************************************************/
 --/*
 CREATE PROC [RDSM].[spMapSynonyms]
@@ -44,13 +45,13 @@ SET NOCOUNT ON;
 --*/
 
     --uncomment for manual test
-   /*
+  /*---
 	DECLARE 
 		@Debug BIT= 1,
 		@Exec BIT = 1,
 		@TargetDB varchar(100)='BCBSA_RDSM',
 		@TargetSchema VARCHAR(100)= 'BCBSA_GDIT2017'
-	--*/
+	--*/---
 		  
 DECLARE @SQL NVARCHAR(MAX),
     @SynonymName VARCHAR(255),
@@ -73,6 +74,9 @@ INSERT INTO @TableNames
 	UNION SELECT 'RxClaim'
     UNION SELECT 'Claim'
     UNION SELECT 'ClamLab'
+	UNION SELECT 'UserPlanCode'
+	UNION SELECT 'Users'
+
 
 SELECT @BaseTableName = MIN(TableName)
     FROM @TableNames
