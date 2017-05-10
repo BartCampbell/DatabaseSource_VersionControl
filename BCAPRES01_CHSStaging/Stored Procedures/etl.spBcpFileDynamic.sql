@@ -3,8 +3,18 @@ GO
 SET ANSI_NULLS ON
 GO
 
+/****************************************************************************************************************************************************
+Description:	Call BCP 
+Depenedents:	
+
+Usage
 
 
+Change Log:
+----------------------------------------------------------------------------------------------------------------------------------------------------- 
+								- Create
+2017-05-10	Michael Vlk			- Add dynamic @SQLDestServer (@lcServer) functionality
+****************************************************************************************************************************************************/
 CREATE PROC [etl].[spBcpFileDynamic] (
 	@lcDB CHAR(50)
 	,@lcTab CHAR(50)
@@ -15,12 +25,14 @@ CREATE PROC [etl].[spBcpFileDynamic] (
 	,@lcAddParam VARCHAR(2000) = NULL
 	,@lcExportQuery VARCHAR(4000) = NULL
 	,@lcSchema VARCHAR(200) = 'etl'
+	,@lcServer VARCHAR(100) = NULL
 	,@Debug INT = 0 -- 0:Exec with no Debug // 1:Exec with Debug // 2:Debug Print Only
 )
 AS
 
-DECLARE @lccmd varchar(8000), 
-    @lcServer VARCHAR(50), 
+DECLARE 
+	@lccmd varchar(8000), 
+    --@lcServer VARCHAR(50), 
     @lcFile VARCHAR(100), 
     @Tablename VARCHAR(100)
 
@@ -31,12 +43,11 @@ IF @lcType IS NULL
 IF RIGHT(RTRIM(@lcPath),1) <> '\' AND RIGHT(RTRIM(@lcPath),1) <> '/'
 	SET @lcPath = RTRIM(@lcPath)+'\'
 
---IF @lcTYPE = 'E'
+IF ISNULL(@lcServer,'') = ''
 	SET @lcServer = CONVERT(CHAR(10),(SELECT SERVERPROPERTY ('machinename')))
---ELSE 
---	SET @lcServer = 'IMIETL05.imihealth.com'
 
-IF @lcType = 'E'
+
+IF @lcType = 'E' -- EXPORT
 BEGIN
 
 	SET @lcCmd = 'bcp ' 
@@ -56,7 +67,7 @@ BEGIN
 	IF @Debug <=1 EXEC xp_cmdshell @lccmd
 
 END
-ELSE
+ELSE -- @lcType = 'I' -- IMPORT
 BEGIN
 
 	--SET @lcFile = @lcTab

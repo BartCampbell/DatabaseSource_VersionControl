@@ -9,7 +9,7 @@ Use:
 
 DECLARE @FileConfigID INT, @FileActionCd INT
 EXEC CHSStaging.etl.spFileConfigGet 
-	'\\CHS-FS01\DataIntake\112556\Aetna\MA','AETNA_CODES_201604.txt',@FileConfigID OUTPUT, @FileActionCd OUTPUT
+	'\\fs01.imihealth.com\FileStore\StFrancis\Anthem\Temp','CODE_SETS_03132017.txt',@FileConfigID OUTPUT, @FileActionCd OUTPUT
 SELECT @FileConfigID, @FileActionCd
 
 Change Log:
@@ -21,6 +21,8 @@ Change Log:
 2017-01-20	Michael Vlk			- Add additional Date pattern
 2017-03-27	Michael Vlk			- Add DateFileStr pattern %<YYYY-MM-DD>%
 2017-03-31	Michael Vlk			- Add DateFileStr pattern %<YYYYMM>%
+2017-04-31	Michael Vlk			- Add DateFileStr pattern %<YYYY_MM>%
+2017-04-12	Michael Vlk			- Use etl.FileSet as primary source for FilePathIntakeVolume / FilePathIntakePath
 ****************************************************************************************************************************************************/
 CREATE PROCEDURE [etl].[spFileConfigGet] (
 	@FilePath VARCHAR(100)
@@ -33,9 +35,12 @@ BEGIN
 
 	SELECT @FileConfigID = fc.FileConfigID, @FileActionCd = fc.FileActionCd
 	FROM etl.FileConfig fc
+	LEFT OUTER JOIN etl.FileSet fs ON fc.FileSetID = fs.FileSetID
 	WHERE 1=1
 		AND fc.IsActive = 1
-		AND fc.FilePathIntakeVolume + fc.FilePathIntakePath = LEFT(@FilePath,(LEN(fc.FilePathIntakeVolume + fc.FilePathIntakePath)))
+		AND (	fs.FilePathIntakeVolume + fs.FilePathIntakePath = LEFT(@FilePath,(LEN(fs.FilePathIntakeVolume + fs.FilePathIntakePath)))
+				OR fc.FilePathIntakeVolume + fc.FilePathIntakePath = LEFT(@FilePath,(LEN(fc.FilePathIntakeVolume + fc.FilePathIntakePath)))
+				)
 		AND @FileName LIKE 
 			CASE 
 				WHEN fc.FileNamePattern LIKE '%<YYYYMMDD>%' 
@@ -48,6 +53,8 @@ BEGIN
 					THEN REPLACE(fc.FileNamePattern, '<YYYY-MM-DD>','[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]')
 				WHEN fc.FileNamePattern LIKE '%<YYYYMM>%' 
 					THEN REPLACE(fc.FileNamePattern,'<YYYYMM>','[0-9][0-9][0-9][0-9][0-9][0-9]')
+				WHEN fc.FileNamePattern LIKE '%<YYYY_MM>%' 
+					THEN REPLACE(fc.FileNamePattern,'<YYYY_MM>','[0-9][0-9][0-9][0-9]_[0-9]')
 				ELSE fc.FileNamePattern
 				END
 

@@ -4,17 +4,17 @@ SET ANSI_NULLS ON
 GO
 
 /****************************************************************************************************************************************************
-Description:	Helper proc to call spBcpFileImport. Gets params for call given the FileLogID 
-Depenedents:	etl.spBcpFileImport
+Description:	Helper proc to call spBcpFileImportDynamic. Gets params for call given the FileLogID 
+Depenedents:	etl.spBcpFileImportDynamic, etl.spBcpFileDynamic
 
 Usage
 
 EXEC CHSStaging.etl.spBcpFileImportDynamicMaster
-	@FileLogID = 1000864 -- INT
-	,@FileProcessID = 3001 -- INT
+	@FileLogID = 1001784 -- INT
+	,@FileProcessID = 1001 -- INT
 	,@Debug = 1 -- INT = 1
 
-SELECT TOP 1000 * FROM CHSStaging.etl.BCPFileStage_1001
+SELECT TOP 1000 * FROM BCPStaging.etl.BCPFileStage_1001784 -- TRUNCATE TABLE CHSStaging.etl.BCPFileStage_1001
 
 Change Log:
 ----------------------------------------------------------------------------------------------------------------------------------------------------- 
@@ -26,6 +26,11 @@ Change Log:
 2017-02-02	Michael Vlk			- Allow stage table to be dynamic based on ProcessID
 2017-03-24	Michael Vlk			- Change Fixed width validation to use DATALENGTH instead of LEN to account for trailing spaces properly
 2017-03-29	Michael Vlk			- Update File Validation to handle when is BcpParmIsTabDelimited
+2017-04-04	Michael Vlk			- Enhance File Val Error Msg with FileLogID
+2017-04-13	Michael Vlk			- Multi-thread update
+2017-04-20	Michael Vlk			- Add @ValidationSkip logic@
+2017-05-04	Michael Vlk			- Enhance @FileLogDetailTxt with @FileNameIntake/FileThread info
+2017-05-10	Michael Vlk			- Add dynamic @SQLDestServer (@lcServer) functionality. Move RowCntImport to BCPStaging.etl.spBcpFileStageToTarget
 ****************************************************************************************************************************************************/
 CREATE PROC [etl].[spBcpFileImportDynamicMaster]
 	@FileLogID INT
@@ -53,6 +58,9 @@ AS
 		,@RowWidthFile INT
 		,@RowCount INT
 		,@FileLogDetailTxt VARCHAR(MAX)
+		,@ValidationSkip INT
+		,@FileThread INT
+		,@SQLDestServer VARCHAR(100)
 
 	--
 
@@ -72,6 +80,9 @@ AS
 		,@BcpParmRemoveTextQuotes = fc.BcpParmRemoveTextQuotes
 		,@HasHeader = fc.HasHeader
 		,@FileFmtValRowSample = fcv.FileFmtValRowSample
+		,@ValidationSkip = fc.ValidationSkip
+		,@FileThread = fl.FileThread
+		,@SQLDestServer = fc.SQLDestServer
 	FROM
 		CHSStaging.etl.FileLog fl
 	INNER JOIN 
@@ -88,15 +99,14 @@ AS
 	IF @Debug >= 1 
 		BEGIN
 			PRINT CHAR(13) + 'spBcpFileImportDynamicMaster:'
-			SELECT @FileLogID,@FileProcessID,@FileConfigID,@FilePathIntake,@FileNameIntake,@BcpParmColCount,@BcpParmFieldTerminator,@BcpParmRowTerminator,@BcpParmIsTabDelimited,@BcpParmRemoveTextQuotes,@HasHeader,@Debug
+			SELECT @FileLogID,@FileProcessID,@FileConfigID,@FilePathIntake,@FileNameIntake,@BcpParmColCount,@BcpParmFieldTerminator,@BcpParmIsFixedWidth AS BcpParmIsFixedWidth,@BcpParmRowTerminator,@BcpParmIsTabDelimited,@BcpParmRemoveTextQuotes,@HasHeader,@Debug
 			SELECT @FileFmtValRowSample
 		END
-
 
 	--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamicMaster: Validation of File Format'
 
-	IF @Debug <= 1 
+	IF @ValidationSkip = 0 AND @Debug <= 1 
 	BEGIN
 		EXEC CHSStaging.etl.spBcpFileImportDynamic
 			@FileLogID = @FileLogID
@@ -110,11 +120,12 @@ AS
 			,@bBcpParmIsFixedWidth = 1
 			,@bRemoveTextQuotes = 0
 			,@iMinRow = NULL
-			,@iMaxRow = 1			
+			,@iMaxRow = 1	
+			,@lcServer = NULL		
 			,@Debug = @Debug
 			;
 
-		SELECT @vcCmd = 'SELECT @FileFmtValRowFile = Col1 FROM CHSStaging.etl.BCPFileStage_' + CAST(@FileProcessID AS VARCHAR) + ' WHERE RowFileID = 1'
+		SELECT @vcCmd = 'SELECT @FileFmtValRowFile = Col1 FROM BCPStaging.etl.BCPFileStage_' + CAST(@FileLogID AS VARCHAR) + ' WHERE RowFileID = 1'
 
 		IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamicMaster: SELECT @FileFmtValRowFile: ' + CHAR(13) + @vcCmd
 		IF @Debug <= 1 EXEC sp_executesql @vcCmd, N'@FileFmtValRowFile VARCHAR(MAX) OUT', @FileFmtValRowFile OUT
@@ -189,7 +200,8 @@ AS
 		IF ISNULL(@FileFmtValRowPass,0) = 0
 			BEGIN
 				SET @FileLogDetailTxt = 
-					'ERROR: spBcpFileImportDynamicMaster: Validation of File Format: FAILURE'
+					'ERROR: spBcpFileImportDynamicMaster: Validation of File Format: FAILURE for FileLogID: ' + CAST(@FileLogID AS VARCHAR) + ' FileThread: ' + CAST(@FileThread AS VARCHAR)
+					+ CHAR(13) + CHAR(9) + '@FileNameIntake: ' + @FileNameIntake
 					+ CHAR(13) + CHAR(9) + '@FileFmtValRowSample:	' + ISNULL(@FileFmtValRowSample,'Error')
 					+ CHAR(13) + CHAR(9) + '@FileFmtValRowFile:		' + ISNULL(@FileFmtValRowFile,'Error')
 					+ CHAR(13) + CHAR(9) + '@RowWidthSample:		' + CAST(ISNULL(@RowWidthSample,-1) AS VARCHAR)
@@ -215,6 +227,10 @@ AS
 
 			END -- ISNULL(@FileFmtValRowPass,0) = 0
 
+	END -- @ValidationSkip = 0 AND @Debug <= 1 
+	ELSE
+	BEGIN
+		SET @FileFmtValRowPass = 1
 	END
 
 	--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -236,16 +252,17 @@ AS
 				,@bBcpParmIsFixedWidth = @BcpParmIsFixedWidth
 				,@bRemoveTextQuotes = @BcpParmRemoveTextQuotes
 				,@iMinRow = NULL			
-				,@iMaxRow = NULL			
+				,@iMaxRow = NULL	
+				,@lcServer = @SQLDestServer		
 				,@Debug = @Debug
 				;
 			
-			SELECT @vcCmd = 'SELECT @RowCount = COUNT(*) FROM CHSStaging.etl.BCPFileStage_' + CAST(@FileProcessID AS VARCHAR)
+			--SELECT @vcCmd = 'SELECT @RowCount = COUNT(*) FROM BCPStaging.etl.BCPFileStage_' + CAST(@FileLogID AS VARCHAR)
 
-			IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamicMaster: SELECT @RowCount: ' + CHAR(13) + @vcCmd
-			IF @Debug <= 1 EXEC sp_executesql @vcCmd, N'@RowCount INT OUT', @RowCount OUT
+			--IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamicMaster: SELECT @RowCount: ' + CHAR(13) + @vcCmd
+			--IF @Debug <= 1 EXEC sp_executesql @vcCmd, N'@RowCount INT OUT', @RowCount OUT
 
-			UPDATE CHSStaging.etl.FileLog SET RowCntImport = @RowCount WHERE FileLogID = @FileLogID
+			--UPDATE CHSStaging.etl.FileLog SET RowCntImport = @RowCount WHERE FileLogID = @FileLogID
 		END
 	END
 

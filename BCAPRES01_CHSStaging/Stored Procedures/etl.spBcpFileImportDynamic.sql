@@ -3,7 +3,6 @@ GO
 SET ANSI_NULLS ON
 GO
 
-
 /****************************************************************************************************************************************************
 Description:			Import a file using BCP to CHSStaging.etl.BCPFileStage. For file automation, this proc will not be called directly. Instead,
 						spBcpFileImportByFileConfigID will be used to lookup the config params and call this.
@@ -11,10 +10,10 @@ Depenedents:			etl.spBcpFile
 
 Usage:
 EXEC CHSStaging.etl.spBcpFileImportDynamic
-	@FileLogID = 1000850
+	@FileLogID = 1000002
 	,@FileProcessID = 1001
-	,@vcPath = '\\CHS-FS01\DataIntake\112562\HEDIS'
-	,@vcTxtFile = 'BCBSAZ_LabResults_20170112.txt'
+	,@vcPath = '\\fs01.imihealth.com\FileStore\StFrancis\Anthem\MA'
+	,@vcTxtFile = 'CTStFrancisMEDICARE_claim_det_03132017.txt'
 	,@iColCnt = 34
 	,@vcFieldTerminator = '|'
 	,@vcRowTerminator = '\n'
@@ -23,10 +22,15 @@ EXEC CHSStaging.etl.spBcpFileImportDynamic
 	,@bRemoveTextQuotes = 1
 	,@iMinRow = NULL	
 	,@iMaxRow = NULL
+	,@lcServer = NULL
 	,@Debug = 1
 
-SELECT * FROM etl.BCPFileFormat_1001
-SELECT * FROM etl.BCPFileStage_1001
+SELECT * FROM BCPStaging.etl.BCPFileFormat_1000002
+SELECT * FROM BCPStaging.etl.BCPFileStage_1000002
+
+EXEC BCPStaging.etl.spBCPFileStageTableDrop_Flat
+	@FileLogID = 1000003 -- INT
+	,@Debug = 1 -- INT = 1
 
 spBcpFile: Import:bcp CHSStaging.etl.BCPFileStage_1001 IN "\\CHS-FS01\DataIntake\112562\HEDIS\BCBSAZ_LabResults_20170112.txt" -S CHSDEVDB01 -T -c -o \\CHS-FS01\DataIntake\112562\HEDIS\BCBSAZ_LabResults_20170112.txt.out -e \\CHS-FS01\DataIntake\112562\HEDIS\BCBSAZ_LabResults_20170112.txt.err /f \\CHS-FS01\DataIntake\112562\HEDISBCPFileFormat_1001.txt
 
@@ -42,7 +46,8 @@ Parameters:
 	@bTabDelimited		: If set to 1, Change @vcFieldTerminator = NULL
 	@bRemoveTextQuotes
 	@iMinRow			: 1st row to import data
-	@iMaxRow			: max row to import data.  
+	@iMaxRow			: max row to import data
+	@lcServer			: SQL Server to import data to. NULL results in default to server proc is executed on  
 	@Debug
 
 Change Log:
@@ -58,6 +63,10 @@ Change Log:
 2017-01-17	Michael Vlk			- Fix Remove \n \r from last col, had static Col223 in replacement string
 2017-02-02	Michael Vlk			- Allow stage table to be dynamic based on ProcessID
 2017-03-14	Michael Vlk			- Add spBCPFileStageTableCreate_Flat to setup stage table for ProcessID
+2017-04-13	Michael Vlk			- Multi-thread update
+2017-05-10	Michael Vlk			- Add dynamic @SQLDestServer (@lcServer) functionality
+								- Move @BCPFileStage create functionality out to SSIS package
+								- Move BCPFileStage_# UPDATES to spBcpFileStageToTarget
 ****************************************************************************************************************************************************/
 CREATE PROC [etl].[spBcpFileImportDynamic]
 	@FileLogID INT
@@ -72,6 +81,7 @@ CREATE PROC [etl].[spBcpFileImportDynamic]
 	,@bRemoveTextQuotes BIT = 0
 	,@iMinRow INT = NULL	
 	,@iMaxRow INT = NULL
+	,@lcServer VARCHAR(100) = NULL
 	,@Debug INT = 0
 AS
 
@@ -93,34 +103,34 @@ AS
 		,@BCPFileStage VARCHAR(100)
 		,@BCPFileStageFull VARCHAR(100)
 
-	SET @BCPFileFormat = 'BCPFileFormat_' + CAST(@FileProcessID AS VARCHAR)
-		SET @BCPFileFormatFull = 'etl.' + @BCPFileFormat
+	SET @BCPFileFormat = 'BCPFileFormat_' + CAST(@FileLogID AS VARCHAR)
+		SET @BCPFileFormatFull = 'BCPStaging.etl.' + @BCPFileFormat
 		SET @BCPFileFormatFile = @BCPFileFormat
-	SET @BCPFileTabInfo = 'BCPFileTabInfo_' + CAST(@FileProcessID AS VARCHAR)
-	SET @BCPFileStage = 'BCPFileStage_' + CAST(@FileProcessID AS VARCHAR)
-		SET @BCPFileStageFull = 'etl.' + @BCPFileStage
+	SET @BCPFileTabInfo = 'BCPFileTabInfo_' + CAST(@FileLogID AS VARCHAR)
+	SET @BCPFileStage = 'BCPFileStage_' + CAST(@FileLogID AS VARCHAR)
+		SET @BCPFileStageFull = 'BCPStaging.etl.' + @BCPFileStage
 	
 	IF @bTabDelimited = 1
 		SET @vcFieldTerminator = CHAR(9)
 
 	SELECT @vcCmd = '
-	IF OBJECT_ID(''etl.' + @BCPFileFormat + ''') IS NOT NULL
-		DROP TABLE etl.' + @BCPFileFormat + '
+	IF OBJECT_ID(''BCPStaging.etl.' + @BCPFileFormat + ''') IS NOT NULL
+		DROP TABLE BCPStaging.etl.' + @BCPFileFormat + '
 	
-		CREATE TABLE etl.' + @BCPFileFormat + ' (txt VARCHAR(200), Rowid INT IDENTITY(1,1))
-		ALTER TABLE etl.' + @BCPFileFormat + ' ADD CONSTRAINT ' + @BCPFileFormat + '_PK PRIMARY KEY (RowID)
+		CREATE TABLE BCPStaging.etl.' + @BCPFileFormat + ' (txt VARCHAR(200), Rowid INT IDENTITY(1,1))
+		ALTER TABLE BCPStaging.etl.' + @BCPFileFormat + ' ADD CONSTRAINT ' + @BCPFileFormat + '_PK PRIMARY KEY (RowID)
 
-	IF OBJECT_ID(''etl.' + @BCPFileTabInfo + ''') IS NOT NULL
-		DROP TABLE etl.' + @BCPFileTabInfo + '
+	IF OBJECT_ID(''BCPStaging.etl.' + @BCPFileTabInfo + ''') IS NOT NULL
+		DROP TABLE BCPStaging.etl.' + @BCPFileTabInfo + '
 	
-		CREATE TABLE etl.' + @BCPFileTabInfo + ' (txt VARCHAR(200), Rowid INT IDENTITY(1,1))
-		ALTER TABLE etl.' + @BCPFileTabInfo + ' ADD CONSTRAINT ' + @BCPFileTabInfo + '_PK PRIMARY KEY (RowID)
+		CREATE TABLE BCPStaging.etl.' + @BCPFileTabInfo + ' (txt VARCHAR(200), Rowid INT IDENTITY(1,1))
+		ALTER TABLE BCPStaging.etl.' + @BCPFileTabInfo + ' ADD CONSTRAINT ' + @BCPFileTabInfo + '_PK PRIMARY KEY (RowID)
 
-	IF OBJECT_ID(''etl.' + @BCPFileStage + ''') IS NOT NULL
-		DROP TABLE etl.' + @BCPFileStage + '
+	--IF OBJECT_ID(''BCPStaging.etl.' + @BCPFileStage + ''') IS NOT NULL
+	--	DROP TABLE BCPStaging.etl.' + @BCPFileStage + '
 
-		SELECT * INTO etl.' + @BCPFileStage + ' FROM etl.BCPFileStage_TemplateFlat
-		ALTER TABLE etl.' + @BCPFileStage + ' ADD CONSTRAINT ' + @BCPFileStage + '_PK PRIMARY KEY (RowFileID)
+	--	SELECT * INTO BCPStaging.etl.' + @BCPFileStage + ' FROM BCPStaging.etl.BCPFileStage_TemplateFlat
+	--	ALTER TABLE BCPStaging.etl.' + @BCPFileStage + ' ADD CONSTRAINT ' + @BCPFileStage + '_PK PRIMARY KEY (RowFileID)
 	'
 
 	IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamic: Create BCP Objects: ' + CHAR(13) + @vcCmd
@@ -131,11 +141,11 @@ AS
 	IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamic: Initialize BCPFileFormat'
 
 	SELECT @vcCmd = '
-	INSERT INTO etl.' + @BCPFileFormat + ' (txt) VALUES (''<?xml version="1.0"?>'')
-	INSERT INTO etl.' + @BCPFileFormat + ' (txt) VALUES (''<BCPFORMAT '')
-	INSERT INTO etl.' + @BCPFileFormat + ' (txt) VALUES (''xmlns="http://schemas.microsoft.com/sqlserver/2004/bulkload/format" '')
-	INSERT INTO etl.' + @BCPFileFormat + ' (txt) VALUES (''xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'')
-	INSERT INTO etl.' + @BCPFileFormat + ' (txt) VALUES (''  <RECORD>'')
+	INSERT INTO BCPStaging.etl.' + @BCPFileFormat + ' (txt) VALUES (''<?xml version="1.0"?>'')
+	INSERT INTO BCPStaging.etl.' + @BCPFileFormat + ' (txt) VALUES (''<BCPFORMAT '')
+	INSERT INTO BCPStaging.etl.' + @BCPFileFormat + ' (txt) VALUES (''xmlns="http://schemas.microsoft.com/sqlserver/2004/bulkload/format" '')
+	INSERT INTO BCPStaging.etl.' + @BCPFileFormat + ' (txt) VALUES (''xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'')
+	INSERT INTO BCPStaging.etl.' + @BCPFileFormat + ' (txt) VALUES (''  <RECORD>'')
 	'
 
 	IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamic: Initialize BCPFileFormat: ' + CHAR(13) + @vcCmd
@@ -149,7 +159,7 @@ AS
 	WHILE @iCnt <= @iColCnt
 		BEGIN
 			SELECT @vcCmd = '
-			INSERT INTO etl.' + @BCPFileFormat + ' (txt) VALUES (''<FIELD ID="' + CONVERT(VARCHAR(10),@iCnt) + '" xsi:type="CharTerm" TERMINATOR=' 
+			INSERT INTO BCPStaging.etl.' + @BCPFileFormat + ' (txt) VALUES (''<FIELD ID="' + CONVERT(VARCHAR(10),@iCnt) + '" xsi:type="CharTerm" TERMINATOR=' 
 													+ CASE WHEN @iCnt = @iColCnt 
 															THEN CASE WHEN @vcRowTerminator IS NULL 
 																		THEN '"\n"' 
@@ -174,8 +184,8 @@ AS
 		END
 	
 	SELECT @vcCmd = '
-	INSERT INTO etl.' + @BCPFileFormat + ' (txt) VALUES (''  </RECORD> '')
-	INSERT INTO etl.' + @BCPFileFormat + ' (txt) VALUES (''    <ROW> '')
+	INSERT INTO BCPStaging.etl.' + @BCPFileFormat + ' (txt) VALUES (''  </RECORD> '')
+	INSERT INTO BCPStaging.etl.' + @BCPFileFormat + ' (txt) VALUES (''    <ROW> '')
 	'
 
 	IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamic: Initialize BCPFileFormat: ' + CHAR(13) + @vcCmd
@@ -186,7 +196,7 @@ AS
 	WHILE @iCnt <= @iColCnt
 		BEGIN
 			SELECT @vcCmd = '
-			INSERT INTO etl.' + @BCPFileFormat + ' (txt) VALUES (''     <COLUMN SOURCE="' + CONVERT(VARCHAR(10),@iCnt) + '" NAME="Col' + CONVERT(VARCHAR(10),@iCnt) + '" xsi:type="SQLVARYCHAR"/>'
+			INSERT INTO BCPStaging.etl.' + @BCPFileFormat + ' (txt) VALUES (''     <COLUMN SOURCE="' + CONVERT(VARCHAR(10),@iCnt) + '" NAME="Col' + CONVERT(VARCHAR(10),@iCnt) + '" xsi:type="SQLVARYCHAR"/>'
 													+ ''')'
 
 			IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamic: Initialize BCPFileFormat: ' + CHAR(13) + @vcCmd
@@ -196,8 +206,8 @@ AS
 		END
 
 	SELECT @vcCmd = '
-	INSERT INTO etl.' + @BCPFileFormat + ' (txt) VALUES (''  </ROW>'')
-	INSERT INTO etl.' + @BCPFileFormat + ' (txt) VALUES (''</BCPFORMAT> '')
+	INSERT INTO BCPStaging.etl.' + @BCPFileFormat + ' (txt) VALUES (''  </ROW>'')
+	INSERT INTO BCPStaging.etl.' + @BCPFileFormat + ' (txt) VALUES (''</BCPFORMAT> '')
 	'
 
 	IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamic: Initialize BCPFileFormat: ' + CHAR(13) + @vcCmd
@@ -205,7 +215,7 @@ AS
 
 	--
 	
-	SELECT @lcExportQuery = '"SELECT txt FROM CHSStaging.etl.' + @BCPFileFormat + '"'
+	SELECT @lcExportQuery = '"SELECT txt FROM BCPStaging.etl.' + @BCPFileFormat + '"'
 
 	IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImport: EXEC spBcpFile: Export BCPFileFormat.txt'
 
@@ -217,14 +227,9 @@ AS
 		,@BCPFileFormatFile
 		,''
 		,@lcExportQuery = @lcExportQuery
+		,@lcServer = NULL
 		,@Debug = @Debug
 
-
--- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamic: EXEC etl.spBCPFileStageTableCreate_Flat'
-	/*
-	IF @Debug <= 1
-	EXEC etl.spBCPFileStageTableCreate_Flat @FileProcessID*/
 
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImport: EXEC etl.spBcpFile Import'
@@ -251,31 +256,33 @@ AS
 	
 	IF @Debug <= 1
 	EXEC etl.spBcpFileDynamic
-		@lcDB = 'CHSStaging' -- char(50)
+		@lcDB = 'BCPStaging' -- char(50)
 		,@lcTab = @BCPFileStage -- char(50)
 		,@lcType = 'I' -- char(1)
 		,@lcPath = @vcPath -- varchar(200)
 		,@lcFileName = @vcTxtFile -- varchar(100)
 		,@lcDelim = NULL -- varchar(1)
 		,@lcAddParam = @lcAddParam
+		,@lcServer = @lcServer
 		,@Debug = @Debug
 	
 	--
 
 	SELECT @vcCmd = '
-	SELECT @BCPFileStageRowCnt = COUNT(*) FROM CHSStaging.etl.' + @BCPFileStage + '
-	UPDATE CHSStaging.etl.' + @BCPFileStage + ' SET FileLogID = ' + CAST (@FileLogID AS VARCHAR)
+	SELECT @BCPFileStageRowCnt = COUNT(*) FROM BCPStaging.etl.' + @BCPFileStage + '
+	UPDATE BCPStaging.etl.' + @BCPFileStage + ' SET FileLogID = ' + CAST (@FileLogID AS VARCHAR)
 
 	IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImportDynamic: Update/Count BCPFileStage: ' + CHAR(13) + @vcCmd
 	IF @Debug <= 1 EXEC sp_executesql @vcCmd, N'@BCPFileStageRowCnt INT OUT', @BCPFileStageRowCnt OUT
 	IF @Debug >= 1 PRINT 'BCP Records Imported: ' + CAST(@BCPFileStageRowCnt AS VARCHAR)
 
+/*
 -- !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 -- Remove \n \r from last col
 
 	IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImport: Remove \n \r from last col'
 
-	SELECT @vcCmd = 'UPDATE CHSStaging.etl.' + @BCPFileStage + ' SET Col' + CAST(@iColCnt AS VARCHAR) + ' = REPLACE(REPLACE(Col' + CAST(@iColCnt AS VARCHAR) + ', CHAR(13), ''''), CHAR(10), '''')'
+	SELECT @vcCmd = 'UPDATE BCPStaging.etl.' + @BCPFileStage + ' SET Col' + CAST(@iColCnt AS VARCHAR) + ' = REPLACE(REPLACE(Col' + CAST(@iColCnt AS VARCHAR) + ', CHAR(13), ''''), CHAR(10), '''')'
 
 	IF @Debug >= 1
 		PRINT @vcCMd
@@ -290,7 +297,7 @@ AS
 	BEGIN
 		IF @Debug >= 1 PRINT CHAR(13) + 'spBcpFileImport: IF @bRemoveTextQuotes = 1'
 
-		SELECT @vcCmd = 'UPDATE CHSStaging.etl.' + @BCPFileStage + ' SET Col1  = REPLACE(col1,''"'','''')'
+		SELECT @vcCmd = 'UPDATE BCPStaging.etl.' + @BCPFileStage + ' SET Col1  = REPLACE(col1,''"'','''')'
 
 		SET @iCnt = 2
 
@@ -309,9 +316,6 @@ AS
 		IF @Debug <= 1
 			EXEC (@vcCMD)
 	END -- IF @bRemoveTextQuotes = 1
-
-
-
-
+*/
 
 GO

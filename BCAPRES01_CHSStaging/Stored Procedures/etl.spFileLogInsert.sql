@@ -7,9 +7,9 @@ Description:	Create an entry into FileLog
 Use:
 
 DECLARE @FileLogID INT
-EXEC CHSStaging.etl.spFileLogInsert 
+EXEC CHSStaging.etl.spFileLogInsert
 	--100000,'\\192.168.50.214\DataIntake\112556\Oxford\Monthly','SFHP_OHP_ccv_mask_2016.06.txt', NULL, NULL, @FileLogID OUTPUT
-	NULL,'\\CHS-FS01\DataIntake\000000','DNUSampleNoLoad', NULL, NULL, @FileLogID OUTPUT
+	100229,'\\fs01.imihealth.com\FileStore\McLaren\CGF','MCLAREN_LAB_MKTP_2017_3.txt', NULL, NULL, NULL, @FileLogID OUTPUT
 SELECT @FileLogID
 SELECT * FROM etl.FileLog WHERE FileLogID = @FileLogID
 
@@ -24,15 +24,20 @@ Change Log:
 2017-02-02	Michael Vlk			- Allow Manual exclusion file list logic to handle dynamic file names.
 2017-03-27	Michael Vlk			- Add DateFileStr pattern %<YYYY-MM-DD>%
 2017-03-31	Michael Vlk			- Add DateFileStr pattern %<YYYYMM>%
+2017-04-05	Michael Vlk			- Add DateFileStr pattern %<YYYY_MM>%
+2017-04-13	Michael Vlk			- Add Input Parm @FileSize
+2017-04-26	Michael Vlk			- Add FTPLogID capture / return
 ****************************************************************************************************************************************************/
 CREATE PROCEDURE [etl].[spFileLogInsert] (
 	@FileConfigID INT 
 	,@FilePathIntake VARCHAR(100)
-	,@FileNameIntake VARCHAR(100) 
+	,@FileNameIntake VARCHAR(100)
+	,@FileSize BIGINT
 	,@RowCntExp INT
 	,@RowCntFile INT
 	,@FileLogSessionID INT
 	,@FileLogID INT OUTPUT
+	,@FTPLogID INT OUTPUT
 	)
 AS
 BEGIN
@@ -45,6 +50,13 @@ BEGIN
 			@CentauriClientID INT,
 			@DateFileStr VARCHAR(255),
 			@DateFile DATETIME
+
+		-- Pull FTPLogID
+		IF @FileNameIntake LIKE '#CHS%#%'
+			BEGIN
+				SET @FTPLogID = CAST(SUBSTRING(@FileNameIntake,5,CHARINDEX('#',@FileNameIntake,5) - 5) AS INT)
+				-- SET @FileNameIntake = SUBSTRING(@FileNameIntake,CHARINDEX('#',@FileNameIntake,5) + 1, 100)
+			END
 
 		-- Get @CentauriClientID
 
@@ -71,6 +83,16 @@ BEGIN
 					THEN SUBSTRING(@FileNameIntake, PATINDEX('%[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]%', @FileNameIntake),10)
 				WHEN fc.FileNamePattern LIKE '%<YYYYMM>%' 
 					THEN SUBSTRING(@FileNameIntake, PATINDEX('%[0-9][0-9][0-9][0-9][0-9][0-9]%', @FileNameIntake),6) + '01'
+				WHEN fc.FileNamePattern LIKE '%<YYYY[_]MM>%' 
+					THEN 
+						CASE WHEN PATINDEX('%[0-9][0-9][0-9][0-9][_][0-9][0-9]%', @FileNameIntake) > 0 
+							THEN SUBSTRING(@FileNameIntake, PATINDEX('%[0-9][0-9][0-9][0-9][_][0-9]%', @FileNameIntake),4) 
+								+ SUBSTRING(@FileNameIntake, PATINDEX('%[0-9][0-9][0-9][0-9][_][0-9]%', @FileNameIntake) + 5, 2)
+								+ '01'
+						ELSE SUBSTRING(@FileNameIntake, PATINDEX('%[0-9][0-9][0-9][0-9][_][0-9]%', @FileNameIntake),4) 
+								+ '0' + SUBSTRING(@FileNameIntake, PATINDEX('%[0-9][0-9][0-9][0-9][_][0-9]%', @FileNameIntake) + 5, 1)
+								+ '01'
+						END 
 				ELSE fc.FileNamePattern
 				END
 		FROM 
@@ -86,8 +108,10 @@ BEGIN
 			FileLogSessionID
 			,FileConfigID
 			,CentauriClientID
+			,FTPLogID
 			,FilePathIntake
 			,FileNameIntake
+			,FileSize
 			,RowCntExp
 			,RowCntFile
 			,DateFile
@@ -96,8 +120,10 @@ BEGIN
 			@FileLogSessionID
 			,@FileConfigID
 			,@CentauriClientID
+			,@FTPLogID
 			,@FilePathIntake
 			,@FileNameIntake
+			,@FileSize
 			,@RowCntExp
 			,@RowCntFile
 			,@DateFile
