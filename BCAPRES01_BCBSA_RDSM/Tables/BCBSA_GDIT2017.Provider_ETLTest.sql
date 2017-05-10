@@ -40,5 +40,5 @@ CREATE TABLE [BCBSA_GDIT2017].[Provider_ETLTest]
 [OMEmail] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AsOfDate] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [SourceID] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
-) ON [PRIMARY]
+) ON [BCBSA_GDIT2017_Provider]
 GO

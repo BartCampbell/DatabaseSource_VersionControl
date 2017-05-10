@@ -156,5 +156,5 @@ CREATE TABLE [BCBSA_GDIT2017].[Claim_ETLTest]
 [SupplementalDataSource] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AuditorApprovedInd] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
 [AsOfDate] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
-) ON [PRIMARY]
+) ON [BCBSA_GDIT2017_Claim]
 GO

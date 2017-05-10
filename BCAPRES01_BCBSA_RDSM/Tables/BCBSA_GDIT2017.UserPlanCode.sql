@@ -1,0 +1,9 @@
+CREATE TABLE [BCBSA_GDIT2017].[UserPlanCode]
+(
+[UserID] [int] NOT NULL,
+[Organization] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
+[PlanCode] [varchar] (255) COLLATE SQL_Latin1_General_CP1_CI_AS NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [BCBSA_GDIT2017].[UserPlanCode] ADD CONSTRAINT [fkUserID] FOREIGN KEY ([UserID]) REFERENCES [BCBSA_GDIT2017].[Users] ([UserID])
+GO
