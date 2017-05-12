@@ -10,6 +10,7 @@ GO
 --Update 09/27/2016 Adding LoadDate to Primary Key PJ
 --Update 09/29/2016 Adding 3 fields to User PJ
 --Update adding/dropping new columns for Advance updates 02282017 PDJ
+--uPDATE 20170421 Adding new columns fro USER PDJ
 -- Description:	Data Vault User Load 
 -- =============================================
 CREATE PROCEDURE [dbo].[spDV_User_LoadSats]
@@ -200,6 +201,10 @@ AS
                   [IsBillingAccountant] ,
                   [IsManagementUser] ,
 				  [IsCoderOnsite],
+				  IsCoderOffsite,
+				  ISQACoder,
+				  IsQAManager,
+				  IsCodingManager,
                   [HashDiff] ,
                   [RecordSource]
                 )
@@ -236,6 +241,10 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsBillingAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], ''))), ':',
 																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOnsite], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOffsite], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[ISQACoder], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsQAManager], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCodingManager], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[LoadDate], '')))))), 2)) ,
                         LoadDate ,
                         UserHashKey ,
@@ -271,6 +280,10 @@ AS
                         [IsBillingAccountant] ,
                         [IsManagementUser] ,
 						[IsCoderOnsite],
+						IsCoderOffsite,
+						ISQACoder,
+						IsQAManager,
+						IsCodingManager,
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.Password, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsAdmin AS VARCHAR), ''))), ':',
@@ -303,10 +316,15 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsInvoiceAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsBillingAccountant], ''))), ':',
 																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOnsite], ''))), ':',
-                                                                       RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], '')))))), 2)) ,
+                                                                       RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOffsite], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[ISQACoder], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsQAManager], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCodingManager], '')))
+																	   ))), 2)) ,
                         RecordSource
                 FROM    CHSStaging.adv.tblUserWCStage rw WITH ( NOLOCK )
-                WHERE    UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
+                WHERE  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.Password, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsAdmin AS VARCHAR), ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsScanTech AS VARCHAR), ''))), ':',
@@ -338,12 +356,17 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsInvoiceAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsBillingAccountant], ''))), ':',
 																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOnsite], ''))), ':',
-                                                                       RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], '')))))), 2)) NOT IN (
+                                                                       RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOffsite], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[ISQACoder], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsQAManager], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCodingManager], '')))
+																	   ))), 2)) NOT IN (
                         SELECT  HashDiff
                         FROM    S_UserDetails
                         WHERE   H_User_RK = rw.UserHashKey
                                 AND RecordEndDate IS NULL )
-                        AND rw.CCI = @CCI
+							    AND rw.CCI = @CCI
                 GROUP BY  UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.CUI, ''))), ':', RTRIM(LTRIM(COALESCE(rw.Password, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsAdmin AS VARCHAR), ''))), ':',
@@ -377,6 +400,10 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsBillingAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], ''))), ':',
 																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOnsite], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOffsite], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[ISQACoder], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsQAManager], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCodingManager], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[LoadDate], '')))))), 2)) ,
                         LoadDate ,
                         UserHashKey ,
@@ -412,6 +439,10 @@ AS
                         [IsBillingAccountant] ,
                         [IsManagementUser] ,
 						[IsCoderOnsite],
+						IsCoderOffsite,
+						ISQACoder,
+						IsQAManager,
+						IsCodingManager,
                         UPPER(CONVERT(CHAR(32), HASHBYTES('MD5',
                                                           UPPER(CONCAT(RTRIM(LTRIM(COALESCE(rw.Password, ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(CAST(rw.IsAdmin AS VARCHAR), ''))), ':',
@@ -444,7 +475,12 @@ AS
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsInvoiceAccountant], ''))), ':',
                                                                        RTRIM(LTRIM(COALESCE(rw.[IsBillingAccountant], ''))), ':',
 																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOnsite], ''))), ':',
-                                                                       RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], '')))))), 2)) ,
+                                                                       RTRIM(LTRIM(COALESCE(rw.[IsManagementUser], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCoderOffsite], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[ISQACoder], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsQAManager], ''))), ':',
+																	   RTRIM(LTRIM(COALESCE(rw.[IsCodingManager], '')))
+																	   ))), 2)) ,
                         RecordSource;
 
 
