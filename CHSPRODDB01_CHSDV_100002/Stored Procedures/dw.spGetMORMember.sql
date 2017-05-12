@@ -20,7 +20,7 @@ AS
             s.LastName ,
 		  s.MiddleInitial ,
             CONVERT(VARCHAR(10),CASE s.Gender WHEN '1' THEN 'M' WHEN '2' THEN 'F' ELSE s.Gender END) AS Gender ,
-            CONVERT(INT,CONVERT(VARCHAR(10),s.DOB,112)) AS DOB,
+            YEAR(CONVERT(DATETIME,LTRIM(RTRIM(s.DOB)))) * 10000 + MONTH(CONVERT(DATETIME,LTRIM(RTRIM(s.DOB)))) * 100 + DAY(CONVERT(DATETIME,LTRIM(RTRIM(s.DOB)))) AS DOB,
 		  s.RecordSource ,
 		  c.Client_BK AS CentauriClientID ,
 		  s.LoadDate
@@ -28,7 +28,7 @@ AS
             INNER JOIN dbo.L_Member_MOR l ON l.H_Member_RK = h.H_Member_RK
 		  INNER JOIN dbo.S_MemberDemo s ON s.H_Member_RK = h.H_Member_RK
 		  CROSS JOIN dbo.H_Client c
-    WHERE   s.RecordEndDate IS NULL AND s.LoadDate > @LastLoadTime;
+    WHERE   s.RecordEndDate IS NULL  AND s.LoadDate > @LastLoadTime
 
 
 

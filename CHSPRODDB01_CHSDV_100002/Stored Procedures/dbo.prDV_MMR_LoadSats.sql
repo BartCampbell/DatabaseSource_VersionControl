@@ -36,6 +36,16 @@ AS
                                                         AND s.HashDiff = m.S_MemberHICN_HashDiff
                 WHERE   s.S_MemberHICN_RK IS NULL;
 
+	   --RECORD END DATE CLEANUP
+        UPDATE  dbo.S_MemberHICN
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.S_MemberHICN AS z
+                                    WHERE     z.H_Member_RK = a.H_Member_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.S_MemberHICN a
+        WHERE   a.RecordEndDate IS NULL;
+
 	   --LOAD MMR Detail
         INSERT  INTO dbo.S_MMRDetail
                 ( [S_MMRDetail_RK] ,
@@ -238,6 +248,17 @@ AS
                                                        AND s.RecordEndDate IS NULL
                                                        AND m.S_MMRDetail_HashDiff = s.HashDiff
                 WHERE   s.S_MMRDetail_RK IS NULL; 
+
+	   --RECORD END DATE CLEANUP
+        UPDATE  dbo.S_MMRDetail
+        SET     RecordEndDate = ( SELECT    DATEADD(ss, -1, MIN(z.LoadDate))
+                                    FROM      dbo.S_MMRDetail AS z
+                                    WHERE     z.H_MMR_RK = a.H_MMR_RK
+                                            AND z.LoadDate > a.LoadDate
+                                )
+        FROM    dbo.S_MMRDetail a
+        WHERE   a.RecordEndDate IS NULL;
+
     END;
 
     
