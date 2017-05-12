@@ -39,7 +39,11 @@ CREATE TABLE [dbo].[S_UserDetails]
 [IsInvoiceAccountant] [bit] NULL,
 [IsBillingAccountant] [bit] NULL,
 [IsManagementUser] [bit] NULL,
-[IsCoderOnsite] [bit] NULL
+[IsCoderOnsite] [bit] NULL,
+[IsCoderOffsite] [bit] NULL,
+[ISQACoder] [bit] NULL,
+[IsQAManager] [int] NULL,
+[IsCodingManager] [bit] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[S_UserDetails] ADD CONSTRAINT [PK_S_UserDetails] PRIMARY KEY CLUSTERED  ([S_UserDetails_RK]) WITH (FILLFACTOR=80) ON [PRIMARY]
