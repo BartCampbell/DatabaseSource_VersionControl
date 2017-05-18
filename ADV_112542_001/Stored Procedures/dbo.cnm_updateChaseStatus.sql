@@ -65,7 +65,7 @@ BEGIN
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK				
-		WHERE S.Channel_PK<>'+CAST(@ChaseStatus AS varchar)
+		WHERE S.ChaseStatus_PK<>'+CAST(@ChaseStatus AS varchar)
 		IF (@IDs<>'0')
 			SET @SQL = @SQL + ' AND P.ProviderOffice_PK IN ('+@IDs+')'
 	END
@@ -78,7 +78,7 @@ BEGIN
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK	
 			INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK			
-		WHERE P.Provider_PK IN ('+@IDs+') AND S.Channel_PK<>'+CAST(@ChaseStatus AS varchar)
+		WHERE P.Provider_PK IN ('+@IDs+') AND S.ChaseStatus_PK<>'+CAST(@ChaseStatus AS varchar)
 	END
 	ELSE IF (@updateType='s')
 	BEGIN
@@ -88,7 +88,7 @@ BEGIN
 		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 		INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
-		WHERE S.Suspect_PK IN ('+@IDs+') AND S.Channel_PK<>'+CAST(@ChaseStatus AS varchar)
+		WHERE S.Suspect_PK IN ('+@IDs+') AND S.ChaseStatus_PK<>'+CAST(@ChaseStatus AS varchar)
 	END
 
 	EXEC (@SQL);
@@ -102,7 +102,7 @@ BEGIN
 	DECLARE @IsOverwriteSchedule AS TinyInt 
 	DECLARE @ChartResolutionCode AS VARCHAR(200)
 	DECLARE @IsOverwriteCNA AS TinyInt = 0
-	SELECT * FROM tblChaseStatus
+
 	SELECT @IsOverwriteSchedule = CASE WHEN ProviderOfficeBucket_PK = 5 THEN 1 ELSE 0 END, @ChartResolutionCode = ChartResolutionCode, @IsNotContacted = IsNotContacted, @IsSchedulingInProgress = IsSchedulingInProgress, @IsScheduled = IsScheduled, @IsExtracted = IsExtracted, @IsCNA = IsCNA, @IsCoded = IsCoded FROM tblChaseStatus WHERE ChaseStatus_PK = @ChaseStatus
 	IF (@ChartResolutionCode='Project Change')
 		SET @IsOverwriteCNA = 1
@@ -120,6 +120,8 @@ BEGIN
 			(@IsNotContacted=1 AND CS.IsIssue=0 AND CS.IsSchedulingInProgress = 0 AND CS.IsScheduled = 0 AND CS.IsCNA = 0 AND CS.IsCoded=0 AND CS.IsExtracted=0) ----Can't overwrite Issue/Schedule/Scheduling InProgress
 		)
 
+	/*
+	--Truning Contact Log entry off as suggested https://go.centaurihs.com/browse/CCSD-4195
 	INSERT INTO tblContactNotesOffice(Project_PK, Office_PK, ContactNote_PK, ContactNoteText, LastUpdated_User_PK, LastUpdated_Date,contact_num)
 	SELECT 0, P.ProviderOffice_PK, 1 ContactNote_PK, CAST(COUNT(DISTINCT CL.Suspect_PK) AS VARCHAR)+' Chases from '+C_From.ChaseStatus+' to '+C_To.ChaseStatus ContactNoteText, @User LastUpdated_User_PK, GetDate() LastUpdated_Date,0 contac_num 
 	FROM tblProvider P WITH (NOLOCK)
@@ -128,6 +130,7 @@ BEGIN
 			INNER JOIN tblChaseStatus C_To WITH (NOLOCK) ON C_To.ChaseStatus_PK = @ChaseStatus
 			INNER JOIN tblChaseStatus C_From WITH (NOLOCK) ON C_From.ChaseStatus_PK = S.ChaseStatus_PK
 	GROUP BY P.ProviderOffice_PK,C_From.ChaseStatus, C_To.ChaseStatus
+	*/
 
 	INSERT INTO tblChaseStatusLog(Suspect_PK,From_ChaseStatus_PK,To_ChaseStatus_PK,User_PK,dtUpdate)
 	SELECT S.Suspect_PK,ChaseStatus_PK,@ChaseStatus,@User,GetDate() FROM #tmpSuspect tS INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Suspect_PK = tS.Suspect_PK

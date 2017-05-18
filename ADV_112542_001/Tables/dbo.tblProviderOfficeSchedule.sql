@@ -10,7 +10,8 @@ CREATE TABLE [dbo].[tblProviderOfficeSchedule]
 [LastUpdated_Date] [smalldatetime] NULL,
 [followup] [smallint] NULL,
 [AddInfo] [varchar] (200) COLLATE SQL_Latin1_General_CP1_CI_AS NULL,
-[sch_type] [smallint] NULL
+[sch_type] [smallint] NULL,
+[Session_PK] [tinyint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblProviderOfficeSchedule] ADD CONSTRAINT [PK_tblProviderOfficeSchedule] PRIMARY KEY CLUSTERED  ([ProviderOfficeSchedule_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]

@@ -18,12 +18,24 @@ CREATE PROCEDURE [dbo].[dc_insertCodedData]
 	@CodedData_PK BigInt,
 	@DelFlag VARCHAR(1),
 	@OpenedPage BigInt,
-	@OpenedPage_ID BigInt
+	@OpenedPage_ID BigInt,
+	@IsOtherProvider TinyInt,
+	@OtherProvider VARCHAR(100)
 AS
 BEGIN
 -----------Transaction Starts-------------------
 	DECLARE @level AS tinyint
 	SELECT @level=CoderLevel FROM tblUser WHERE User_PK=@Coded_User_PK
+	DECLARE @OtherProviderID AS BIGINT = NULL
+	IF @IsOtherProvider=1
+	BEGIN
+		SELECT @OtherProviderID=OtherProvider_PK FROM tblOtherProvider WITH (NOLOCK) WHERE Provider_Name=@OtherProvider
+		IF @OtherProviderID IS NULL
+		BEGIN
+			INSERT INTO tblOtherProvider(Provider_Name) VALUES(@OtherProvider)
+			SELECT @OtherProviderID = @@IDENTITY
+		END
+	END
 
 	RETRY1: -- Transaction RETRY
 	BEGIN TRANSACTION
@@ -51,7 +63,8 @@ BEGIN
 				Coded_User_PK=@Coded_User_PK,Updated_Date=GetDate(),
 				OpenedPage = CASE WHEN @OpenedPage=0 THEN OpenedPage ELSE @OpenedPage END,
 				ScannedData_PK = CASE WHEN @OpenedPage=0 THEN ScannedData_PK ELSE @OpenedPage_ID END,
-				CoderLevel = @level
+				CoderLevel = @level,
+				OtherProvider_PK=@OtherProviderID
 			WHERE CodedData_PK = @CodedData_PK
 
 			SET @SQL = 'DELETE FROM tblCodedDataNote WITH (ROWLOCK) WHERE CodedData_PK='+CAST(@CodedData_PK AS VARCHAR)+'; 
@@ -71,8 +84,8 @@ BEGIN
 			IF @CodedData_PK=0
 			BEGIN
 				PRINT 'INsert'
-				Insert Into tblCodedData(Suspect_PK,DiagnosisCode,DOS_From,DOS_Thru,CPT,Provider_PK,CodedSource_PK,IsICD10,Coded_User_PK,Coded_Date,Updated_Date,OpenedPage,ScannedData_PK,CoderLevel)
-				Values(@Suspect_PK,@DiagnosisCode,@DOS_From,@DOS_Thru,@CPT,@Provider_WK,@CodedSource_PK,@IsICD10,@Coded_User_PK,GetDate(),GetDate(),@OpenedPage,@OpenedPage_ID,@level)
+				Insert Into tblCodedData(Suspect_PK,DiagnosisCode,DOS_From,DOS_Thru,CPT,Provider_PK,CodedSource_PK,IsICD10,Coded_User_PK,Coded_Date,Updated_Date,OpenedPage,ScannedData_PK,CoderLevel,OtherProvider_PK)
+				Values(@Suspect_PK,@DiagnosisCode,@DOS_From,@DOS_Thru,@CPT,@Provider_WK,@CodedSource_PK,@IsICD10,@Coded_User_PK,GetDate(),GetDate(),@OpenedPage,@OpenedPage_ID,@level,@OtherProviderID)
 				
 				SELECT @CodedData_PK=@@IDENTITY 
 				

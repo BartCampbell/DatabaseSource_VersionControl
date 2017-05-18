@@ -41,7 +41,8 @@ CREATE TABLE [dbo].[tblSuspect]
 [LastContacted] [smalldatetime] NULL,
 [FollowUp] [smalldatetime] NULL,
 [ChaseStatus_PK] [int] NULL,
-[LinkedSuspect_PK] [bigint] NULL
+[LinkedSuspect_PK] [bigint] NULL,
+[Session_PK] [tinyint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblSuspect] ADD CONSTRAINT [PK_tblSuspect] PRIMARY KEY CLUSTERED  ([Suspect_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]

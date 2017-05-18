@@ -4,14 +4,14 @@ SET ANSI_NULLS ON
 GO
 --	a_ca_insertExtractedIndex @invoice, @id,	@file, @user
 CREATE PROCEDURE [dbo].[a_ca_insertExtractedIndex] 
-	@invoice tinyint,
+	@attach_type tinyint,
 	@id bigint,
 	@file varchar(50),
 	@user int
 AS
 BEGIN
 	DECLARE @ChaseStatusPK AS INT = 1
-	IF (@invoice = 0)
+	IF (@attach_type = 0) -- Chart
 	BEGIN
 -----------Transaction Starts-------------------
 			RETRY_SD: -- Transaction RETRY
@@ -72,7 +72,7 @@ BEGIN
 -----------Transaction Starts-------------------
 		END
 	END
-	ELSE
+	ELSE IF (@attach_type = 1) -- Invoice
 	BEGIN
 -----------Transaction Starts-------------------
 			RETRY_SDI: -- Transaction RETRY
@@ -91,6 +91,27 @@ BEGIN
 				BEGIN
 					WAITFOR DELAY '00:00:00.05' -- Wait for 5 ms
 					GOTO RETRY_SDI -- Go to Label RETRY
+				END
+			END CATCH
+-----------Transaction Starts-------------------
+	END
+	ELSE IF (@attach_type = 2) -- W9
+	BEGIN
+-----------Transaction Starts-------------------
+			RETRY_W9: -- Transaction RETRY
+			BEGIN TRANSACTION
+			BEGIN TRY
+				INSERT INTO tblScannedDataW9(ProviderOffice_PK,[FileName],User_PK,dtInsert,is_deleted)
+					VALUES(@id,@file,@user,GETDATE(),0)
+
+				COMMIT TRANSACTION
+			END TRY
+			BEGIN CATCH
+				ROLLBACK TRANSACTION
+				IF ERROR_NUMBER() = 1205 -- Deadlock Error Number
+				BEGIN
+					WAITFOR DELAY '00:00:00.05' -- Wait for 5 ms
+					GOTO RETRY_W9 -- Go to Label RETRY
 				END
 			END CATCH
 -----------Transaction Starts-------------------

@@ -70,8 +70,8 @@ BEGIN
 			--LEFT JOIN tblUser U ON U.User_PK = CA.User_PK
 		WHERE (
 			@search_filter=0 OR 
-			(@search_filter=101 AND IsNull(SLC.IsCompleted,0)=0 AND S.IsScanned=1) OR
-			(@search_filter=102 AND IsNull(SLC.IsCompleted,0)=0) OR
+			(@search_filter=101 AND SLC.IsCompleted IS NULL AND S.IsScanned=1) OR
+			(@search_filter=102 AND SLC.IsCompleted IS NULL) OR
 			(@search_filter=103 AND S.IsScanned=1) OR
 			(@search_filter=104 AND S.IsScanned=0) OR
 			(@search_filter=105 AND SLC.IsCompleted=0) OR
