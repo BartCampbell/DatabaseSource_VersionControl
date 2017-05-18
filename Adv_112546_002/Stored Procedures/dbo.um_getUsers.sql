@@ -29,7 +29,7 @@ BEGIN
 			,only_work_selected_hours, only_work_selected_zipcodes
 			,linked_provider_id,IsNull(linked_provider_pk,0) linked_provider_pk
 			,sch_name,sch_tel,sch_fax
-			,isScanTechSV, isSchedulerSV,IsChangePasswordOnFirstLogin,IsNull(Location_PK,0) Location_PK, isQCC, isAllowDownload, IsSchedulerManager
+			,isScanTechSV, isSchedulerSV,IsChangePasswordOnFirstLogin,IsNull(Location_PK,0) Location_PK, isQCC, isAllowDownload, isAllowUpload, IsSchedulerManager
 			,IsInvoiceAccountant, IsBillingAccountant, IsQAManager, IsCoderOnsite,IsCodingManager
 		FROM tblUser
 		WHERE Username Like @Alpha+'%'

@@ -27,7 +27,7 @@ BEGIN
 	END
 	-- PROJECT/Channel SELECTION
 
-	SELECT SUM(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN 1 ELSE 0 END) Charts,Count(DISTINCT P.Provider_PK) Providers, CASE WHEN SUM(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN 1 ELSE 0 END)=0 THEN 6 ELSE MAX(CS.ProviderOfficeBucket_PK) END ProviderOfficeBucket_PK, MIN(S.FollowUp) FollowUp, MAX(LastContacted) LastContacted
+	SELECT SUM(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN 1 ELSE 0 END) Charts,Count(DISTINCT P.Provider_PK) Providers, CASE WHEN SUM(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN 1 ELSE 0 END)=0 THEN 6 ELSE MAX(CS.ProviderOfficeBucket_PK) END ProviderOfficeBucket_PK, MIN(CASE WHEN S.IsScanned=0 AND S.IsCNA=0 THEN S.FollowUp ELSE NULL END) FollowUp, MAX(LastContacted) LastContacted
 		FROM tblProvider P WITH (NOLOCK) 
 			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
 			INNER JOIN tblChaseStatus CS WITH (NOLOCK) ON CS.ChaseStatus_PK = S.ChaseStatus_PK

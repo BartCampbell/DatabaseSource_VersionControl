@@ -77,8 +77,8 @@ BEGIN
 				AND
 				(
 					@search_filter=0
-					OR (@search_filter=101 AND S.IsScanned=1 AND IsNull(SLC.IsCompleted,0)=0)
-					OR (@search_filter=102 AND IsNull(SLC.IsCompleted,0)=0)
+					OR (@search_filter=101 AND S.IsScanned=1 AND SLC.IsCompleted IS NULL)
+					OR (@search_filter=102 AND SLC.IsCompleted IS NULL)
 					OR (@search_filter=103 AND SLC.ReceivedAdditionalPages=1)
 					OR (@search_filter IN (1,2,3,4,5,6) AND CS.CompletionStatus_PK=@search_filter)
 					)

@@ -15,7 +15,8 @@ CREATE TABLE [dbo].[tblExtractionQueueAttachLog]
 [ProviderOfficeInvoice_PK] [int] NULL,
 [dtProcessed] [smalldatetime] NULL,
 [IsCNA] [tinyint] NULL,
-[IsDuplicate] [tinyint] NULL
+[IsDuplicate] [tinyint] NULL,
+[IsW9] [bit] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblExtractionQueueAttachLog] ADD CONSTRAINT [PK_tblExtractionQueueAttachLog] PRIMARY KEY CLUSTERED  ([ExtractionQueueAttachLog_PK]) ON [PRIMARY]

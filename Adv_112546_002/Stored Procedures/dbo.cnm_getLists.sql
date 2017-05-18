@@ -10,6 +10,7 @@ BEGIN
 	SELECT Channel_PK, Channel_Name FROM tblChannel ORDER BY Channel_Name
 
 	SELECT DISTINCT CS.ChaseStatusGroup_PK, CS.ChaseStatus, MIN(CS.ChaseStatus_PK) ChaseStatus_PK,CS.ChartResolutionCode FROM tblChaseStatus CS
+	WHERE IsEditable=1
 	GROUP BY CS.ChaseStatusGroup_PK, CS.ChaseStatus, CS.ChartResolutionCode
 	ORDER BY  CS.ChaseStatus, CS.ChartResolutionCode
 END
