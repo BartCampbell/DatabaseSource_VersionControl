@@ -8,7 +8,7 @@ GO
 --		3	Scheduled
 --		4	Removed from Chase list
 -- =============================================
---	oil_getStatus 4,0,0,0,0,1
+--	oil_getStatus 0,0,0,0,0,1
 CREATE PROCEDURE [dbo].[oil_getStatus]
 	@Channel VARCHAR(1000),
 	@Projects varchar(1000),
@@ -57,7 +57,7 @@ BEGIN
 	-- PROJECT/Channel SELECTION
 	;
 	WITH Offices AS (
-	SELECT PO.ProviderOffice_PK,CASE WHEN S.FollowUp IS NULL THEN 0 ELSE 1 END AwaitingScheduler 
+	SELECT PO.ProviderOffice_PK,CASE WHEN S.FollowUp IS NULL THEN 0 ELSE 1 END AwaitingScheduler,MAX(POI.ProviderOfficeInvoiceBucket_PK) OTL_Issue 
 			FROM tblProviderOffice PO WITH (NOLOCK) 
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
 				INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Provider_PK = P.Provider_PK
@@ -65,12 +65,15 @@ BEGIN
 				INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 				INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
-	WHERE CS.ProviderOfficeBucket_PK=5 AND (PO.ProviderOfficeSubBucket_PK IS NULL OR PO.ProviderOfficeSubBucket_PK<>3)
+				LEFT JOIN tblProviderOfficeInvoice POI WITH (NOLOCK) ON POI.ProviderOffice_PK = PO.ProviderOffice_PK AND POI.ProviderOfficeInvoiceBucket_PK=9 --OLT Issue
+	WHERE CS.ProviderOfficeBucket_PK=5 AND (PO.ProviderOfficeSubBucket_PK IS NULL OR PO.ProviderOfficeSubBucket_PK<>3 OR POI.ProviderOfficeInvoiceBucket_PK IS NOT NULL)
 	GROUP BY PO.ProviderOffice_PK,CASE WHEN S.FollowUp IS NULL THEN 0 ELSE 1 END
 	Having COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END)>0
 	)
-	SELECT COUNT(1) IssueOffices, 'Pending Feedback' Bucket FROM Offices WHERE AwaitingScheduler=0
+	SELECT COUNT(1) IssueOffices, 'Pending Feedback' Bucket FROM Offices WHERE AwaitingScheduler=0 AND OTL_Issue IS NULL
+	UNION 
+	SELECT COUNT(1) IssueOffices, 'OTL Issue' Bucket FROM Offices WHERE OTL_Issue IS NOT NULL
 	UNION
-	SELECT COUNT(1) IssueOffices, 'Awaiting Scheduler' Bucket FROM Offices WHERE AwaitingScheduler=1 ORDER BY Bucket
+	SELECT COUNT(1) IssueOffices, 'Awaiting Scheduler' Bucket FROM Offices WHERE AwaitingScheduler=1 AND OTL_Issue IS NULL ORDER BY Bucket
 END
 GO

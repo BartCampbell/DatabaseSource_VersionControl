@@ -36,15 +36,48 @@ BEGIN
 		FROM
 			tblProviderOfficeInvoice POI WITH (NOLOCK)
 			INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK=POI.ProviderOffice_PK 
-			INNER JOIN tblProviderOfficeInvoiceSuspect POIS ON POIS.ProviderOfficeInvoice_PK = POI.ProviderOfficeInvoice_PK
-			INNER JOIN tblSuspect S ON S.Suspect_PK = POIS.Suspect_PK
+			INNER JOIN tblProviderOfficeInvoiceSuspect POIS WITH (NOLOCK) ON POIS.ProviderOfficeInvoice_PK = POI.ProviderOfficeInvoice_PK
+			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Suspect_PK = POIS.Suspect_PK
 			INNER JOIN #tmpProject P ON P.Project_PK = S.Project_PK
 	GROUP BY POI.ProviderOfficeInvoiceBucket_PK
 
 	SELECT POIB.Bucket,POIB.ProviderOfficeInvoiceBucket_PK,IsNull(Invoices,0) Invoices,IsNull(Charts,0) Charts
+	INTO #tmp2
 	FROM tblProviderOfficeInvoiceBucket POIB 
 			LEFT JOIN #tmp POI WITH (NOLOCK) ON POIB.ProviderOfficeInvoiceBucket_PK = POI.ProviderOfficeInvoiceBucket_PK
+			WHERE ParentProviderOfficeInvoiceBucket_PK IS NULL
 	ORDER BY POIB.sortOrder
-END
+	SELECT * FROM #tmp2
 
+	SELECT * FROM (
+		SELECT POIB.Bucket,POIB.ProviderOfficeInvoiceBucket_PK,IsNull(Invoices,0) Invoices,IsNull(Charts,0) Charts,ParentProviderOfficeInvoiceBucket_PK,sortOrder
+		FROM tblProviderOfficeInvoiceBucket POIB 
+				LEFT JOIN #tmp POI WITH (NOLOCK) ON POIB.ProviderOfficeInvoiceBucket_PK = POI.ProviderOfficeInvoiceBucket_PK
+				WHERE ParentProviderOfficeInvoiceBucket_PK IS NOT NULL
+		UNION
+		SELECT 'Non OTL Rejections' Bucket,ProviderOfficeInvoiceBucket_PK,Invoices,Charts,2 ParentProviderOfficeInvoiceBucket_PK,0 sortOrder FROM #tmp2 WHERE ProviderOfficeInvoiceBucket_PK=2
+		UNION
+		SELECT 'Awaiting Charts' Bucket,ProviderOfficeInvoiceBucket_PK, COUNT(DISTINCT ProviderOfficeInvoice_PK) Invoices,0 Charts,ParentProviderOfficeInvoiceBucket_PK,1 sortOrder FROM
+			(SELECT ProviderOfficeInvoiceBucket_PK*100+1 ProviderOfficeInvoiceBucket_PK,POI.ProviderOfficeInvoice_PK,ProviderOfficeInvoiceBucket_PK ParentProviderOfficeInvoiceBucket_PK
+			FROM
+			tblProviderOfficeInvoice POI WITH (NOLOCK)
+			INNER JOIN tblProviderOfficeInvoiceSuspect POIS WITH (NOLOCK) ON POIS.ProviderOfficeInvoice_PK = POI.ProviderOfficeInvoice_PK
+			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Suspect_PK = POIS.Suspect_PK
+			WHERE ProviderOfficeInvoiceBucket_PK IN (4,5)
+			GROUP BY ProviderOfficeInvoiceBucket_PK,POI.ProviderOfficeInvoice_PK
+			Having MIN(CASE WHEN S.IsScanned=1 OR S.IsCNA=1 THEN 1 ELSE 0 END)=0
+			) T GROUP BY ProviderOfficeInvoiceBucket_PK,ParentProviderOfficeInvoiceBucket_PK
+		UNION
+		SELECT 'All Charts Received' Bucket,ProviderOfficeInvoiceBucket_PK, COUNT(DISTINCT ProviderOfficeInvoice_PK) Invoices,0 Charts,ParentProviderOfficeInvoiceBucket_PK,2 sortOrder FROM
+			(SELECT ProviderOfficeInvoiceBucket_PK*100+2 ProviderOfficeInvoiceBucket_PK,POI.ProviderOfficeInvoice_PK,ProviderOfficeInvoiceBucket_PK ParentProviderOfficeInvoiceBucket_PK
+			FROM
+			tblProviderOfficeInvoice POI WITH (NOLOCK)
+			INNER JOIN tblProviderOfficeInvoiceSuspect POIS WITH (NOLOCK) ON POIS.ProviderOfficeInvoice_PK = POI.ProviderOfficeInvoice_PK
+			INNER JOIN tblSuspect S WITH (NOLOCK) ON S.Suspect_PK = POIS.Suspect_PK
+			WHERE ProviderOfficeInvoiceBucket_PK IN (4,5)
+			GROUP BY ProviderOfficeInvoiceBucket_PK,POI.ProviderOfficeInvoice_PK
+			Having MIN(CASE WHEN S.IsScanned=1 OR S.IsCNA=1 THEN 1 ELSE 0 END)=1
+			) T GROUP BY ProviderOfficeInvoiceBucket_PK,ParentProviderOfficeInvoiceBucket_PK
+	) T	ORDER BY sortOrder
+END
 GO

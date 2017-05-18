@@ -39,6 +39,14 @@ BEGIN
 	DELETE FROM tblProviderOfficeInvoiceSuspect WHERE ProviderOfficeInvoice_PK = @invoice
 	EXEC('INSERT INTO tblProviderOfficeInvoiceSuspect(ProviderOfficeInvoice_PK,Suspect_PK) SELECT '+@invoice+',Suspect_PK FROM tblSuspect WHERE Suspect_PK IN ('+@suspects+')')
 
+	IF (@invoice_status=9) --OTL Issue
+	BEGIN
+	SELECT * FROM tblProviderOfficeInvoiceSuspect
+		DECLARE @ChaseStatusPK tinyint = 4
+		SELECT @ChaseStatusPK=ChaseStatus_PK FROM tblChaseStatus WHERE VendorCode='P-6b'
+		Update S SET ChaseStatus_PK=@ChaseStatusPK,FollowUp=NULL FROM tblSuspect S INNER JOIN tblProviderOfficeInvoiceSuspect P WITH (NOLOCK) ON P.Suspect_PK = S.Suspect_PK WHERE P.ProviderOfficeInvoice_PK=@invoice AND S.IsCNA=0 AND S.IsCoded=0 AND IsScanned=0
+	END
+
 	DECLARE @default_note AS varchar(1000)
 	IF (@invoice_status=4)
 	BEGIN
