@@ -45,23 +45,39 @@ BEGIN
 	3-Other
 	5-Update
 	*/
-	IF (@issue_res IN (2,3))	
+	IF (@issue_res IN (2,3,10,11))	
 	BEGIN
-		UPDATE S SET FollowUp = GetDate()
+		DECLARE @OTL_ChaseStatus AS SmallINT = 0
+		SELECT @OTL_ChaseStatus = ChaseStatus_PK FROM tblChaseStatus WHERE 
+			(VendorCodeType='CIOX' AND VendorCode='Scheduled' AND @issue_res=10) -- OTL Approved
+			OR
+			(VendorCodeType='CIOX' AND VendorCode='NCA' AND @issue_res=11) -- OTL Rejected
+			
+		UPDATE S SET FollowUp = GetDate(), ChaseStatus_PK = CASE WHEN @issue_res IN (10,11) THEN @OTL_ChaseStatus ELSE S.ChaseStatus_PK END
+			,IsCNA = CASE WHEN @issue_res=11 THEN 1 ELSE 0 END
+			,CNA_Date = CASE WHEN @issue_res=11 THEN GetDate() ELSE NULL END
+			,CNA_User_PK = CASE WHEN @issue_res=11 THEN @User ELSE NULL END
 		FROM tblProvider P WITH (NOLOCK)
 			INNER JOIN tblSuspect S WITH (ROWLOCK) ON S.Provider_PK = P.Provider_PK
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN tblChaseStatus CS ON CS.ChaseStatus_PK = S.ChaseStatus_PK
-		WHERE P.ProviderOffice_PK=@Office AND S.IsScanned=0 AND S.IsCNA=0 AND CS.ProviderOfficeBucket_PK=5
+		WHERE P.ProviderOffice_PK=@Office AND S.IsCoded=0 AND S.IsScanned=0 AND S.IsCNA=0 AND CS.ProviderOfficeBucket_PK=5
 	END
 
+
 	DECLARE @ContactNote AS INT
-	SELECT @ContactNote=ContactNote_PK FROM tblContactNote WHERE (@issue_res=2 AND ContactNoteID='OILRO') OR (@issue_res=3 AND ContactNoteID='OILON') OR (@issue_res=5 AND ContactNoteID='OILU')
+	SELECT @ContactNote=ContactNote_PK FROM tblContactNote WHERE (@issue_res=2 AND ContactNoteID='OILRO') OR (@issue_res=3 AND ContactNoteID='OILON') OR (@issue_res=5 AND ContactNoteID='OILU') OR (@issue_res=10 AND ContactNoteID='OILOA') OR (@issue_res=11 AND ContactNoteID='OILOR')
 
 	INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num,followup) 
 	VALUES(0,@office,@ContactNote,@issue_res_text,@User,getdate(),0,GetDate())
-	
+
+	If (@issue_res=10) --OTL Approved
+		Update tblProviderOfficeInvoice SET ProviderOfficeInvoiceBucket_PK=10 WHERE ProviderOffice_PK=@Office AND ProviderOfficeInvoiceBucket_PK=9
+	else if (@issue_res=11) --OTL Rejected
+		Update tblProviderOfficeInvoice SET ProviderOfficeInvoiceBucket_PK=13 WHERE ProviderOffice_PK=@Office AND ProviderOfficeInvoiceBucket_PK=9
+		
+
 		
 /*
 		if (issue_res == 2 || issue_res == 3)

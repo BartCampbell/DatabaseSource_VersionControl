@@ -17,7 +17,8 @@ CREATE TABLE [dbo].[tblChaseStatus]
 [IsExtracted] [tinyint] NULL,
 [IsCNA] [tinyint] NULL,
 [IsCoded] [tinyint] NULL,
-[ProviderOfficeBucket_PK] [tinyint] NULL
+[ProviderOfficeBucket_PK] [tinyint] NULL,
+[IsEditable] [bit] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblChaseStatus] ADD CONSTRAINT [PK_tblChaseStatus] PRIMARY KEY CLUSTERED  ([ChaseStatus_PK]) ON [PRIMARY]
