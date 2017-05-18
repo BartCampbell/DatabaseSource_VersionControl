@@ -76,7 +76,7 @@ BEGIN
 		SET @SQL = @SQL + '			AND SLC_This.Suspect_PK IS NULL' --Replaced 'AND IsCoded=0' to this to Show only not coded charts by this level. 
 		SET @SQL = @SQL + '			AND CA.Suspect_PK IS NULL'
 		IF @priority<>''
-			SET @SQL = @SQL + '			S.ChartPriority='+CAST(@priority AS VARCHAR)
+			SET @SQL = @SQL + '		AND	S.ChartPriority='''+CAST(@priority AS VARCHAR)+''''
 		SET @SQL = @SQL + '			AND ('+CAST(@IsBlindCoding AS VARCHAR)+'=1 OR '+CAST(@level AS VARCHAR)+'=1 OR SLC.Suspect_PK IS NOT NULL)'
 		IF @IsHCCOnly<>0
 			SET @SQL = @SQL + '			AND MC.DiagnosisCode IS NOT NULL'

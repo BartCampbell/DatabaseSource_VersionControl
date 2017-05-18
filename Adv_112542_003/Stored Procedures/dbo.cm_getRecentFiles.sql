@@ -10,8 +10,8 @@ CREATE PROCEDURE [dbo].[cm_getRecentFiles]
 AS
 BEGIN
 		SELECT EQ.ExtractionQueue_PK,PDFname,
-			COUNT(DISTINCT CASE WHEN EQAL.Suspect_PK<>0 AND IsInvoice=0 THEN EQAL.Suspect_PK ELSE NULL END) Charts,
-			COUNT(DISTINCT CASE WHEN EQAL.Suspect_PK<>0 AND IsInvoice=1 THEN EQAL.Suspect_PK ELSE NULL END) Invoices,
+			COUNT(DISTINCT CASE WHEN EQAL.Suspect_PK<>0 AND IsW9=0 AND IsInvoice=0 THEN EQAL.Suspect_PK ELSE NULL END) Charts,
+			COUNT(DISTINCT CASE WHEN EQAL.Suspect_PK<>0 AND IsW9=0 AND IsInvoice=1 THEN EQAL.Suspect_PK ELSE NULL END) Invoices,
 			IsNull(MAX(EQAL.IsCNA),0) CNA,
 			IsNull(MAX(EQAL.IsDuplicate),0) Duplicate,
 			AssignedDate INTO #tmp FROM tblExtractionQueue EQ WITH (NOLOCK)

@@ -92,7 +92,7 @@ BEGIN
 	END
 
 
-	CREATE TABLE #tmpOffices (ProviderOffice_PK BIGINT,Providers INT, Charts Int, LastContact SmallDateTime, FollowUpDate SmallDateTime,Offices smallint,ProviderOfficeBucket_PK TinyInt)
+	CREATE TABLE #tmpOffices (ProviderOffice_PK BIGINT,Providers INT, Charts Int, LastContact SmallDateTime, FollowUpDate SmallDateTime,Offices smallint,ProviderOfficeBucket_PK TinyInt,ProviderGroup VARCHAR(100))
 	CREATE INDEX idxProviderOffice_PK ON #tmpOffices (ProviderOffice_PK)
 	;
 	WITH 
@@ -119,7 +119,7 @@ BEGIN
 		),
 		OfficeStatus AS 
 		(
-			SELECT OS.ProviderOffice_PK,OS.Providers, OS.Charts,OS.LastContact,OS.FollowUpDate,OS.Offices,OS.ProviderOfficeBucket_PK 
+			SELECT OS.ProviderOffice_PK,OS.Providers, OS.Charts,OS.LastContact,OS.FollowUpDate,OS.Offices,OS.ProviderOfficeBucket_PK,Count(DISTINCT IsNull(PM.ProviderGroup,'')) ProviderGroupCount,MAX(ProviderGroup) ProviderGroup
 			FROM OfficeStatus1 OS
 				INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK = OS.ProviderOffice_PK
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
@@ -154,8 +154,8 @@ BEGIN
 				GROUP BY OS.ProviderOffice_PK,OS.Providers, OS.Charts,OS.LastContact,OS.FollowUpDate,OS.Offices,OS.ProviderOfficeBucket_PK 	
 		)
 
-	INSERT INTO #tmpOffices(ProviderOffice_PK,Providers, Charts, LastContact, FollowUpDate,Offices,ProviderOfficeBucket_PK)
-	SELECT OS.ProviderOffice_PK,OS.Providers, OS.Charts,OS.LastContact,OS.FollowUpDate,OS.Offices,ProviderOfficeBucket_PK 
+	INSERT INTO #tmpOffices(ProviderOffice_PK,Providers, Charts, LastContact, FollowUpDate,Offices,ProviderOfficeBucket_PK,ProviderGroup)
+	SELECT OS.ProviderOffice_PK,OS.Providers, OS.Charts,OS.LastContact,OS.FollowUpDate,OS.Offices,ProviderOfficeBucket_PK,CASE WHEN OS.ProviderGroupCount=1 THEN OS.ProviderGroup ELSE 'Multiple' END 
 		FROM OfficeStatus OS WITH (NOLOCK)
 	WHERE @bucket IN (0,101,99) OR OS.ProviderOfficeBucket_PK=@bucket
 
@@ -176,6 +176,7 @@ BEGIN
 				,cPO.Charts
 				,cPO.ProviderOfficeBucket_PK OfficeStatus,cPO.FollowUpDate,cPO.LastContact
 				,POAU.Lastname+IsNull(','+POAU.Firstname,'') AssignedScheduler,POAU.User_PK
+				,ProviderGroup
 			FROM #tmpOffices cPO WITH (NOLOCK)
 				INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON cPO.ProviderOffice_PK=PO.ProviderOffice_PK 
 				LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
@@ -209,6 +210,7 @@ BEGIN
 				,POB.Bucket [Office Status],FollowUpDate [Follow Up],cPO.LastContact [Last Contact]
 				,IsNull(POAU.Lastname+IsNull(','+POAU.Firstname,''),'') AssignedScheduler
 				,PO.LocationID [Location ID],cPO.ProviderOffice_PK ID
+				,ProviderGroup
 			FROM #tmpOffices cPO WITH (NOLOCK)
 				INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON cPO.ProviderOffice_PK=PO.ProviderOffice_PK 
 				INNER JOIN tblProviderOfficeBucket POB WITH (NOLOCK) ON POB.ProviderOfficeBucket_PK=cPO.ProviderOfficeBucket_PK

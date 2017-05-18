@@ -51,7 +51,9 @@ BEGIN
 
 		,dbo.tmi_udf_GetSuspectDOSs(S.Suspect_PK) DOSs
 		,IsNull(S.IsInComp_Replied,0) IsInComp_Replied
-		,EQ.PDFname,EQAL.PageFrom,EQAL.PageTo,EQAL.dtInsert AttachDate,U.Lastname+IsNull(', '+U.Firstname,'') AttachedBy,EQAL.IsInvoice,EQAL.IsCNA,S.LinkedSuspect_PK
+		,EQ.PDFname,EQAL.PageFrom,EQAL.PageTo,EQAL.dtInsert AttachDate,U.Lastname+IsNull(', '+U.Firstname,'') AttachedBy,EQAL.IsInvoice,EQAL.IsCNA,S.LinkedSuspect_PK,EQAL.IsW9
+		,0 IsW9Scanned
+		INTO #tmp
 	FROM 
 		tblSuspect S WITH (NOLOCK)
 		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
@@ -73,5 +75,9 @@ BEGIN
 		AND (@MemberDOB IS NULL OR M.DOB = @MemberDOB)
 		AND (@ProviderID='' OR PM.Provider_ID LIKE '%'+@ProviderID+'%')
 		AND (@ProviderName='' OR PM.Lastname+IsNull(', '+PM.Firstname,'') LIKE '%'+@ProviderName+'%')
+
+	Update T SET IsW9Scanned=1 FROM #tmp T INNER JOIN tblScannedDataW9 W9 With (NOLOCK) ON W9.ProviderOffice_PK = T.ProviderOffice_PK WHERE is_deleted is null or is_deleted=0
+
+	SELECT * FROM #tmp
 END
 GO

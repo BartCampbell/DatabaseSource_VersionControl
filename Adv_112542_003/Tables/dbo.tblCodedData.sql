@@ -17,10 +17,13 @@ CREATE TABLE [dbo].[tblCodedData]
 [ScannedData_PK] [bigint] NULL,
 [CoderLevel] [tinyint] NULL,
 [BeforeQA_OpenedPage] [smallint] NULL,
-[BeforeQA_ScannedData_PK] [bigint] NULL
+[BeforeQA_ScannedData_PK] [bigint] NULL,
+[OtherProvider_PK] [bigint] NULL
 ) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_tblCodedDataSource] ON [dbo].[tblCodedData] ([CodedSource_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [idxtblCodedData_OtherProvider_PK] ON [dbo].[tblCodedData] ([OtherProvider_PK]) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_tblCodedDataProvider] ON [dbo].[tblCodedData] ([Provider_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
