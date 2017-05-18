@@ -68,7 +68,7 @@ BEGIN
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 			INNER JOIN tblProject Pr ON Pr.Project_PK = S.Project_PK
-	WHERE PO.ProviderOffice_PK = @OFFICE
+	WHERE PO.ProviderOffice_PK = @OFFICE AND Session_PK IS NULL
 	GROUP BY Pr.Project_Name,Pr.ProjectGroup
 END
 GO

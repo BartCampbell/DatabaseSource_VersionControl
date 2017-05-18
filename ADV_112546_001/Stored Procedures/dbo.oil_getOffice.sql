@@ -76,7 +76,8 @@ BEGIN
 				,COUNT(DISTINCT S.Provider_PK) Providers
 				,COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END) Charts
 				,MAX(CAST(S.LastContacted AS Date)) LastContacted
-				,CASE WHEN MAX(S.FollowUp) IS NULL THEN 'Pending Feedback' ELSE 'Awaiting Scheduler' END [Office Status]
+				,CASE WHEN MAX(POI.ProviderOfficeInvoiceBucket_PK) IS NOT NULL THEN 'OTL Issue' WHEN MAX(S.FollowUp) IS NULL THEN 'Pending Feedback' ELSE 'Awaiting Scheduler' END [Office Status]
+				,CASE WHEN Count(DISTINCT IsNull(PM.ProviderGroup,''))=1 THEN MAX(ProviderGroup) ELSE 'Multiple' END ProviderGroup
 			INTO #tbl
 			FROM tblProviderOffice PO WITH (NOLOCK) 
 				INNER JOIN tblProvider P WITH (NOLOCK) ON P.ProviderOffice_PK = PO.ProviderOffice_PK
@@ -88,10 +89,14 @@ BEGIN
 				INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
 				INNER JOIN #tmpChaseStatus FS ON FS.ChaseStatus_PK = S.ChaseStatus_PK
 				LEFT JOIN tblZipcode ZC WITH (NOLOCK) ON ZC.ZipCode_PK = PO.ZipCode_PK	
+				LEFT JOIN tblProviderOfficeInvoice POI WITH (NOLOCK) ON POI.ProviderOffice_PK = PO.ProviderOffice_PK AND POI.ProviderOfficeInvoiceBucket_PK=9 --OLT Issue
 			WHERE IsNull(PO.Address,'') Like @Alpha+'%'
 				--AND POS.OfficeIssueStatus NOT IN (66,3,5,0)
 				AND (
-						@filter_type=0 OR (@filter_type=1 AND S.FollowUp IS NULL) OR (@filter_type=2 AND S.FollowUp IS NOT NULL)
+						@filter_type=0 OR 
+						(@filter_type=1 AND S.FollowUp IS NULL AND POI.ProviderOfficeInvoiceBucket_PK IS NULL) OR 
+						(@filter_type=2 AND POI.ProviderOfficeInvoiceBucket_PK IS NOT NULL) OR  
+						(@filter_type=3 AND S.FollowUp IS NOT NULL AND POI.ProviderOfficeInvoiceBucket_PK IS NULL)
 					)
 				AND (@search_type=0 OR
 					(@search_type=101 AND PO.Address Like '%'+@search_value+'%') OR
@@ -109,7 +114,7 @@ BEGIN
 					(@search_type=303 AND M.HICNumber Like '%'+@search_value+'%') OR
 					(@search_type=304 AND S.ChaseID Like '%'+@search_value+'%')
 				)
-				AND CS.ProviderOfficeBucket_PK=5 AND (PO.ProviderOfficeSubBucket_PK IS NULL OR PO.ProviderOfficeSubBucket_PK<>3)
+				AND CS.ProviderOfficeBucket_PK=5 AND (PO.ProviderOfficeSubBucket_PK IS NULL OR PO.ProviderOfficeSubBucket_PK<>3 OR POI.ProviderOfficeInvoiceBucket_PK IS NOT NULL)
 			GROUP BY PO.ProviderOffice_PK,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode,PO.ContactPerson,PO.ContactNumber,PO.FaxNumber,PO.Email_Address,Isnull(PO.EMR_Type_PK,0)
 			HAVING COUNT(DISTINCT CASE WHEN S.IsCNA=0 AND S.IsScanned=0 THEN S.Suspect_PK ELSE NULL END)>0 OR @search_type>0
 		--)

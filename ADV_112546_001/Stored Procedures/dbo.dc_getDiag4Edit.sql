@@ -21,11 +21,11 @@ BEGIN
 			,MAX(Provider_PK) Provider_PK, MAX(Provider) Provider
 			,dbo.tmi_udf_GetChartNotes(MAX(CodedData_PK),0) Notes
 			,MAX(NoteText) NoteText
-			,MAX(OpenedPage) OpenedPage,MAX(ScannedData_PK) ScannedData_PK,MAX(V12HCC) V12HCC,MAX(V21HCC) V21HCC,MAX(V22HCC) V22HCC,MAX(RxHCC) RxHCC
+			,MAX(OpenedPage) OpenedPage,MAX(ScannedData_PK) ScannedData_PK,MAX(V12HCC) V12HCC,MAX(V21HCC) V21HCC,MAX(V22HCC) V22HCC,MAX(RxHCC) RxHCC, MAX(OtherProvider) OtherProvider
 	FROM (
 		--Diagnosis Data
 		SELECT CD.CodedData_PK,CD.DiagnosisCode,Code_Description,DOS_From,DOS_Thru,CPT,Coded_User_PK User_PK,CD.IsICD10,CD.CodedSource_PK 
-			,CD.Provider_PK, PM.Lastname+IsNull(', '+PM.Firstname,'')+' ('+PM.Provider_ID+')' Provider
+			,CD.Provider_PK, PM.Lastname+IsNull(', '+PM.Firstname,'')+' ('+PM.Provider_ID+')' Provider, OP.Provider_Name OtherProvider
 			--,dbo.tmi_udf_GetChartNotes(CD.CodedData_PK) Notes
 			,IsNull(CDNT.Note_Text,'') NoteText
 			,CD.OpenedPage, CD.ScannedData_PK,MC.V12HCC,MC.V21HCC,MC.V22HCC,MC.RxHCC
@@ -34,12 +34,13 @@ BEGIN
 			LEFT JOIN tblProvider P WITH (NOLOCK) ON P.Provider_PK = CD.Provider_PK
 			LEFT JOIN tblProviderMaster PM ON PM.ProviderMaster_PK = P.ProviderMaster_PK
 			LEFT JOIN tblCodedDataNoteText CDNT WITH (NOLOCK) ON CDNT.CodedData_PK = CD.CodedData_PK
+			LEFT JOIN tblOtherProvider OP WITH (NOLOCK) ON OP.OtherProvider_PK = CD.OtherProvider_PK 
 			WHERE CD.Suspect_PK=@Suspect AND CD.DOS_Thru = @DOS AND IsNull(CD.Is_Deleted,0)=0 AND (CD.CoderLevel = @level OR @IsBlindCoding=0)
 		UNION
 		--Claim Data for Validation
 		SELECT 
 			0 CodedData_PK,CD.DiagnosisCode,Code_Description,CD.DOS_From,CD.DOS_Thru,CD.CPT,0 User_PK,0 IsICD10,0 CodedSource_PK 
-			,CD.ProviderMaster_PK, PM.Lastname+IsNull(', '+PM.Firstname,'')+' ('+PM.Provider_ID+')' Provider
+			,CD.ProviderMaster_PK, PM.Lastname+IsNull(', '+PM.Firstname,'')+' ('+PM.Provider_ID+')' Provider,NULL OtherProvider
 			--,0 Notes	
 			,'' NoteText				
 			,0 OpenedPage,0 ScannedData_PK,MC.V12HCC,MC.V21HCC,MC.V22HCC,MC.RxHCC

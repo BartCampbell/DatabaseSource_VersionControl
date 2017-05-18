@@ -11,7 +11,8 @@ CREATE TABLE [dbo].[tblContactNotesOffice]
 [followup] [date] NULL,
 [IsResponded] [bit] NULL,
 [IsViewedByScheduler] [bit] NULL,
-[MergedProviderOffice_PK] [bigint] NULL
+[MergedProviderOffice_PK] [bigint] NULL,
+[Session_PK] [tinyint] NULL
 ) ON [PRIMARY]
 GO
 ALTER TABLE [dbo].[tblContactNotesOffice] ADD CONSTRAINT [PK_tblContactNotesOffice] PRIMARY KEY CLUSTERED  ([ContactNotesOffice_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
@@ -27,4 +28,10 @@ GO
 CREATE NONCLUSTERED INDEX [IX_tblContactNotesOffice_Office] ON [dbo].[tblContactNotesOffice] ([Office_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
 GO
 CREATE NONCLUSTERED INDEX [IX_tblContactNotesOffice_Project] ON [dbo].[tblContactNotesOffice] ([Project_PK]) WITH (FILLFACTOR=80) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [idxtblContactNotesOfficeSession] ON [dbo].[tblContactNotesOffice] ([Session_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [idxtblProviderOfficeScheduleSession] ON [dbo].[tblContactNotesOffice] ([Session_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [idxtblSuspectSession] ON [dbo].[tblContactNotesOffice] ([Session_PK]) ON [PRIMARY]
 GO
