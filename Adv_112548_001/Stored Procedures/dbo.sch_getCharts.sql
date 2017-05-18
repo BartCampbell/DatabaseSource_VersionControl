@@ -81,7 +81,7 @@ BEGIN
 
 
 
-            SET @SQL = @SQL + ' WHERE P.ProviderOffice_PK=' + CAST(@office AS VARCHAR);
+            SET @SQL = @SQL + ' WHERE S.Session_PK IS NULL AND P.ProviderOffice_PK=' + CAST(@office AS VARCHAR);
 
             if (@drill_type = 1) --Chart Rec
                 SET @SQL = @SQL + ' AND (S.IsScanned=1 OR ChartRec_Date IS NOT NULL)'

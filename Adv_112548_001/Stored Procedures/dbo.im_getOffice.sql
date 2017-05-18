@@ -28,6 +28,14 @@ Create PROCEDURE [dbo].[im_getOffice]
 	@officePK int
 AS
 BEGIN
+	DECLARE @subfilter_type AS int = @filter_type
+	if (@filter_type IN (401,402))
+		SET @filter_type = 4
+	else if (@filter_type IN (501,502))
+		SET @filter_type = 5
+	else
+		SET @subfilter_type = 0
+
 	If (@officePK>0)
 		SET @PageSize = 1000
 	-- PROJECT SELECTION
@@ -61,7 +69,7 @@ BEGIN
 			,PO.Address,ZC.City,ZC.County,ZC.State,ZC.Zipcode
 			,POIB.Bucket [Status], POIB.ProviderOfficeInvoiceBucket_PK
 			,Count(DISTINCT S.Suspect_PK) Charts
-			,POI.InvoiceVendor_PK, InvoiceAccountNumber, Check_Transaction_Number, PaymentType_PK, Inv_File,POI.AmountPaid
+			,POI.InvoiceVendor_PK, InvoiceAccountNumber, Check_Transaction_Number, PaymentType_PK, Inv_File,POI.AmountPaid			
 		INTO #tbl
 		FROM 
 			tblProviderOfficeInvoice POI WITH (NOLOCK)
@@ -89,6 +97,9 @@ BEGIN
 			,PO.Address,ZC.City,ZC.County,ZC.State,PO.ZipCode_PK,ZC.Zipcode
 			,POIB.Bucket, POIB.ProviderOfficeInvoiceBucket_PK
 			,POI.InvoiceVendor_PK, InvoiceAccountNumber, Check_Transaction_Number, PaymentType_PK, Inv_File,POI.AmountPaid
+		Having @subfilter_type=0
+			OR (MIN(CASE WHEN S.IsScanned=1 OR S.IsCNA=1 THEN 1 ELSE 0 END)=0 AND @subfilter_type IN (401,501))
+			OR (MIN(CASE WHEN S.IsScanned=1 OR S.IsCNA=1 THEN 1 ELSE 0 END)=1 AND @subfilter_type IN (402,502))
 	IF (@Page<>0) 
 	BEGIN
 		SELECT * FROM #tbl WHERE RowNumber>@PageSize*(@Page-1) AND RowNumber<=@PageSize*@Page ORDER BY RowNumber

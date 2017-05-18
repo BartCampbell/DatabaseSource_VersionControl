@@ -24,7 +24,7 @@ BEGIN
 		SELECT TOP 1 @InvoicePK=ProviderOfficeInvoice_PK FROM tblExtractionQueueAttachLog WITH (NOLOCK) WHERE IsProcessed=0 AND IsInvoice=1 AND ExtractionQueue_PK=@fileID AND PageFrom=@pgFrom AND PageTo=@pgTo
 		IF (@InvoicePK IS NULL OR @InvoicePK=0)
 		BEGIN
-			INSERT INTO tblProviderOfficeInvoice(InvoiceAmount,InvoiceNumber,InvoiceVendor_PK,ProviderOffice_PK,dtUpdate,UploadDate,Update_User_PK) VALUES(@invoiceAmount,@invoiceNumber,@invoiceVendor,@office,GETDATE(),GetDate(),@usr)
+			INSERT INTO tblProviderOfficeInvoice(InvoiceAmount,InvoiceNumber,InvoiceVendor_PK,ProviderOffice_PK,dtUpdate,UploadDate,Update_User_PK,ProviderOfficeInvoiceBucket_PK) VALUES(@invoiceAmount,@invoiceNumber,@invoiceVendor,@office,GETDATE(),GetDate(),@usr,6)
 			SELECT @InvoicePK = @@IDENTITY
 		END
 		ELSE
@@ -33,13 +33,13 @@ BEGIN
 		END
 	END
 	DECLARE @SQL AS VARCHAR(MAX)
-	SELECT TOP 0 Suspect_PK,User_PK,ExtractionQueue_PK,PageFrom,PageTo,dtInsert,IsProcessed,IsInvoice,ProviderOfficeInvoice_PK,IsCNA,IsDuplicate INTO #tmp FROM tblExtractionQueueAttachLog
+	SELECT TOP 0 Suspect_PK,User_PK,ExtractionQueue_PK,PageFrom,PageTo,dtInsert,IsProcessed,IsInvoice,IsW9,ProviderOfficeInvoice_PK,IsCNA,IsDuplicate INTO #tmp FROM tblExtractionQueueAttachLog
 	SET @SQL = ' '; 
 	IF (@dup=1) 
-		SET @SQL = @SQL + 'INSERT INTO #tmp SELECT 0 Suspect_PK,'+CAST(@usr AS VARCHAR)+','+CAST(@fileID AS VARCHAR)+','+CAST(@pgFrom AS VARCHAR)+','+CAST(@pgTo AS VARCHAR)+',getDate(),1,'+CAST(CASE WHEN @attach_type=1 THEN 1 ELSE 0 END AS VARCHAR)+','+CAST(@InvoicePK AS VARCHAR)+','+CAST(@cna AS VARCHAR)+','+CAST(@dup AS VARCHAR)+';';
+		SET @SQL = @SQL + 'INSERT INTO #tmp SELECT 0 Suspect_PK,'+CAST(@usr AS VARCHAR)+','+CAST(@fileID AS VARCHAR)+','+CAST(@pgFrom AS VARCHAR)+','+CAST(@pgTo AS VARCHAR)+',getDate(),1,'+CAST(CASE WHEN @attach_type=1 THEN 1 ELSE 0 END AS VARCHAR)+','+CAST(CASE WHEN @attach_type=3 THEN 1 ELSE 0 END AS VARCHAR)+','+CAST(@InvoicePK AS VARCHAR)+','+CAST(@cna AS VARCHAR)+','+CAST(@dup AS VARCHAR)+';';
 	ELSE 
-		SET @SQL = @SQL + 'INSERT INTO #tmp SELECT Suspect_PK,'+CAST(@usr AS VARCHAR)+','+CAST(@fileID AS VARCHAR)+','+CAST(@pgFrom AS VARCHAR)+','+CAST(@pgTo AS VARCHAR)+',getDate(),0,'+CAST(CASE WHEN @attach_type=1 THEN 1 ELSE 0 END AS VARCHAR)+','+CAST(@InvoicePK AS VARCHAR)+','+CAST(@cna AS VARCHAR)+','+CAST(@dup AS VARCHAR)+' FROM tblSuspect WITH (NOLOCK) WHERE Suspect_PK IN ('+ @suspect +');';
-	IF (@dup=0 AND @cna=0)
+		SET @SQL = @SQL + 'INSERT INTO #tmp SELECT Suspect_PK,'+CAST(@usr AS VARCHAR)+','+CAST(@fileID AS VARCHAR)+','+CAST(@pgFrom AS VARCHAR)+','+CAST(@pgTo AS VARCHAR)+',getDate(),0,'+CAST(CASE WHEN @attach_type=1 THEN 1 ELSE 0 END AS VARCHAR)+','+CAST(CASE WHEN @attach_type=3 THEN 1 ELSE 0 END AS VARCHAR)+','+CAST(@InvoicePK AS VARCHAR)+','+CAST(@cna AS VARCHAR)+','+CAST(@dup AS VARCHAR)+' FROM tblSuspect WITH (NOLOCK) WHERE Suspect_PK IN ('+ @suspect +');';
+	IF (@dup=0 AND @cna=0 AND @attach_type IN (0,1))
 	BEGIN
 		SET @SQL = @SQL + 'UPDATE tblSuspect WITH (ROWLOCK) SET '+CASE WHEN @attach_type=1 THEN 'InvoiceRec_Date' ELSE 'ChartRec_Date' END+'=GETDATE() WHERE Suspect_PK IN ('+ @suspect +');'
 	END
@@ -58,7 +58,7 @@ BEGIN
 		SET @suspect = @SuspectPK
 	END
 
-	INSERT INTO tblExtractionQueueAttachLog(Suspect_PK,User_PK,ExtractionQueue_PK,PageFrom,PageTo,dtInsert,IsProcessed,IsInvoice,ProviderOfficeInvoice_PK,IsCNA,IsDuplicate) 
+	INSERT INTO tblExtractionQueueAttachLog(Suspect_PK,User_PK,ExtractionQueue_PK,PageFrom,PageTo,dtInsert,IsProcessed,IsInvoice,IsW9,ProviderOfficeInvoice_PK,IsCNA,IsDuplicate) 
 	SELECT * FROM #tmp
 
 	SELECT @suspect;

@@ -38,6 +38,7 @@ CREATE PROCEDURE [dbo].[um_UpdateAddUser]
 	@IsChangePasswordOnFirstLogin bit,
 	@location tinyint, 
 	@IsAllowDownload bit,
+	@isAllowUpload bit,
 	@IsSchedulerManager bit,
 	@IsInvoiceAccountant bit,
 	@IsBillingAccountant bit,
@@ -89,8 +90,8 @@ BEGIN
 			
 	IF (@id=0)
 	BEGIN
-		INSERT INTO tblUser(Username,[Password],Lastname,Firstname,Email_Address,IsClient,IsAdmin,IsScanTech,IsScheduler,IsCoderOffsite,IsQACoder,IsHRA,isQCC,IsActive,only_work_selected_hours,only_work_selected_zipcodes,linked_provider_id,linked_provider_pk,sch_name,sch_tel,sch_fax,isScanTechSV,isSchedulerSV,IsChangePasswordOnFirstLogin,location_pk,isAllowDownload,IsSchedulerManager,IsInvoiceAccountant, IsBillingAccountant, IsQAManager,IsCoderOnsite,CoderLevel,IsCodingManager)
-		VALUES(@Username,@pwd,@Lastname,@Firstname,@email,@IsClient,@IsAdmin,@IsScanTech,@IsScheduler,@isCoder,@IsQACoder,@IsHRA,@isQCC,@IsActive,@only_work_selected_hours,@only_work_selected_zipcodes,@Provider_ID,@Provider_PK,@sch_name,@sch_tel,@sch_fax,@isScanTechSV,@isSchedulerSV,@IsChangePasswordOnFirstLogin,@location,@isAllowDownload,@IsSchedulerManager,@IsInvoiceAccountant, @IsBillingAccountant, @IsQAManager, @IsCoderOnsite,1,@IsCodingManager)
+		INSERT INTO tblUser(Username,[Password],Lastname,Firstname,Email_Address,IsClient,IsAdmin,IsScanTech,IsScheduler,IsCoderOffsite,IsQACoder,IsHRA,isQCC,IsActive,only_work_selected_hours,only_work_selected_zipcodes,linked_provider_id,linked_provider_pk,sch_name,sch_tel,sch_fax,isScanTechSV,isSchedulerSV,IsChangePasswordOnFirstLogin,location_pk,isAllowDownload,isAllowUpload,IsSchedulerManager,IsInvoiceAccountant, IsBillingAccountant, IsQAManager,IsCoderOnsite,CoderLevel,IsCodingManager)
+		VALUES(@Username,@pwd,@Lastname,@Firstname,@email,@IsClient,@IsAdmin,@IsScanTech,@IsScheduler,@isCoder,@IsQACoder,@IsHRA,@isQCC,@IsActive,@only_work_selected_hours,@only_work_selected_zipcodes,@Provider_ID,@Provider_PK,@sch_name,@sch_tel,@sch_fax,@isScanTechSV,@isSchedulerSV,@IsChangePasswordOnFirstLogin,@location,@isAllowDownload,@isAllowUpload,@IsSchedulerManager,@IsInvoiceAccountant, @IsBillingAccountant, @IsQAManager, @IsCoderOnsite,1,@IsCodingManager)
 		
 		SELECT @id=@@IDENTITY;
 	END
@@ -102,7 +103,7 @@ BEGIN
 			,sch_name=@sch_name,sch_tel=@sch_tel,sch_fax=@sch_fax
 			,isScanTechSV = @isScanTechSV, isSchedulerSV = @isSchedulerSV, IsSchedulerManager=@IsSchedulerManager
 			,IsChangePasswordOnFirstLogin=@IsChangePasswordOnFirstLogin
-			,location_pk = @location, isAllowDownload = @isAllowDownload
+			,location_pk = @location, isAllowDownload = @isAllowDownload,isAllowUpload=@isAllowUpload
 			,IsInvoiceAccountant=@IsInvoiceAccountant, IsBillingAccountant=@IsBillingAccountant, IsQAManager=@IsQAManager, IsCodingManager=@IsCodingManager
 			,IsCoderOnsite = @IsCoderOnsite
 			,CoderLevel = CASE WHEN CoderLevel IS NULL THEN 1 ELSE CoderLevel END
