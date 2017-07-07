@@ -1,0 +1,3 @@
+CREATE SCHEMA [INTERNAL\Submission.Team]
+AUTHORIZATION [INTERNAL\Submission.Team]
+GO

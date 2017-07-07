@@ -10,3 +10,5 @@ CREATE TABLE [dbo].[tblSessionChaseHistory]
 GO
 ALTER TABLE [dbo].[tblSessionChaseHistory] ADD CONSTRAINT [PK_tblSessionChaseHistory] PRIMARY KEY CLUSTERED  ([SessionChaseHistory_PK]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_Session_PK] ON [dbo].[tblSessionChaseHistory] ([Session_PK]) INCLUDE ([ChaseStatus_PK], [Suspect_PK]) ON [PRIMARY]
+GO

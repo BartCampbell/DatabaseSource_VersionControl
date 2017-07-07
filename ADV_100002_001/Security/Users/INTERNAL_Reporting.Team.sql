@@ -1,0 +1,6 @@
+IF NOT EXISTS (SELECT * FROM master.dbo.syslogins WHERE loginname = N'INTERNAL\Reporting.Team')
+CREATE LOGIN [INTERNAL\Reporting.Team] FROM WINDOWS
+GO
+CREATE USER [INTERNAL\Reporting.Team] FOR LOGIN [INTERNAL\Reporting.Team] WITH DEFAULT_SCHEMA=[INTERNAL\Reporting.Team]
+GO
+GRANT VIEW DEFINITION TO [INTERNAL\Reporting.Team]

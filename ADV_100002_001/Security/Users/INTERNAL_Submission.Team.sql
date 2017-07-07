@@ -1,0 +1,6 @@
+IF NOT EXISTS (SELECT * FROM master.dbo.syslogins WHERE loginname = N'INTERNAL\Submission.Team')
+CREATE LOGIN [INTERNAL\Submission.Team] FROM WINDOWS
+GO
+CREATE USER [INTERNAL\Submission.Team] FOR LOGIN [INTERNAL\Submission.Team] WITH DEFAULT_SCHEMA=[INTERNAL\Submission.Team]
+GO
+GRANT VIEW DEFINITION TO [INTERNAL\Submission.Team]

@@ -1,0 +1,6 @@
+IF NOT EXISTS (SELECT * FROM master.dbo.syslogins WHERE loginname = N'INTERNAL\Core.Platform.Team')
+CREATE LOGIN [INTERNAL\Core.Platform.Team] FROM WINDOWS
+GO
+CREATE USER [INTERNAL\Core.Platform.Team] FOR LOGIN [INTERNAL\Core.Platform.Team] WITH DEFAULT_SCHEMA=[INTERNAL\Core.Platform.Team]
+GO
+GRANT VIEW DEFINITION TO [INTERNAL\Core.Platform.Team]

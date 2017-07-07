@@ -84,7 +84,7 @@ BEGIN
 	;
 	--SELECT * FROM tblScheduleType
 	WITH SCH AS (
-		SELECT DISTINCT ProviderOffice_PK,MAX(Sch_Start) ScheduleDate,MIN(sch_type) ScheduleType_PK FROM tblProviderOfficeSchedule PO WITH (NOLOCK) GROUP BY ProviderOffice_PK
+		SELECT DISTINCT ProviderOffice_PK,MAX(Sch_Start) ScheduleDate,MIN(sch_type) ScheduleType_PK FROM tblProviderOfficeSchedule PO WITH (NOLOCK) WHERE PO.Session_PK IS NULL GROUP BY ProviderOffice_PK
 	)
 	SELECT TOP (@Records)
 		C.Channel_Name Project,PR.Project_Name LOB,

@@ -1,0 +1,3 @@
+CREATE SCHEMA [INTERNAL\Core.Platform.Team]
+AUTHORIZATION [INTERNAL\Core.Platform.Team]
+GO

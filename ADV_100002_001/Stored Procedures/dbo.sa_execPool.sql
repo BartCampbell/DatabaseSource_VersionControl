@@ -113,6 +113,8 @@ BEGIN
 		INNER JOIN tblChaseStatus CS WITH (NOLOCK) ON CS.ChaseStatus_PK = S.ChaseStatus_PK
 		INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 		INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
+		LEFT JOIN #tmpZone Z ON Z.ProviderOffice_PK = PO.ProviderOffice_PK
+	WHERE (@IsZoneRule=0 OR @Zone_PK=0 OR Z.ProviderOffice_PK IS NOT NULL)
 	GROUP BY P.ProviderOffice_PK		
 	CREATE INDEX idxElgProviderOffice_PK ON #EligibleOffices (ProviderOffice_PK)
 
@@ -120,7 +122,7 @@ BEGIN
 	FROM #EligibleOffices E WITH (ROWLOCK)
 		INNER JOIN tblProviderOffice PO WITH (NOLOCK) ON PO.ProviderOffice_PK = E.ProviderOffice_PK
 		LEFT JOIN #tmpSchedule tS ON tS.ProviderOffice_PK = E.ProviderOffice_PK
-		LEFT JOIN #tmpZone Z ON tS.ProviderOffice_PK = E.ProviderOffice_PK
+		--LEFT JOIN #tmpZone Z ON Z.ProviderOffice_PK = E.ProviderOffice_PK
 		LEFT JOIN tblPoolBucket PB ON E.ProviderOfficeBucket_PK = PB.ProviderOfficeBucket_PK AND PB.Pool_PK = @PoolPK
 		WHERE IsNull(E.RemainingCharts,0)>0
 			AND (PO.Pool_PK IS NULL OR @IsForcedAllocationAllowed=1)
@@ -128,7 +130,7 @@ BEGIN
 			AND (@IsFollowupRule=0 OR E.FollowUpDate<=GetDate())
 			AND (@IsLastScheduledRule=0 OR DATEDIFF(day,ScheduleDate,GetDate())>=@DaysSinceLastScheduled)
 			AND (@IsScheduledTypeRule=0 OR @ScheduledType=0 OR ScheduleType=@ScheduledType)
-			AND (@IsZoneRule=0 OR @Zone_PK=0 OR Z.ProviderOffice_PK IS NOT NULL)
+			--AND (@IsZoneRule=0 OR @Zone_PK=0 OR Z.ProviderOffice_PK IS NOT NULL)
 			AND (
 					@IsRemainingRule=0
 					OR (@RemainingChartsMoreOrEqual=1 AND RemainingCharts>=@RemainingCharts)

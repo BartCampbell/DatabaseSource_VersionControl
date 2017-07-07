@@ -19,7 +19,7 @@ BEGIN
 		BEGIN TRANSACTION
 		BEGIN TRY
 			INSERT INTO tblContactNotesOffice(Project_PK,Office_PK,ContactNote_PK,ContactNoteText,LastUpdated_User_PK,LastUpdated_Date,contact_num) 
-			SELECT Project_PK,ProviderOffice_PK,6,'To '+@FaxNumber,@User_PK,GETDATE(),0 FROM cacheProviderOffice WITH (NOLOCK) WHERE ProviderOffice_PK=@office
+			SELECT 0 Project_PK,ProviderOffice_PK,6,'To '+@FaxNumber,@User_PK,GETDATE(),0 FROM tblProviderOffice WITH (NOLOCK) WHERE ProviderOffice_PK=@office
 			COMMIT TRANSACTION
 		END TRY
 		BEGIN CATCH
@@ -31,7 +31,7 @@ BEGIN
 			END
 		END CATCH
 -----------Transaction Starts-------------------
-
+/*
 -----------Transaction Starts-------------------
 		RETRY2: -- Transaction RETRY
 		BEGIN TRANSACTION
@@ -49,8 +49,8 @@ BEGIN
 			END
 		END CATCH
 -----------Transaction Starts-------------------
-
+		*/
 		SELECT @ContactPerson ContactPerson, @FaxNumber FaxNumber
-END
 
+END
 GO

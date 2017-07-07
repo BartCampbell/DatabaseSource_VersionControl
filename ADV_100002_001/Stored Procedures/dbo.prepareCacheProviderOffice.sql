@@ -52,6 +52,5 @@ BEGIN
 END
 
 
-GO
-GRANT EXECUTE ON  [dbo].[prepareCacheProviderOffice] TO [INTERNAL\Paul.Johnson]
+
 GO

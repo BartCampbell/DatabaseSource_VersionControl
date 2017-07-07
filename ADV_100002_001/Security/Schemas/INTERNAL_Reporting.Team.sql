@@ -1,0 +1,3 @@
+CREATE SCHEMA [INTERNAL\Reporting.Team]
+AUTHORIZATION [INTERNAL\Reporting.Team]
+GO

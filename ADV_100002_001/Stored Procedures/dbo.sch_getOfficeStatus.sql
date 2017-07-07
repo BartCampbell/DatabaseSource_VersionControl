@@ -33,6 +33,6 @@ BEGIN
 			INNER JOIN tblChaseStatus CS WITH (NOLOCK) ON CS.ChaseStatus_PK = S.ChaseStatus_PK
 			INNER JOIN #tmpProject FP ON FP.Project_PK = S.Project_PK
 			INNER JOIN #tmpChannel FC ON FC.Channel_PK = S.Channel_PK
-		WHERE P.ProviderOffice_PK=@office	
+		WHERE P.ProviderOffice_PK=@office and S.Session_PK IS NULL
 END
 GO

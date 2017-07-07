@@ -13,3 +13,7 @@ ALTER TABLE [dbo].[tblSuspectLevelCoded] ADD CONSTRAINT [PK_tblSuspectLevelCoded
 GO
 CREATE NONCLUSTERED INDEX [idxCompletionStatusSCL] ON [dbo].[tblSuspectLevelCoded] ([CompletionStatus_PK]) ON [PRIMARY]
 GO
+CREATE NONCLUSTERED INDEX [IDX_SuspectPK] ON [dbo].[tblSuspectLevelCoded] ([Suspect_PK]) ON [PRIMARY]
+GO
+CREATE NONCLUSTERED INDEX [IDX_SuspectPK_IsCompleted] ON [dbo].[tblSuspectLevelCoded] ([Suspect_PK], [IsCompleted]) ON [PRIMARY]
+GO
